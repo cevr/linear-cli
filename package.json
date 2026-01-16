@@ -7,13 +7,11 @@
   },
   "files": [
     "src",
-    "bin",
     "tsconfig.json"
   ],
   "scripts": {
     "build": "bun build ./src/main.ts --compile --outfile bin/linear",
     "postinstall": "bun run build",
-    "prepublishOnly": "rm -rf bin",
     "test": "vitest run",
     "test:watch": "vitest",
     "link": "ln -sf $(pwd)/bin/linear ~/.local/bin/linear",
