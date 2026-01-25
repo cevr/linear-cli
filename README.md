@@ -44,24 +44,24 @@ linear team list
 
 ### Authentication
 
-| Command | Description |
-|---------|-------------|
-| `linear auth` | Authenticate with Linear (opens browser for API key) |
-| `linear auth whoami` | Show current user info |
+| Command              | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `linear auth`        | Authenticate with Linear (opens browser for API key) |
+| `linear auth whoami` | Show current user info                               |
 
 ### Issues
 
-| Command | Description |
-|---------|-------------|
-| `linear issue list` | List your assigned issues |
-| `linear issue view [id]` | View issue details (interactive picker if no ID) |
-| `linear issue start [id]` | Start working on an issue |
-| `linear issue create` | Create a new issue |
+| Command                   | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| `linear issue list`       | List your assigned issues                        |
+| `linear issue view [id]`  | View issue details (interactive picker if no ID) |
+| `linear issue start [id]` | Start working on an issue                        |
+| `linear issue create`     | Create a new issue                               |
 
 ### Teams
 
-| Command | Description |
-|---------|-------------|
+| Command            | Description    |
+| ------------------ | -------------- |
 | `linear team list` | List all teams |
 
 ## Configuration
@@ -101,6 +101,7 @@ bun run src/main.ts --help
 ## Architecture
 
 Built with:
+
 - **[Bun](https://bun.sh)**: Fast JavaScript runtime with native compilation
 - **[Effect](https://effect.website)**: TypeScript library for type-safe, composable code
 - **[@effect/cli](https://github.com/Effect-TS/effect/tree/main/packages/cli)**: CLI framework with prompts and argument parsing

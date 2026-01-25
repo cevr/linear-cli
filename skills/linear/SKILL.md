@@ -1,18 +1,23 @@
+---
+name: linear
+description: Interact with Linear issues from the command line.
+---
+
 # Linear CLI
 
 Interact with Linear issues from the command line.
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| Authenticate | `linear auth` |
-| Check current user | `linear auth whoami` |
-| List my issues | `linear issue list` |
-| View issue | `linear issue view ABC-123` |
-| Start issue | `linear issue start ABC-123` |
-| Create issue | `linear issue create` |
-| List teams | `linear team list` |
+| Task               | Command                      |
+| ------------------ | ---------------------------- |
+| Authenticate       | `linear auth`                |
+| Check current user | `linear auth whoami`         |
+| List my issues     | `linear issue list`          |
+| View issue         | `linear issue view ABC-123`  |
+| Start issue        | `linear issue start ABC-123` |
+| Create issue       | `linear issue create`        |
+| List teams         | `linear team list`           |
 
 ## Authentication
 
@@ -74,16 +79,19 @@ linear team list
 ## Configuration
 
 **Paths:**
+
 - Token: `~/.config/linear/token`
 - Global config: `~/.config/linear/config.toml`
 - Project config: `.linear.toml` in repo root
 
 **Project config example:**
+
 ```toml
 team_id = "TEAM-KEY"
 ```
 
 **Token resolution order:**
+
 1. `~/.config/linear/token`
 2. `LINEAR_API_KEY` environment variable
 3. Error prompting to run `linear auth`

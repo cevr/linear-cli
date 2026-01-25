@@ -1,7 +1,10 @@
 {
   "name": "@cvr/linear",
   "version": "0.1.0",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cevr/linear-cli.git"
+  },
   "bin": {
     "linear": "./bin/linear"
   },
@@ -9,40 +12,46 @@
     "src",
     "tsconfig.json"
   ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "bun build ./src/main.ts --compile --outfile bin/linear",
     "postinstall": "bun run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "link": "ln -sf $(pwd)/bin/linear ~/.local/bin/linear",
-    "prepare": "effect-language-service patch",
+    "lint": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "typecheck": "bunx tsc --noEmit",
+    "gate": "concurrently -n type,lint,fmt,test -c blue,yellow,magenta,green \"bun run typecheck\" \"bun run lint\" \"bun run fmt\" \"bun run test\"",
+    "prepare": "lefthook install",
     "version": "changeset version",
     "release": "changeset publish"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cevr/linear-cli.git"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
-  },
   "dependencies": {
-    "effect": "^3.12.7",
-    "@effect/cli": "^0.56.6",
-    "@effect/platform": "^0.87.0",
-    "@effect/platform-bun": "^0.87.0",
-    "@linear/sdk": "^29.0.0"
+    "@effect/cli": "^0.73.1",
+    "@effect/platform": "^0.94.2",
+    "@effect/platform-bun": "^0.87.1",
+    "@linear/sdk": "^71.0.0",
+    "effect": "^3.19.15"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.0",
-    "@effect/language-service": "^0.65.0",
+    "@effect/language-service": "^0.72.0",
     "@effect/vitest": "^0.27.0",
     "@types/bun": "latest",
+    "concurrently": "^9.2.1",
+    "lefthook": "^2.0.15",
+    "oxfmt": "^0.26.0",
+    "oxlint": "^1.41.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
   }
 }
