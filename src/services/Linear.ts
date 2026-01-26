@@ -11,7 +11,7 @@ export interface IssueFilter {
   readonly limit?: number;
 }
 
-export class LinearService extends Context.Tag("@linear/LinearService")<
+export class LinearService extends Context.Tag("@cvr/linear/services/Linear/LinearService")<
   LinearService,
   {
     readonly getViewer: Effect.Effect<
@@ -81,9 +81,10 @@ export class LinearService extends Context.Tag("@linear/LinearService")<
               client.issues({
                 first: filter.limit ?? 50,
                 filter: {
-                  team: filter.teamId ? { id: { eq: filter.teamId } } : undefined,
-                  state: filter.state ? { type: { eq: filter.state } } : undefined,
-                  assignee: filter.assigneeId ? { id: { eq: filter.assigneeId } } : undefined,
+                  team: filter.teamId !== undefined ? { id: { eq: filter.teamId } } : undefined,
+                  state: filter.state !== undefined ? { type: { eq: filter.state } } : undefined,
+                  assignee:
+                    filter.assigneeId !== undefined ? { id: { eq: filter.assigneeId } } : undefined,
                 },
               }),
             catch: (e) => LinearApiError.make({ message: String(e) }),
@@ -103,7 +104,10 @@ export class LinearService extends Context.Tag("@linear/LinearService")<
             try: () =>
               viewer.assignedIssues({
                 first: 50,
-                filter: filter?.state ? { state: { type: { eq: filter.state } } } : undefined,
+                filter:
+                  filter?.state !== undefined
+                    ? { state: { type: { eq: filter.state } } }
+                    : undefined,
               }),
             catch: (e) => LinearApiError.make({ message: String(e) }),
           });
@@ -146,7 +150,7 @@ export class LinearService extends Context.Tag("@linear/LinearService")<
               catch: (e) => LinearApiError.make({ message: String(e) }),
             });
             const issueFetch = payload.issue;
-            if (!issueFetch) {
+            if (issueFetch === undefined) {
               return yield* LinearApiError.make({ message: "Failed to create issue" });
             }
             return yield* Effect.tryPromise({
@@ -174,15 +178,16 @@ export class LinearService extends Context.Tag("@linear/LinearService")<
     issues?: readonly Issue[];
   }) =>
     Layer.succeed(LinearService, {
-      getViewer: options?.viewer
-        ? Effect.succeed(options.viewer)
-        : Effect.fail(LinearApiError.make({ message: "No viewer in test" })),
+      getViewer:
+        options?.viewer !== undefined
+          ? Effect.succeed(options.viewer)
+          : Effect.fail(LinearApiError.make({ message: "No viewer in test" })),
       getTeams: Effect.succeed(options?.teams ?? []),
       getIssues: (_filter) => Effect.succeed(options?.issues ?? []),
       getMyIssues: (_filter) => Effect.succeed(options?.issues ?? []),
       getIssue: (id) => {
         const issue = options?.issues?.find((i) => i.id === id || i.identifier === id);
-        return issue
+        return issue !== undefined
           ? Effect.succeed(issue)
           : Effect.fail(LinearApiError.make({ message: `Issue ${id} not found` }));
       },

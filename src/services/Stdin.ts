@@ -4,7 +4,7 @@ import { Context, Effect, Layer } from "effect";
  * Simple stdin reading service that works with Bun compiled binaries.
  * Uses Node's readline API which Bun supports.
  */
-export class StdinService extends Context.Tag("StdinService")<
+export class StdinService extends Context.Tag("@cvr/linear/services/Stdin/StdinService")<
   StdinService,
   {
     readonly readLine: (prompt: string) => Effect.Effect<string>;

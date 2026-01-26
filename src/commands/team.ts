@@ -18,7 +18,8 @@ export const teamListCommand = Command.make("list", {}, () =>
     for (const team of teams) {
       const key = team.key;
       const name = team.name;
-      const description = team.description ? ` - ${team.description}` : "";
+      const description =
+        team.description !== undefined && team.description !== null ? ` - ${team.description}` : "";
       yield* Console.log(`  ${key.padEnd(8)} ${name}${description}`);
     }
 

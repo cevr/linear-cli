@@ -9,7 +9,7 @@ export interface LinearConfig {
   readonly issueSort?: "manual" | "priority";
 }
 
-export class ConfigService extends Context.Tag("@linear/ConfigService")<
+export class ConfigService extends Context.Tag("@cvr/linear/services/Config/ConfigService")<
   ConfigService,
   {
     readonly getToken: Effect.Effect<string, TokenNotFoundError | ConfigError>;
@@ -46,13 +46,13 @@ export class ConfigService extends Context.Tag("@linear/ConfigService")<
           catch: () => null,
         }).pipe(Effect.option);
 
-        if (Option.isSome(fileToken) && fileToken.value.trim()) {
+        if (Option.isSome(fileToken) && fileToken.value.trim().length > 0) {
           return fileToken.value.trim();
         }
 
         // 2. Try env var
         const envToken = process.env.LINEAR_API_KEY;
-        if (envToken) {
+        if (envToken !== undefined) {
           return envToken;
         }
 
@@ -60,14 +60,15 @@ export class ConfigService extends Context.Tag("@linear/ConfigService")<
         return yield* TokenNotFoundError.default;
       }).pipe(Effect.withSpan("ConfigService.getToken"));
 
-      const saveToken = (token: string) =>
+      const saveToken = Effect.fn("ConfigService.saveToken")((token: string) =>
         Effect.gen(function* () {
           yield* ensureConfigDir;
           yield* Effect.tryPromise({
             try: () => Bun.write(tokenPath, token.trim()),
             catch: (e) => ConfigError.make({ message: `Failed to save token: ${e}` }),
           });
-        }).pipe(Effect.withSpan("ConfigService.saveToken"));
+        }),
+      );
 
       const getConfig = Effect.gen(function* () {
         // Try project config first (.linear.toml in cwd or git root)

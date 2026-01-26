@@ -8,7 +8,7 @@ import { ConfigService } from "../services/Config.js";
 
 /** Resolve LinearFetch<T> | undefined (LinearFetch is Promise-like lazy loader) */
 const resolveFetch = <T>(fetch: PromiseLike<T> | undefined): Effect.Effect<T | null> =>
-  fetch
+  fetch !== undefined
     ? Effect.tryPromise(() => Promise.resolve(fetch)).pipe(Effect.orElseSucceed(() => null))
     : Effect.succeed(null);
 
@@ -94,7 +94,7 @@ export const issueViewCommand = Command.make("view", { id: issueIdArg }, ({ id }
     yield* Console.log(`Assignee: ${assignee?.name ?? "Unassigned"}`);
     yield* Console.log(`URL:      ${issue.url}`);
 
-    if (issue.description) {
+    if (issue.description !== undefined && issue.description !== null) {
       yield* Console.log(`\nDescription:\n${issue.description}`);
     }
 
@@ -119,7 +119,7 @@ export const issueStartCommand = Command.make("start", { id: issueIdArg }, ({ id
     // Get the "Started" state for this team
     const states = yield* Effect.tryPromise({
       try: async () => {
-        if (!issueTeam) return [];
+        if (issueTeam === null) return [];
         const connection = await issueTeam.states();
         return connection.nodes;
       },
@@ -130,7 +130,7 @@ export const issueStartCommand = Command.make("start", { id: issueIdArg }, ({ id
       (s) => s.type === "started" || s.name.toLowerCase() === "in progress",
     );
 
-    if (startedState) {
+    if (startedState !== undefined) {
       yield* linear.updateIssueState(issue.id, startedState.id);
       yield* Console.log(`\nStarted: ${issue.identifier} - ${issue.title}`);
       yield* Console.log(`State changed to: ${startedState.name}`);
@@ -139,7 +139,7 @@ export const issueStartCommand = Command.make("start", { id: issueIdArg }, ({ id
     }
 
     // Show branch name for git
-    if (issue.branchName) {
+    if (issue.branchName !== undefined && issue.branchName !== null) {
       yield* Console.log(`\nBranch name: ${issue.branchName}`);
     }
 
@@ -165,9 +165,9 @@ export const issueCreateCommand = Command.make("create", {}, () =>
     // Select team (or use default from config)
     let teamId: string;
 
-    if (linearConfig.teamId) {
+    if (linearConfig.teamId !== undefined) {
       const team = teams.find((t) => t.id === linearConfig.teamId || t.key === linearConfig.teamId);
-      if (team) {
+      if (team !== undefined) {
         teamId = team.id;
         yield* Console.log(`Using team from config: ${team.name}`);
       } else {

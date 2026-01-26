@@ -61,7 +61,7 @@ export const whoamiCommand = Command.make("whoami", {}, () =>
     yield* Console.log(`  Name:  ${viewer.name}`);
     yield* Console.log(`  Email: ${viewer.email}`);
     yield* Console.log(`  Admin: ${viewer.admin ? "Yes" : "No"}`);
-    if (viewer.statusLabel) {
+    if (viewer.statusLabel !== undefined && viewer.statusLabel !== null) {
       yield* Console.log(`  Status: ${viewer.statusEmoji ?? ""} ${viewer.statusLabel}`);
     }
   }),

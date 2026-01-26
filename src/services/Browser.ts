@@ -1,7 +1,7 @@
 import { Context, Effect, Layer } from "effect";
 import { BrowserError } from "../lib/errors.js";
 
-export class BrowserService extends Context.Tag("@linear/BrowserService")<
+export class BrowserService extends Context.Tag("@cvr/linear/services/Browser/BrowserService")<
   BrowserService,
   {
     readonly open: (url: string) => Effect.Effect<void, BrowserError>;
