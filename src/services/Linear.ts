@@ -34,6 +34,8 @@ export class LinearService extends Context.Tag("@cvr/linear/services/Linear/Line
       title: string;
       teamId: string;
       description?: string;
+      parentId?: string;
+      priority?: number;
     }) => Effect.Effect<Issue, LinearApiError | TokenNotFoundError>;
   }
 >() {
@@ -137,7 +139,13 @@ export class LinearService extends Context.Tag("@cvr/linear/services/Linear/Line
       );
 
       const createIssue = Effect.fn("LinearService.createIssue")(
-        (input: { title: string; teamId: string; description?: string }) =>
+        (input: {
+          title: string;
+          teamId: string;
+          description?: string;
+          parentId?: string;
+          priority?: number;
+        }) =>
           Effect.gen(function* () {
             const client = yield* getClient;
             const payload = yield* Effect.tryPromise({
@@ -146,6 +154,8 @@ export class LinearService extends Context.Tag("@cvr/linear/services/Linear/Line
                   title: input.title,
                   teamId: input.teamId,
                   description: input.description,
+                  parentId: input.parentId,
+                  priority: input.priority,
                 }),
               catch: (e) => LinearApiError.make({ message: String(e) }),
             });
