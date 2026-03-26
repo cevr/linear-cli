@@ -25,6 +25,35 @@ const limitOption = Options.integer("limit").pipe(
   Options.withDescription("Number of issues to show"),
 );
 
+// Create options
+const titleOption = Options.text("title").pipe(
+  Options.withAlias("t"),
+  Options.withDescription("Issue title (skips interactive prompt when provided)"),
+  Options.optional,
+);
+
+const descriptionOption = Options.text("description").pipe(
+  Options.withAlias("d"),
+  Options.withDescription("Issue description (markdown)"),
+  Options.optional,
+);
+
+const teamOption = Options.text("team").pipe(
+  Options.withDescription("Team key or ID"),
+  Options.optional,
+);
+
+const parentIdOption = Options.text("parent-id").pipe(
+  Options.withDescription("Parent issue identifier (e.g. TEAM-123) to create a sub-issue"),
+  Options.optional,
+);
+
+const priorityOption = Options.integer("priority").pipe(
+  Options.withAlias("p"),
+  Options.withDescription("Priority level (0=none, 1=urgent, 2=high, 3=medium, 4=low)"),
+  Options.optional,
+);
+
 // Args
 const issueIdArg = Args.text({ name: "id" }).pipe(
   Args.withDescription("Issue ID or identifier (e.g., ABC-123)"),
@@ -148,60 +177,100 @@ export const issueStartCommand = Command.make("start", { id: issueIdArg }, ({ id
 );
 
 // linear issue create - Create a new issue
-export const issueCreateCommand = Command.make("create", {}, () =>
-  Effect.gen(function* () {
-    const linear = yield* LinearService;
-    const config = yield* ConfigService;
-    const linearConfig = yield* config.getConfig;
+export const issueCreateCommand = Command.make(
+  "create",
+  {
+    title: titleOption,
+    description: descriptionOption,
+    team: teamOption,
+    parentId: parentIdOption,
+    priority: priorityOption,
+  },
+  ({
+    title: titleOpt,
+    description: descOpt,
+    team: teamOpt,
+    parentId: parentIdOpt,
+    priority: priorityOpt,
+  }) =>
+    Effect.gen(function* () {
+      const linear = yield* LinearService;
+      const config = yield* ConfigService;
+      const linearConfig = yield* config.getConfig;
 
-    // Get teams for selection
-    const teams = yield* linear.getTeams;
+      // Get teams for selection
+      const teams = yield* linear.getTeams;
 
-    if (teams.length === 0) {
-      yield* Console.error("No teams found. Cannot create issue.");
-      return;
-    }
+      if (teams.length === 0) {
+        yield* Console.error("No teams found. Cannot create issue.");
+        return;
+      }
 
-    // Select team (or use default from config)
-    let teamId: string;
+      // Resolve team ID
+      let teamId: string;
+      const teamValue = Option.getOrUndefined(teamOpt);
 
-    if (linearConfig.teamId !== undefined) {
-      const team = teams.find((t) => t.id === linearConfig.teamId || t.key === linearConfig.teamId);
-      if (team !== undefined) {
-        teamId = team.id;
-        yield* Console.log(`Using team from config: ${team.name}`);
+      if (teamValue !== undefined) {
+        const team = teams.find((t) => t.id === teamValue || t.key === teamValue);
+        if (team !== undefined) {
+          teamId = team.id;
+        } else {
+          yield* Console.error(`Team "${teamValue}" not found.`);
+          return;
+        }
+      } else if (linearConfig.teamId !== undefined) {
+        const team = teams.find(
+          (t) => t.id === linearConfig.teamId || t.key === linearConfig.teamId,
+        );
+        if (team !== undefined) {
+          teamId = team.id;
+          yield* Console.log(`Using team from config: ${team.name}`);
+        } else {
+          teamId = yield* selectTeam(teams);
+        }
+      } else if (teams.length === 1) {
+        teamId = teams[0].id;
+        yield* Console.log(`Using team: ${teams[0].name}`);
       } else {
         teamId = yield* selectTeam(teams);
       }
-    } else if (teams.length === 1) {
-      teamId = teams[0].id;
-      yield* Console.log(`Using team: ${teams[0].name}`);
-    } else {
-      teamId = yield* selectTeam(teams);
-    }
 
-    // Prompt for title
-    const title = yield* Prompt.text({
-      message: "Issue title",
-    });
+      // Resolve title
+      const title = yield* Option.match(titleOpt, {
+        onNone: () => Prompt.text({ message: "Issue title" }),
+        onSome: (t) => Effect.succeed(t),
+      });
 
-    // Prompt for description (optional)
-    const description = yield* Prompt.text({
-      message: "Description (optional, press Enter to skip)",
-      default: "",
-    });
+      // Resolve description
+      const description = yield* Option.match(descOpt, {
+        onNone: () =>
+          Option.isSome(titleOpt)
+            ? Effect.succeed("")
+            : Prompt.text({ message: "Description (optional, press Enter to skip)", default: "" }),
+        onSome: (d) => Effect.succeed(d),
+      });
 
-    // Create the issue
-    const issue = yield* linear.createIssue({
-      title,
-      teamId,
-      description: description || undefined,
-    });
+      // Resolve parent issue ID (convert identifier like TEAM-123 to internal ID)
+      let parentId: string | undefined;
+      const parentIdValue = Option.getOrUndefined(parentIdOpt);
+      if (parentIdValue !== undefined) {
+        const parentIssue = yield* linear.getIssue(parentIdValue);
+        parentId = parentIssue.id;
+      }
 
-    yield* Console.log(`\nCreated: ${issue.identifier} - ${issue.title}`);
-    yield* Console.log(`URL: ${issue.url}`);
-    yield* Console.log("");
-  }),
+      // Create the issue
+      const issue = yield* linear.createIssue({
+        title,
+        teamId,
+        description: description || undefined,
+        parentId,
+        priority: Option.getOrUndefined(priorityOpt),
+      });
+
+      yield* Console.log(`\nCreated: ${issue.identifier} - ${issue.title}`);
+      yield* Console.log(`URL: ${issue.url}`);
+      yield* Console.log("");
+    }),
 );
 
 // Combined issue command with subcommands
