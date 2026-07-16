@@ -1,7 +1,6 @@
 import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 import { encodeJson } from "../lib/json.js";
-import { ConfigService } from "../services/Config.js";
 import { LinearService } from "../services/Linear.js";
 import { BrowserService } from "../services/Browser.js";
 import { StdinService } from "../services/Stdin.js";
@@ -16,7 +15,6 @@ const jsonOption = Flag.boolean("json").pipe(
 export const authCommand = Command.make("auth", {}, () =>
   Effect.gen(function* () {
     const browser = yield* BrowserService;
-    const config = yield* ConfigService;
     const stdin = yield* StdinService;
 
     yield* Console.log(`\nTo authenticate, you'll need a Linear API key.`);
@@ -35,20 +33,8 @@ export const authCommand = Command.make("auth", {}, () =>
     // Validate token by making an API call
     yield* Console.log("\nValidating token...");
 
-    // Save token first so LinearService can use it
-    yield* config.saveToken(token);
-
-    // Now validate with the saved token
     const linear = yield* LinearService;
-    const viewer = yield* linear.getViewer.pipe(
-      Effect.catchTag("InvalidTokenError", (e) =>
-        Effect.gen(function* () {
-          yield* Console.error(`\nError: ${e.message}`);
-          yield* Console.error("Please try again with a valid API key.");
-          return yield* Effect.die(e);
-        }),
-      ),
-    );
+    const viewer = yield* linear.authenticate(token);
 
     yield* Console.log(`\nAuthenticated as ${viewer.name} (${viewer.email})`);
   }),
@@ -67,10 +53,7 @@ export const whoamiCommand = Command.make("whoami", { json: jsonOption }, ({ jso
           name: viewer.name,
           email: viewer.email,
           admin: viewer.admin,
-          status: {
-            emoji: viewer.statusEmoji ?? undefined,
-            label: viewer.statusLabel ?? undefined,
-          },
+          status: viewer.status,
         }),
       );
       return;
@@ -80,8 +63,8 @@ export const whoamiCommand = Command.make("whoami", { json: jsonOption }, ({ jso
     yield* Console.log(`  Name:  ${viewer.name}`);
     yield* Console.log(`  Email: ${viewer.email}`);
     yield* Console.log(`  Admin: ${viewer.admin ? "Yes" : "No"}`);
-    if (viewer.statusLabel !== undefined && viewer.statusLabel !== null) {
-      yield* Console.log(`  Status: ${viewer.statusEmoji ?? ""} ${viewer.statusLabel}`);
+    if (viewer.status?.label !== undefined) {
+      yield* Console.log(`  Status: ${viewer.status.emoji ?? ""} ${viewer.status.label}`);
     }
   }),
 );

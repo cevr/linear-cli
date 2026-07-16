@@ -1,15 +1,10 @@
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli";
 import { Console, Effect, Option } from "effect";
+import type { IssueDetails } from "../domain/Linear.js";
 import { InvalidInputError, NoIssuesError } from "../lib/errors.js";
 import { encodeJson } from "../lib/json.js";
-import { LinearService, type IssueDetails } from "../services/Linear.js";
+import { LinearService } from "../services/Linear.js";
 import { ConfigService } from "../services/Config.js";
-
-/** Resolve LinearFetch<T> | undefined (LinearFetch is Promise-like lazy loader) */
-const resolveFetch = <T>(fetch: PromiseLike<T> | undefined): Effect.Effect<T | null> =>
-  fetch !== undefined
-    ? Effect.tryPromise(() => Promise.resolve(fetch)).pipe(Effect.orElseSucceed(() => null))
-    : Effect.succeed(null);
 
 // Options
 const stateOption = Flag.string("state").pipe(
@@ -96,39 +91,17 @@ export const issueListCommand = Command.make(
         return;
       }
 
-      yield* Console.log("\nYour Issues:\n");
-
       const displayed = issues.slice(0, limit);
 
       if (json) {
-        const values = yield* Effect.forEach(
-          displayed,
-          (issue) =>
-            resolveFetch(issue.state).pipe(
-              Effect.map((issueState) => ({
-                id: issue.id,
-                identifier: issue.identifier,
-                title: issue.title,
-                url: issue.url,
-                branchName: issue.branchName,
-                priority: { value: issue.priority, label: getPriorityLabel(issue.priority) },
-                state:
-                  issueState === null
-                    ? undefined
-                    : { id: issueState.id, name: issueState.name, type: issueState.type },
-              })),
-            ),
-          { concurrency: 4 },
-        );
-        yield* Console.log(encodeJson(values));
+        yield* Console.log(encodeJson(displayed));
         return;
       }
 
+      yield* Console.log("\nYour Issues:\n");
       for (const issue of displayed) {
-        const issueState = yield* resolveFetch(issue.state);
-        const stateName = issueState?.name ?? "Unknown";
-        const priority = issue.priority ?? 0;
-        const priorityIcon = getPriorityIcon(priority);
+        const stateName = issue.state?.name ?? "Unknown";
+        const priorityIcon = getPriorityIcon(issue.priority.value);
 
         yield* Console.log(
           `  ${priorityIcon} ${issue.identifier.padEnd(10)} ${stateName.padEnd(12)} ${truncate(issue.title, 50)}`,
@@ -188,35 +161,10 @@ export const issueStartCommand = Command.make("start", { id: optionalIssueIdArg 
       onSome: (selectedId) => Effect.succeed(selectedId),
     });
 
-    const issue = yield* linear.getIssue(issueId);
-    const issueTeam = yield* resolveFetch(issue.team);
-
-    // Get the "Started" state for this team
-    const states = yield* Effect.tryPromise({
-      try: async () => {
-        if (issueTeam === null) return [];
-        const connection = await issueTeam.states();
-        return connection.nodes;
-      },
-      catch: () => [],
-    });
-
-    const startedState = states.find(
-      (s) => s.type === "started" || s.name.toLowerCase() === "in progress",
-    );
-
-    if (startedState !== undefined) {
-      yield* linear.updateIssueState(issue.id, startedState.id);
-      yield* Console.log(`\nStarted: ${issue.identifier} - ${issue.title}`);
-      yield* Console.log(`State changed to: ${startedState.name}`);
-    } else {
-      yield* Console.log(`\nCould not find a "started" state for this issue's team.`);
-    }
-
-    // Show branch name for git
-    if (issue.branchName !== undefined && issue.branchName !== null) {
-      yield* Console.log(`\nBranch name: ${issue.branchName}`);
-    }
+    const started = yield* linear.startIssue(issueId);
+    yield* Console.log(`\nStarted: ${started.issue.identifier} - ${started.issue.title}`);
+    yield* Console.log(`State changed to: ${started.state.name}`);
+    yield* Console.log(`\nBranch name: ${started.branchName}`);
 
     yield* Console.log("");
   }),
@@ -356,18 +304,11 @@ const selectIssue = Effect.gen(function* () {
   }
 
   // Build choices with state info
-  const choices = yield* Effect.all(
-    allIssues.slice(0, 20).map((candidate) =>
-      Effect.gen(function* () {
-        const issueState = yield* resolveFetch(candidate.state);
-        return {
-          title: `${candidate.identifier}: ${truncate(candidate.title, 40)}`,
-          value: candidate.identifier,
-          description: issueState?.name ?? "Unknown state",
-        };
-      }),
-    ),
-  );
+  const choices = allIssues.slice(0, 20).map((candidate) => ({
+    title: `${candidate.identifier}: ${truncate(candidate.title, 40)}`,
+    value: candidate.identifier,
+    description: candidate.state?.name ?? "Unknown state",
+  }));
 
   const selected = yield* Prompt.select({
     message: "Select an issue",
@@ -457,7 +398,7 @@ const resolveTeamId = Effect.fn("IssueCommand.resolveTeamId")(function* (
 });
 
 const resolveProjectId = Effect.fn("IssueCommand.resolveProjectId")(function* (
-  projects: readonly { id: string; name: string; slugId: string }[],
+  projects: readonly { id: string; name: string; slug: string }[],
   selector: string,
 ) {
   const normalized = selector.toLowerCase();
@@ -465,7 +406,7 @@ const resolveProjectId = Effect.fn("IssueCommand.resolveProjectId")(function* (
     (project) =>
       project.id === selector ||
       project.name.toLowerCase() === normalized ||
-      project.slugId.toLowerCase() === normalized,
+      project.slug.toLowerCase() === normalized,
   );
   return selected === undefined
     ? yield* InvalidInputError.make({ message: `Unknown project: ${selector}` })
@@ -502,22 +443,5 @@ function getPriorityIcon(priority: number): string {
       return "↓"; // Low
     default:
       return "○";
-  }
-}
-
-function getPriorityLabel(priority: number): string {
-  switch (priority) {
-    case 0:
-      return "No priority";
-    case 1:
-      return "Urgent";
-    case 2:
-      return "High";
-    case 3:
-      return "Medium";
-    case 4:
-      return "Low";
-    default:
-      return "Unknown";
   }
 }

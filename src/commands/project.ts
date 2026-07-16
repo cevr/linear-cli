@@ -18,7 +18,7 @@ export const projectListCommand = Command.make("list", { json: jsonOption }, ({ 
           projects.map((project) => ({
             id: project.id,
             name: project.name,
-            slug: project.slugId,
+            slug: project.slug,
             state: project.state,
             url: project.url,
           })),

@@ -3,20 +3,11 @@ import { Command } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer } from "effect";
 import packageJson from "../package.json" with { type: "json" };
-import { auth } from "./commands/auth.js";
-import { api } from "./commands/api.js";
-import { team } from "./commands/team.js";
-import { issue } from "./commands/issue.js";
-import { project } from "./commands/project.js";
+import { linear } from "./cli.js";
 import { ConfigService } from "./services/Config.js";
 import { LinearService } from "./services/Linear.js";
 import { BrowserService } from "./services/Browser.js";
 import { StdinService } from "./services/Stdin.js";
-
-// Root command
-const linear = Command.make("linear", {}, () =>
-  Console.log("Linear CLI - Use --help to see available commands"),
-).pipe(Command.withSubcommands([auth, team, project, issue, api]));
 
 // Build the CLI runner
 const cli = Command.run(linear, { version: packageJson.version });
