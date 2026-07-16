@@ -172,6 +172,47 @@ describe("linear CLI", () => {
     ),
   );
 
+  it.effect("requires explicit authorization for raw GraphQL mutations", () =>
+    Effect.gen(function* () {
+      const called = yield* Ref.make(false);
+      const mutation = 'mutation { issueArchive(id: "TEST-1") { success } }';
+      const result = yield* runCli(["api", "graphql", "--query", mutation]).pipe(
+        Effect.provide(
+          LinearService.layerTest({
+            rawQuery: () => Ref.set(called, true).pipe(Effect.as({})),
+          }),
+        ),
+        Effect.result,
+      );
+
+      expect(result._tag).toBe("Failure");
+      expect(yield* Ref.get(called)).toBe(false);
+    }).pipe(
+      Effect.provide(ConfigService.layerTest()),
+      Effect.provide(TestConsole.layer),
+      Effect.provide(BunServicesLayer),
+    ),
+  );
+
+  it.effect("runs an explicitly authorized raw GraphQL mutation", () =>
+    Effect.gen(function* () {
+      const mutation = 'mutation { issueArchive(id: "TEST-1") { success } }';
+      yield* runCli(["api", "graphql", "--query", mutation, "--allow-mutation"]).pipe(
+        Effect.provide(
+          LinearService.layerTest({
+            rawQuery: () => Effect.succeed({ issueArchive: { success: true } }),
+          }),
+        ),
+      );
+
+      expect(yield* TestConsole.logLines).toEqual(['{"issueArchive":{"success":true}}']);
+    }).pipe(
+      Effect.provide(ConfigService.layerTest()),
+      Effect.provide(TestConsole.layer),
+      Effect.provide(BunServicesLayer),
+    ),
+  );
+
   it.effect("rejects invalid list limits before calling Linear", () =>
     Effect.gen(function* () {
       const called = yield* Ref.make(false);

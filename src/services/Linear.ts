@@ -91,12 +91,14 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
       );
 
       const getTeams = withClient((client) => client.teams()).pipe(
-        Effect.map((connection) => connection.nodes.map(toTeam)),
+        Effect.flatMap(loadAllPages),
+        Effect.map((teams) => teams.map(toTeam)),
         Effect.withSpan("LinearService.getTeams"),
       );
 
       const getProjects = withClient((client) => client.projects()).pipe(
-        Effect.map((connection) => connection.nodes.map(toProject)),
+        Effect.flatMap(loadAllPages),
+        Effect.map((projects) => projects.map(toProject)),
         Effect.withSpan("LinearService.getProjects"),
       );
 
@@ -433,5 +435,21 @@ const resolveOptionalFetch = <T>(
 ): Effect.Effect<T | undefined, LinearApiError> =>
   fetch === undefined ? Effect.succeed(undefined) : resolveLinearFetch(fetch);
 
-const loadConnection = <T>(load: () => PromiseLike<{ readonly nodes: ReadonlyArray<T> }>) =>
-  resolveLinearFetch(load()).pipe(Effect.map((connection) => connection.nodes));
+interface PaginatedConnection<T> {
+  readonly nodes: ReadonlyArray<T>;
+  readonly pageInfo: { readonly hasNextPage: boolean };
+  readonly fetchNext: () => PromiseLike<PaginatedConnection<T>>;
+}
+
+const loadAllPages = Effect.fn("LinearService.loadAllPages")(function* <T>(
+  initial: PaginatedConnection<T>,
+) {
+  let connection = initial;
+  while (connection.pageInfo.hasNextPage) {
+    connection = yield* resolveLinearFetch(connection.fetchNext());
+  }
+  return connection.nodes;
+});
+
+const loadConnection = <T>(load: () => PromiseLike<PaginatedConnection<T>>) =>
+  resolveLinearFetch(load()).pipe(Effect.flatMap(loadAllPages));

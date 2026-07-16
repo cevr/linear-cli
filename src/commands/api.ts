@@ -1,5 +1,6 @@
 import { Console, Effect, FileSystem, Option, Path, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
+import { Kind, parse } from "graphql";
 import { InvalidInputError } from "../lib/errors.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
@@ -19,9 +20,25 @@ const variablesOption = Flag.string("variables").pipe(
   Flag.withDefault("{}"),
 );
 
+const allowMutationOption = Flag.boolean("allow-mutation").pipe(
+  Flag.withDescription("Explicitly authorize a raw GraphQL mutation"),
+);
+
 const VariablesJson = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 const decodeVariables = Schema.decodeUnknownEffect(VariablesJson);
 const maximumInputLength = 1_000_000;
+
+const containsMutation = Effect.fn("ApiCommand.containsMutation")(function* (document: string) {
+  const parsed = yield* Effect.try({
+    try: () => parse(document),
+    catch: (error) =>
+      InvalidInputError.make({ message: `Invalid GraphQL document: ${String(error)}` }),
+  });
+  return parsed.definitions.some(
+    (definition) =>
+      definition.kind === Kind.OPERATION_DEFINITION && definition.operation === "mutation",
+  );
+});
 
 const readWorkspaceQueryFile = Effect.fn("ApiCommand.readWorkspaceQueryFile")(function* (
   requestedPath: string,
@@ -47,8 +64,13 @@ const readWorkspaceQueryFile = Effect.fn("ApiCommand.readWorkspaceQueryFile")(fu
 
 export const graphqlCommand = Command.make(
   "graphql",
-  { query: queryOption, queryFile: queryFileOption, variables: variablesOption },
-  ({ query, queryFile, variables }) =>
+  {
+    query: queryOption,
+    queryFile: queryFileOption,
+    variables: variablesOption,
+    allowMutation: allowMutationOption,
+  },
+  ({ query, queryFile, variables, allowMutation }) =>
     Effect.gen(function* () {
       if (Option.isSome(query) && Option.isSome(queryFile)) {
         return yield* InvalidInputError.make({
@@ -84,6 +106,12 @@ export const graphqlCommand = Command.make(
           message: `--variables cannot exceed ${maximumInputLength} characters`,
         });
       }
+      if ((yield* containsMutation(document)) && !allowMutation) {
+        return yield* InvalidInputError.make({
+          message:
+            "Raw GraphQL mutations require explicit authorization with --allow-mutation. Preview and inspect the document before retrying.",
+        });
+      }
       const parsedVariables = yield* decodeVariables(variables).pipe(
         Effect.mapError((error) =>
           InvalidInputError.make({ message: `--variables must be a JSON object: ${error}` }),
@@ -103,6 +131,10 @@ export const graphqlCommand = Command.make(
     {
       command: "linear api graphql --query-file query.graphql --variables '{}'",
       description: "Run a GraphQL query from a file with variables",
+    },
+    {
+      command: "linear api graphql --query-file mutation.graphql --allow-mutation",
+      description: "Explicitly authorize a raw GraphQL mutation",
     },
   ]),
 );

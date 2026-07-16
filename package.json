@@ -37,6 +37,7 @@
     "@effect/platform-bun": "4.0.0-beta.98",
     "@linear/sdk": "^88.2.0",
     "effect": "4.0.0-beta.98",
+    "graphql": "^17.0.2",
     "toml": "^5.0.0"
   },
   "devDependencies": {

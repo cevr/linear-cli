@@ -16,8 +16,10 @@ Use the `linear` CLI for Linear work. It owns authentication, stable JSON output
 4. Treat issue identifiers and Linear issue URLs as equivalent inputs.
 5. Do not mutate Linear unless the user explicitly requested the mutation.
 6. For supported mutations, run `--dry-run` first, validate the result, then run the same command without `--dry-run`.
-7. Use `linear api graphql` only when no typed command can express the operation. For GraphQL mutations, the user's request itself must explicitly authorize the write.
+7. Use `linear api graphql` only when no typed command can express the operation. For GraphQL mutations, the user's request itself must explicitly authorize the write and the command must include `--allow-mutation`.
 8. Trust exit codes: nonzero means the operation failed. Do not infer success from partial stdout.
+9. Prompts are opt-in. Pass `--interactive` only when a human is present; otherwise provide every required input.
+10. Keep `--query-file` inside the current workspace. The CLI rejects traversal and symlinks that escape it.
 
 If `/linear` is invoked without an issue or task, run `linear issue list --json` and summarize the available work.
 
@@ -57,17 +59,18 @@ Use the returned `branchName`; do not invent a branch name from the title.
 ### Start work
 
 ```bash
-linear issue start BITE-123
+linear issue start BITE-123 --dry-run
+linear issue start BITE-123 --json
 ```
 
-This moves the issue to the team's started state and returns the Linear branch name. It does not create or check out a Git branch.
+The dry run resolves the issue and target state without updating Linear. The real command moves the issue to the team's started state and returns the Linear branch name. It does not create or check out a Git branch.
 
 ### Create an issue
 
 Interactive:
 
 ```bash
-linear issue create
+linear issue create --interactive
 ```
 
 Non-interactive agent flow:
@@ -116,10 +119,12 @@ linear api graphql \
 For multiline documents, keep the query in a file:
 
 ```bash
-linear api graphql --query-file /path/to/query.graphql --variables '{"id":"BITE-123"}'
+linear api graphql --query-file .linear/issue-query.graphql --variables '{"id":"BITE-123"}'
 ```
 
-The command uses the configured credential and emits only the GraphQL `data` object as JSON. Keep variables separate from the query. Prefer one bulk GraphQL operation over shell loops when migrating a large issue tree.
+The query file must resolve inside the current workspace. The command uses the configured credential and emits only the GraphQL `data` object as JSON. Keep variables separate from the query. Prefer one bulk GraphQL operation over shell loops when migrating a large issue tree.
+
+Raw GraphQL mutations are rejected unless `--allow-mutation` is present. Add that flag only after verifying that the user explicitly authorized the write and inspecting the complete mutation document and variables.
 
 ## Authentication and configuration
 

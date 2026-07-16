@@ -28,7 +28,8 @@ linear auth whoami
 linear issue list
 
 # Start working on an issue
-linear issue start ABC-123
+linear issue start ABC-123 --dry-run
+linear issue start ABC-123 --json
 
 # View issue details
 linear issue view ABC-123
@@ -39,8 +40,8 @@ linear issue view ABC-123 ABC-124 --json
 # Include comments, sub-issues, and relations
 linear issue view ABC-123 --comments --children --relations --json
 
-# Create a new issue
-linear issue create
+# Create a new issue with prompts
+linear issue create --interactive
 
 # Non-interactive creation with validation
 linear issue create --team ABC --title "Title" --project "Tech Debt" --dry-run
@@ -63,13 +64,13 @@ linear team list
 
 ### Issues
 
-| Command                   | Description                                      |
-| ------------------------- | ------------------------------------------------ |
-| `linear issue list`       | List your assigned issues                        |
-| `linear issue view [id]`  | View issue details (interactive picker if no ID) |
-| `linear issue start [id]` | Start working on an issue                        |
-| `linear issue create`     | Create a new issue                               |
-| `linear issue comment ID` | Add a comment, with `--dry-run` support          |
+| Command                   | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| `linear issue list`       | List your assigned issues                           |
+| `linear issue view [id]`  | View issue details; prompts require `--interactive` |
+| `linear issue start [id]` | Start work, with `--dry-run` and `--json` support   |
+| `linear issue create`     | Create a new issue                                  |
+| `linear issue comment ID` | Add a comment, with `--dry-run` support             |
 
 ### Teams
 
@@ -90,7 +91,10 @@ linear team list
 - `issue view --json` always returns an array and accepts multiple identifiers or Linear issue URLs.
 - Use `--comments`, `--children`, and `--relations` only when that context is needed.
 - Run supported mutations with `--dry-run` before executing them.
+- Prompts are opt-in with `--interactive`; missing agent inputs fail fast.
 - Prefer typed commands. Use `linear api graphql` only for operations the typed CLI cannot express.
+- Keep `--query-file` paths inside the current workspace; traversal and escaping symlinks are rejected.
+- Raw GraphQL mutations require the explicit `--allow-mutation` flag.
 - Never read or interpolate the token directly; the CLI owns authentication.
 
 ## Configuration
