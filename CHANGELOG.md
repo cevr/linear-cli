@@ -1,5 +1,11 @@
 # @cvr/linear
 
+## 0.4.0
+
+### Minor Changes
+
+- [`fc24f55`](https://github.com/cevr/linear-cli/commit/fc24f55512075288b27833310b70ffd166262330) Thanks [@cevr](https://github.com/cevr)! - Harden agent workflows with explicit interactive mode, dry-run issue starts, validated issue selectors, workspace-confined GraphQL files, and complete command help examples.
+
 ## 0.3.0
 
 ### Minor Changes
