@@ -1,6 +1,7 @@
 import { Console, Effect, FileSystem, Option, Path, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
-import { Kind, parse } from "graphql";
+import { Kind } from "graphql/language/kinds.js";
+import { parse } from "graphql/language/parser.js";
 import { InvalidInputError } from "../lib/errors.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
