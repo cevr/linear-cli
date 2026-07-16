@@ -1,6 +1,6 @@
 import { LinearClient } from "@linear/sdk";
 import type { Issue, IssueRelation as SdkIssueRelation, User } from "@linear/sdk";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Redacted } from "effect";
 import type {
   CreateIssueInput,
   CreatedIssue,
@@ -21,7 +21,7 @@ import { ConfigService } from "./Config.js";
 type LinearError = ConfigError | InvalidTokenError | LinearApiError | TokenNotFoundError;
 
 interface LinearOperations {
-  readonly authenticate: (token: string) => Effect.Effect<Viewer, LinearError>;
+  readonly authenticate: (token: Redacted.Redacted<string>) => Effect.Effect<Viewer, LinearError>;
   readonly getViewer: Effect.Effect<Viewer, LinearError>;
   readonly getTeams: Effect.Effect<readonly Team[], LinearError>;
   readonly getProjects: Effect.Effect<readonly Project[], LinearError>;
@@ -53,7 +53,9 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
     Effect.gen(function* () {
       const config = yield* ConfigService;
       const getClient = yield* Effect.cached(
-        config.getToken.pipe(Effect.map((token) => new LinearClient({ apiKey: token }))),
+        config.getToken.pipe(
+          Effect.map((token) => new LinearClient({ apiKey: Redacted.value(token) })),
+        ),
       );
 
       const withClient = <A>(
@@ -68,8 +70,10 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
           ),
         );
 
-      const authenticate = Effect.fn("LinearService.authenticate")(function* (token: string) {
-        const client = new LinearClient({ apiKey: token });
+      const authenticate = Effect.fn("LinearService.authenticate")(function* (
+        token: Redacted.Redacted<string>,
+      ) {
+        const client = new LinearClient({ apiKey: Redacted.value(token) });
         const viewer = yield* Effect.tryPromise({
           try: () => client.viewer,
           catch: toLinearError,
@@ -309,7 +313,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
             Effect.succeed({
               id: "viewer",
               name: "Test User",
-              email: `${token}@example.com`,
+              email: `${Redacted.value(token)}@example.com`,
               admin: false,
             }),
           getViewer: Effect.succeed({

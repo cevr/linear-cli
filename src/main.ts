@@ -6,8 +6,6 @@ import packageJson from "../package.json" with { type: "json" };
 import { linear } from "./cli.js";
 import { ConfigService } from "./services/Config.js";
 import { LinearService } from "./services/Linear.js";
-import { BrowserService } from "./services/Browser.js";
-import { StdinService } from "./services/Stdin.js";
 
 // Build the CLI runner
 const cli = Command.run(linear, { version: packageJson.version });
@@ -16,12 +14,8 @@ const cli = Command.run(linear, { version: packageJson.version });
 // - BunServices provides FileSystem, Path, Terminal, Stdio, and child processes
 // - ConfigService depends on FileSystem, Path
 // - LinearService depends on ConfigService
-// - BrowserService is standalone
-
 // Build layers with dependencies
-const MainLayer = StdinService.layer.pipe(
-  Layer.provideMerge(BrowserService.layer),
-  Layer.provideMerge(LinearService.layer),
+const MainLayer = LinearService.layer.pipe(
   Layer.provideMerge(ConfigService.layer),
   Layer.provideMerge(BunServices.layer),
 );

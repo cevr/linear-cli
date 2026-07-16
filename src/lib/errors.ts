@@ -9,10 +9,6 @@ export class LinearApiError extends Schema.TaggedErrorClass<LinearApiError>()("L
   code: Schema.optional(Schema.String),
 }) {}
 
-export class BrowserError extends Schema.TaggedErrorClass<BrowserError>()("BrowserError", {
-  message: Schema.String,
-}) {}
-
 export class TokenNotFoundError extends Schema.TaggedErrorClass<TokenNotFoundError>()(
   "TokenNotFoundError",
   {
@@ -47,7 +43,6 @@ export class InvalidInputError extends Schema.TaggedErrorClass<InvalidInputError
 export const AppError = Schema.Union([
   ConfigError,
   LinearApiError,
-  BrowserError,
   TokenNotFoundError,
   InvalidTokenError,
   NoIssuesError,
