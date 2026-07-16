@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
     "noImplicitOverride": true,
     "skipLibCheck": true,
@@ -14,16 +18,20 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "types": ["bun-types"],
+    "rootDir": ".",
+    "types": ["bun"],
     "plugins": [
       {
         "name": "@effect/language-service",
         "diagnostics": true,
         "diagnosticsName": true,
+        "includeSuggestionsInTsc": true,
+        "ignoreEffectSuggestionsInTscExitCode": false,
+        "ignoreEffectWarningsInTscExitCode": false,
+        "ignoreEffectErrorsInTscExitCode": false,
         "diagnosticSeverity": {
           "anyUnknownInErrorContext": "error",
-          "deterministicKeys": "warning",
+          "deterministicKeys": "error",
           "importFromBarrel": "warning",
           "instanceOfSchema": "warning",
           "missedPipeableOpportunity": "suggestion",
@@ -60,10 +68,20 @@
             "pattern": "default",
             "skipLeadingPath": ["src/"]
           }
+        ],
+        "overrides": [
+          {
+            "include": ["**/tests/**/*.ts", "**/*.test.ts"],
+            "options": {
+              "diagnosticSeverity": {
+                "strictEffectProvide": "off"
+              }
+            }
+          }
         ]
       }
     ]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "bin"]
 }

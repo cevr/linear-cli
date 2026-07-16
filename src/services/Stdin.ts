@@ -1,33 +1,26 @@
-import { Context, Effect, Layer } from "effect";
+import { Console, Context, Effect, Layer, Terminal } from "effect";
 
 /**
  * Simple stdin reading service that works with Bun compiled binaries.
  * Uses Node's readline API which Bun supports.
  */
-export class StdinService extends Context.Tag("@cvr/linear/services/Stdin/StdinService")<
+export class StdinService extends Context.Service<
   StdinService,
   {
-    readonly readLine: (prompt: string) => Effect.Effect<string>;
+    readonly readLine: (prompt: string) => Effect.Effect<string, Terminal.QuitError>;
   }
->() {
-  static readonly layer = Layer.succeed(StdinService, {
-    readLine: (prompt) =>
-      Effect.async<string>((resume) => {
-        // Use Node's readline API (Bun compatible)
-        const readline = require("node:readline");
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-        });
+>()("@cvr/linear/services/Stdin/StdinService") {
+  static readonly layer = Layer.effect(
+    StdinService,
+    Effect.gen(function* () {
+      const terminal = yield* Terminal.Terminal;
+      return StdinService.of({
+        readLine: (prompt) => Console.log(prompt).pipe(Effect.andThen(terminal.readLine)),
+      });
+    }),
+  );
 
-        rl.question(prompt, (answer: string) => {
-          rl.close();
-          resume(Effect.succeed(answer));
-        });
-      }),
-  });
-
-  static readonly testLayer = (input: string) =>
+  static readonly layerTest = (input: string) =>
     Layer.succeed(StdinService, {
       readLine: (_prompt) => Effect.succeed(input),
     });

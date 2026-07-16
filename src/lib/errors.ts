@@ -1,19 +1,19 @@
 import { Schema } from "effect";
 
-export class ConfigError extends Schema.TaggedError<ConfigError>()("ConfigError", {
+export class ConfigError extends Schema.TaggedErrorClass<ConfigError>()("ConfigError", {
   message: Schema.String,
 }) {}
 
-export class LinearApiError extends Schema.TaggedError<LinearApiError>()("LinearApiError", {
+export class LinearApiError extends Schema.TaggedErrorClass<LinearApiError>()("LinearApiError", {
   message: Schema.String,
   code: Schema.optional(Schema.String),
 }) {}
 
-export class BrowserError extends Schema.TaggedError<BrowserError>()("BrowserError", {
+export class BrowserError extends Schema.TaggedErrorClass<BrowserError>()("BrowserError", {
   message: Schema.String,
 }) {}
 
-export class TokenNotFoundError extends Schema.TaggedError<TokenNotFoundError>()(
+export class TokenNotFoundError extends Schema.TaggedErrorClass<TokenNotFoundError>()(
   "TokenNotFoundError",
   {
     message: Schema.String,
@@ -24,25 +24,33 @@ export class TokenNotFoundError extends Schema.TaggedError<TokenNotFoundError>()
   });
 }
 
-export class InvalidTokenError extends Schema.TaggedError<InvalidTokenError>()(
+export class InvalidTokenError extends Schema.TaggedErrorClass<InvalidTokenError>()(
   "InvalidTokenError",
   {
     message: Schema.String,
   },
 ) {}
 
-export class NoIssuesError extends Schema.TaggedError<NoIssuesError>()("NoIssuesError", {
+export class NoIssuesError extends Schema.TaggedErrorClass<NoIssuesError>()("NoIssuesError", {
   message: Schema.String,
 }) {
   static readonly default = NoIssuesError.make({ message: "No issues found to select from." });
 }
 
-export const AppError = Schema.Union(
+export class InvalidInputError extends Schema.TaggedErrorClass<InvalidInputError>()(
+  "InvalidInputError",
+  {
+    message: Schema.String,
+  },
+) {}
+
+export const AppError = Schema.Union([
   ConfigError,
   LinearApiError,
   BrowserError,
   TokenNotFoundError,
   InvalidTokenError,
   NoIssuesError,
-);
+  InvalidInputError,
+]);
 export type AppError = typeof AppError.Type;

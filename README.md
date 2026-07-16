@@ -33,8 +33,20 @@ linear issue start ABC-123
 # View issue details
 linear issue view ABC-123
 
+# Read one or many issues as JSON
+linear issue view ABC-123 ABC-124 --json
+
+# Include comments, sub-issues, and relations
+linear issue view ABC-123 --comments --children --relations --json
+
 # Create a new issue
 linear issue create
+
+# Non-interactive creation with validation
+linear issue create --team ABC --title "Title" --project "Tech Debt" --dry-run
+
+# List projects
+linear project list --json
 
 # List teams
 linear team list
@@ -57,12 +69,29 @@ linear team list
 | `linear issue view [id]`  | View issue details (interactive picker if no ID) |
 | `linear issue start [id]` | Start working on an issue                        |
 | `linear issue create`     | Create a new issue                               |
+| `linear issue comment ID` | Add a comment, with `--dry-run` support          |
 
 ### Teams
 
 | Command            | Description    |
 | ------------------ | -------------- |
 | `linear team list` | List all teams |
+
+### Projects and GraphQL
+
+| Command                      | Description                                     |
+| ---------------------------- | ----------------------------------------------- |
+| `linear project list --json` | List projects with stable machine-readable data |
+| `linear api graphql`         | Authenticated GraphQL escape hatch              |
+
+## Agent usage
+
+- Add `--json` to reads; commands return stable JSON and meaningful exit codes.
+- `issue view --json` always returns an array and accepts multiple identifiers or Linear issue URLs.
+- Use `--comments`, `--children`, and `--relations` only when that context is needed.
+- Run supported mutations with `--dry-run` before executing them.
+- Prefer typed commands. Use `linear api graphql` only for operations the typed CLI cannot express.
+- Never read or interpolate the token directly; the CLI owns authentication.
 
 ## Configuration
 
@@ -104,7 +133,7 @@ Built with:
 
 - **[Bun](https://bun.sh)**: Fast JavaScript runtime with native compilation
 - **[Effect](https://effect.website)**: TypeScript library for type-safe, composable code
-- **[@effect/cli](https://github.com/Effect-TS/effect/tree/main/packages/cli)**: CLI framework with prompts and argument parsing
+- **[Effect CLI](https://github.com/Effect-TS/effect/tree/main/packages/effect/src/unstable/cli)**: CLI framework with prompts and argument parsing
 - **[@linear/sdk](https://github.com/linear/linear)**: Official Linear GraphQL SDK
 
 ## Credits

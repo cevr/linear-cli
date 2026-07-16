@@ -1,5 +1,4 @@
-import { Context, Effect, Layer, Option } from "effect";
-import { FileSystem, Path } from "@effect/platform";
+import { Config, Context, Effect, FileSystem, Layer, Option, Path } from "effect";
 import { ConfigError, TokenNotFoundError } from "../lib/errors.js";
 
 // Config structure for .linear.toml
@@ -9,21 +8,22 @@ export interface LinearConfig {
   readonly issueSort?: "manual" | "priority";
 }
 
-export class ConfigService extends Context.Tag("@cvr/linear/services/Config/ConfigService")<
+export class ConfigService extends Context.Service<
   ConfigService,
   {
     readonly getToken: Effect.Effect<string, TokenNotFoundError | ConfigError>;
     readonly saveToken: (token: string) => Effect.Effect<void, ConfigError>;
     readonly getConfig: Effect.Effect<LinearConfig, ConfigError>;
   }
->() {
+>()("@cvr/linear/services/Config/ConfigService") {
   static readonly layer = Layer.effect(
     ConfigService,
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
-      const homeDir = process.env.HOME ?? "";
+      const homeDir = yield* Config.string("HOME").pipe(Config.withDefault(""));
+      const envToken = yield* Config.string("LINEAR_API_KEY").pipe(Config.option);
       const configDir = path.join(homeDir, ".config", "linear");
       const tokenPath = path.join(configDir, "token");
       const configPath = path.join(configDir, "config.toml");
@@ -34,8 +34,8 @@ export class ConfigService extends Context.Tag("@cvr/linear/services/Config/Conf
           yield* fs.makeDirectory(configDir, { recursive: true });
         }
       }).pipe(
-        Effect.catchAll((e) =>
-          ConfigError.make({ message: `Failed to create config directory: ${e}` }),
+        Effect.catch((e) =>
+          Effect.fail(ConfigError.make({ message: `Failed to create config directory: ${e}` })),
         ),
       );
 
@@ -51,9 +51,8 @@ export class ConfigService extends Context.Tag("@cvr/linear/services/Config/Conf
         }
 
         // 2. Try env var
-        const envToken = process.env.LINEAR_API_KEY;
-        if (envToken !== undefined) {
-          return envToken;
+        if (Option.isSome(envToken)) {
+          return envToken.value;
         }
 
         // 3. Error
@@ -90,7 +89,7 @@ export class ConfigService extends Context.Tag("@cvr/linear/services/Config/Conf
     }),
   );
 
-  static readonly testLayer = (options?: { token?: string; config?: LinearConfig }) =>
+  static readonly layerTest = (options?: { token?: string; config?: LinearConfig }) =>
     Layer.succeed(ConfigService, {
       getToken:
         options?.token != null
@@ -124,7 +123,7 @@ const loadTomlConfig = Effect.fn("ConfigService.loadTomlConfig")((filePath: stri
           .trim()
           .replace(/^["']|["']$/g, "");
 
-        switch (key.trim()) {
+        switch (key?.trim()) {
           case "team_id":
             teamId = value;
             break;

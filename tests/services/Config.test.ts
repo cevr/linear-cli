@@ -9,18 +9,18 @@ describe("ConfigService", () => {
         const config = yield* ConfigService;
         const token = yield* config.getToken;
         expect(token).toBe("test-token-123");
-      }).pipe(Effect.provide(ConfigService.testLayer({ token: "test-token-123" }))),
+      }).pipe(Effect.provide(ConfigService.layerTest({ token: "test-token-123" }))),
     );
 
     it.effect("fails with TokenNotFoundError when no token", () =>
       Effect.gen(function* () {
         const config = yield* ConfigService;
-        const result = yield* config.getToken.pipe(Effect.either);
-        expect(result._tag).toBe("Left");
-        if (result._tag === "Left") {
-          expect(result.left._tag).toBe("TokenNotFoundError");
+        const result = yield* config.getToken.pipe(Effect.result);
+        expect(result._tag).toBe("Failure");
+        if (result._tag === "Failure") {
+          expect(result.failure._tag).toBe("TokenNotFoundError");
         }
-      }).pipe(Effect.provide(ConfigService.testLayer())),
+      }).pipe(Effect.provide(ConfigService.layerTest())),
     );
   });
 
@@ -30,7 +30,7 @@ describe("ConfigService", () => {
         const config = yield* ConfigService;
         const linearConfig = yield* config.getConfig;
         expect(linearConfig).toEqual({});
-      }).pipe(Effect.provide(ConfigService.testLayer())),
+      }).pipe(Effect.provide(ConfigService.layerTest())),
     );
 
     it.effect("returns provided config", () =>
@@ -38,7 +38,7 @@ describe("ConfigService", () => {
         const config = yield* ConfigService;
         const linearConfig = yield* config.getConfig;
         expect(linearConfig.teamId).toBe("team-123");
-      }).pipe(Effect.provide(ConfigService.testLayer({ config: { teamId: "team-123" } }))),
+      }).pipe(Effect.provide(ConfigService.layerTest({ config: { teamId: "team-123" } }))),
     );
   });
 });

@@ -1,12 +1,12 @@
 import { Context, Effect, Layer } from "effect";
 import { BrowserError } from "../lib/errors.js";
 
-export class BrowserService extends Context.Tag("@cvr/linear/services/Browser/BrowserService")<
+export class BrowserService extends Context.Service<
   BrowserService,
   {
     readonly open: (url: string) => Effect.Effect<void, BrowserError>;
   }
->() {
+>()("@cvr/linear/services/Browser/BrowserService") {
   // macOS-only implementation using `open` command
   static readonly layer = Layer.succeed(BrowserService, {
     open: (url) =>
@@ -17,7 +17,7 @@ export class BrowserService extends Context.Tag("@cvr/linear/services/Browser/Br
   });
 
   // No-op layer for testing
-  static readonly testLayer = Layer.succeed(BrowserService, {
+  static readonly layerTest = Layer.succeed(BrowserService, {
     open: (_url) => Effect.void,
   });
 }

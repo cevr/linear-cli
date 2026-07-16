@@ -1,11 +1,16 @@
-import { Command } from "@effect/cli";
+import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
+import { encodeJson } from "../lib/json.js";
 import { ConfigService } from "../services/Config.js";
 import { LinearService } from "../services/Linear.js";
 import { BrowserService } from "../services/Browser.js";
 import { StdinService } from "../services/Stdin.js";
 
 const LINEAR_API_KEY_URL = "https://linear.app/settings/account/security";
+
+const jsonOption = Flag.boolean("json").pipe(
+  Flag.withDescription("Emit stable JSON for scripts and agents"),
+);
 
 // linear auth - Interactive authentication flow
 export const authCommand = Command.make("auth", {}, () =>
@@ -21,9 +26,7 @@ export const authCommand = Command.make("auth", {}, () =>
     yield* browser
       .open(LINEAR_API_KEY_URL)
       .pipe(
-        Effect.catchAll(() =>
-          Console.log(`Could not open browser. Please visit the URL manually.`),
-        ),
+        Effect.catch(() => Console.log(`Could not open browser. Please visit the URL manually.`)),
       );
 
     // Simple prompt using readline
@@ -52,10 +55,26 @@ export const authCommand = Command.make("auth", {}, () =>
 );
 
 // linear auth whoami - Show current user
-export const whoamiCommand = Command.make("whoami", {}, () =>
+export const whoamiCommand = Command.make("whoami", { json: jsonOption }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
     const viewer = yield* linear.getViewer;
+
+    if (json) {
+      yield* Console.log(
+        encodeJson({
+          id: viewer.id,
+          name: viewer.name,
+          email: viewer.email,
+          admin: viewer.admin,
+          status: {
+            emoji: viewer.statusEmoji ?? undefined,
+            label: viewer.statusLabel ?? undefined,
+          },
+        }),
+      );
+      return;
+    }
 
     yield* Console.log(`\nLogged in as:`);
     yield* Console.log(`  Name:  ${viewer.name}`);
