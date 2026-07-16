@@ -1,7 +1,9 @@
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli";
 import { Console, Effect, Option } from "effect";
 import type { IssueDetails } from "../domain/Linear.js";
+import { parseIssueSelector, validateText } from "../domain/Input.js";
 import { InvalidInputError, NoIssuesError } from "../lib/errors.js";
+import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 import { ConfigService } from "../services/Config.js";
@@ -17,10 +19,6 @@ const limitOption = Flag.integer("limit").pipe(
   Flag.withAlias("n"),
   Flag.withDefault(20),
   Flag.withDescription("Number of issues to show"),
-);
-
-const jsonOption = Flag.boolean("json").pipe(
-  Flag.withDescription("Emit stable JSON for scripts and agents"),
 );
 
 const commentsOption = Flag.boolean("comments").pipe(
@@ -67,6 +65,10 @@ const dryRunOption = Flag.boolean("dry-run").pipe(
   Flag.withDescription("Validate and print the mutation without writing"),
 );
 
+const interactiveOption = Flag.boolean("interactive").pipe(
+  Flag.withDescription("Allow prompts when required input is missing"),
+);
+
 const bodyOption = Flag.string("body").pipe(Flag.withDescription("Comment body in Markdown"));
 
 // Args
@@ -78,13 +80,18 @@ const issueIdsArg = Argument.string("id").pipe(
 // linear issue list - List issues
 export const issueListCommand = Command.make(
   "list",
-  { state: stateOption, limit: limitOption, json: jsonOption },
+  { state: stateOption, limit: limitOption, json: jsonFlag },
   ({ state, limit, json }) =>
     Effect.gen(function* () {
-      const linear = yield* LinearService;
+      if (limit < 1 || limit > 250) {
+        return yield* InvalidInputError.make({
+          message: "--limit must be between 1 and 250. Example: linear issue list --limit 20",
+        });
+      }
 
+      const linear = yield* LinearService;
       const stateFilter = Option.getOrUndefined(state);
-      const issues = yield* linear.getMyIssues({ state: stateFilter });
+      const issues = yield* linear.getMyIssues({ state: stateFilter, limit });
 
       if (issues.length === 0) {
         yield* Console.log(json ? "[]" : "No issues found.");
@@ -114,6 +121,15 @@ export const issueListCommand = Command.make(
 
       yield* Console.log("");
     }),
+).pipe(
+  Command.withDescription("List issues assigned to the authenticated user"),
+  Command.withExamples([
+    { command: "linear issue list --json", description: "List assigned issues as JSON" },
+    {
+      command: "linear issue list --state started --limit 10 --json",
+      description: "List up to ten started issues",
+    },
+  ]),
 );
 
 // linear issue view [id] - View issue details
@@ -121,15 +137,25 @@ export const issueViewCommand = Command.make(
   "view",
   {
     ids: issueIdsArg,
-    json: jsonOption,
+    json: jsonFlag,
+    interactive: interactiveOption,
     comments: commentsOption,
     children: childrenOption,
     relations: relationsOption,
   },
-  ({ ids, json, comments, children, relations }) =>
+  ({ ids, json, interactive, comments, children, relations }) =>
     Effect.gen(function* () {
+      if (ids.length === 0 && !interactive) {
+        return yield* InvalidInputError.make({
+          message:
+            "Issue identifier required in non-interactive mode. Usage: linear issue view ISSUE-123 --json",
+        });
+      }
+      const selectedIds = yield* Effect.forEach(
+        ids.length === 0 ? [yield* selectIssue] : ids,
+        parseIssueSelector,
+      );
       const linear = yield* LinearService;
-      const selectedIds = ids.length === 0 ? [yield* selectIssue] : ids;
       const details = yield* Effect.forEach(
         selectedIds,
         (id) => linear.getIssueDetails(id, { comments, children, relations }),
@@ -143,6 +169,16 @@ export const issueViewCommand = Command.make(
 
       yield* Effect.forEach(details, renderIssueDetails, { discard: true });
     }),
+).pipe(
+  Command.withDescription("Read one or more issues"),
+  Command.withExamples([
+    { command: "linear issue view ENG-123 --json", description: "Read one issue as JSON" },
+    {
+      command: "linear issue view ENG-123 ENG-124 --comments --json",
+      description: "Read several issues with comments",
+    },
+    { command: "linear issue view --interactive", description: "Choose an issue interactively" },
+  ]),
 );
 
 // linear issue start [id] - Start working on an issue
@@ -151,23 +187,63 @@ const optionalIssueIdArg = Argument.string("id").pipe(
   Argument.optional,
 );
 
-export const issueStartCommand = Command.make("start", { id: optionalIssueIdArg }, ({ id }) =>
-  Effect.gen(function* () {
-    const linear = yield* LinearService;
+export const issueStartCommand = Command.make(
+  "start",
+  {
+    id: optionalIssueIdArg,
+    dryRun: dryRunOption,
+    json: jsonFlag,
+    interactive: interactiveOption,
+  },
+  ({ id, dryRun, json, interactive }) =>
+    Effect.gen(function* () {
+      const selectedIssue = yield* Option.match(id, {
+        onNone: () =>
+          interactive
+            ? selectIssue
+            : InvalidInputError.make({
+                message:
+                  "Issue identifier required in non-interactive mode. Usage: linear issue start ISSUE-123 --dry-run",
+              }),
+        onSome: Effect.succeed,
+      });
+      const issueId = yield* parseIssueSelector(selectedIssue);
 
-    // If no ID provided, prompt for selection
-    const issueId = yield* Option.match(id, {
-      onNone: () => selectIssue,
-      onSome: (selectedId) => Effect.succeed(selectedId),
-    });
+      const linear = yield* LinearService;
+      const started = yield* linear.startIssue(issueId, { dryRun });
+      if (dryRun) {
+        yield* Console.log(
+          encodeJson({
+            dryRun: true,
+            operation: "issue.start",
+            input: { id: issueId },
+            result: started,
+          }),
+        );
+        return;
+      }
+      if (json) {
+        yield* Console.log(encodeJson(started));
+        return;
+      }
 
-    const started = yield* linear.startIssue(issueId);
-    yield* Console.log(`\nStarted: ${started.issue.identifier} - ${started.issue.title}`);
-    yield* Console.log(`State changed to: ${started.state.name}`);
-    yield* Console.log(`\nBranch name: ${started.branchName}`);
-
-    yield* Console.log("");
-  }),
+      yield* Console.log(`\nStarted: ${started.issue.identifier} - ${started.issue.title}`);
+      yield* Console.log(`State changed to: ${started.state.name}`);
+      yield* Console.log(`\nBranch name: ${started.branchName}`);
+      yield* Console.log("");
+    }),
+).pipe(
+  Command.withDescription("Move an issue to its team's started state"),
+  Command.withExamples([
+    {
+      command: "linear issue start ENG-123 --dry-run",
+      description: "Validate and preview the state change",
+    },
+    {
+      command: "linear issue start ENG-123 --json",
+      description: "Start an issue and return the result as JSON",
+    },
+  ]),
 );
 
 // linear issue create - Create a new issue
@@ -181,20 +257,27 @@ export const issueCreateCommand = Command.make(
     project: projectOption,
     priority: priorityOption,
     dryRun: dryRunOption,
-    json: jsonOption,
+    json: jsonFlag,
+    interactive: interactiveOption,
   },
-  ({ title, description, team, parent, project, priority, dryRun, json }) =>
+  ({ title, description, team, parent, project, priority, dryRun, json, interactive }) =>
     Effect.gen(function* () {
+      if (Option.isNone(title) && !interactive) {
+        return yield* InvalidInputError.make({
+          message:
+            '--title is required in non-interactive mode. Usage: linear issue create --team ENG --title "Title" --dry-run',
+        });
+      }
+
       const linear = yield* LinearService;
       const config = yield* ConfigService;
       const linearConfig = yield* config.getConfig;
-
-      // Get teams for selection
       const teams = yield* linear.getTeams;
 
       if (teams.length === 0) {
-        yield* Console.error("No teams found. Cannot create issue.");
-        return;
+        return yield* InvalidInputError.make({
+          message: "No teams found; an issue cannot be created",
+        });
       }
 
       const isInteractive = Option.isNone(title);
@@ -214,6 +297,17 @@ export const issueCreateCommand = Command.make(
             : Effect.succeed(""),
         onSome: Effect.succeed,
       });
+      const validatedTitle = yield* validateText({
+        name: "Issue title",
+        value: issueTitle,
+        maximumLength: 255,
+      });
+      const validatedDescription = yield* validateText({
+        name: "Issue description",
+        value: issueDescription,
+        maximumLength: 100_000,
+        allowEmpty: true,
+      });
       const priorityValue = Option.getOrUndefined(priority);
       if (priorityValue !== undefined && (priorityValue < 0 || priorityValue > 4)) {
         return yield* InvalidInputError.make({ message: "--priority must be between 0 and 4" });
@@ -225,10 +319,13 @@ export const issueCreateCommand = Command.make(
           ? undefined
           : yield* resolveProjectId(yield* linear.getProjects, projectSelector);
       const input = {
-        title: issueTitle,
+        title: validatedTitle,
         teamId,
-        description: issueDescription.length === 0 ? undefined : issueDescription,
-        parentId: Option.getOrUndefined(parent),
+        description: validatedDescription.length === 0 ? undefined : validatedDescription,
+        parent: yield* Option.match(parent, {
+          onNone: () => Effect.succeed(undefined),
+          onSome: parseIssueSelector,
+        }),
         projectId,
         priority: priorityValue,
       };
@@ -250,6 +347,19 @@ export const issueCreateCommand = Command.make(
       yield* Console.log(`URL: ${created.url}`);
       yield* Console.log("");
     }),
+).pipe(
+  Command.withDescription("Create an issue interactively or from flags"),
+  Command.withExamples([
+    {
+      command: 'linear issue create --team ENG --title "Title" --dry-run',
+      description: "Validate and preview a non-interactive creation",
+    },
+    {
+      command: 'linear issue create --team ENG --title "Title" --json',
+      description: "Create an issue and return it as JSON",
+    },
+    { command: "linear issue create --interactive", description: "Create with prompts" },
+  ]),
 );
 
 export const issueCommentCommand = Command.make(
@@ -258,31 +368,54 @@ export const issueCommentCommand = Command.make(
     id: Argument.string("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
     body: bodyOption,
     dryRun: dryRunOption,
-    json: jsonOption,
+    json: jsonFlag,
   },
   ({ id, body, dryRun, json }) =>
     Effect.gen(function* () {
+      const issueId = yield* parseIssueSelector(id);
+      const commentBody = yield* validateText({
+        name: "Comment body",
+        value: body,
+        maximumLength: 100_000,
+      });
       if (dryRun) {
         yield* Console.log(
-          encodeJson({ dryRun: true, operation: "issue.comment", input: { id, body } }),
+          encodeJson({
+            dryRun: true,
+            operation: "issue.comment",
+            input: { id: issueId, body: commentBody },
+          }),
         );
         return;
       }
 
       const linear = yield* LinearService;
-      const comment = yield* linear.createComment(id, body);
+      const comment = yield* linear.createComment(issueId, commentBody);
       if (json) {
         yield* Console.log(encodeJson(comment));
         return;
       }
       yield* Console.log(`Comment created: ${comment.url}`);
     }),
+).pipe(
+  Command.withDescription("Add a Markdown comment to an issue"),
+  Command.withExamples([
+    {
+      command: 'linear issue comment ENG-123 --body "Ready" --dry-run',
+      description: "Preview a comment without sending it",
+    },
+    {
+      command: 'linear issue comment ENG-123 --body "Ready" --json',
+      description: "Create a comment and return its URL",
+    },
+  ]),
 );
 
 // Combined issue command with subcommands
 export const issue = Command.make("issue", {}, () =>
   Console.log("Use 'linear issue list' to list issues. See --help for more."),
 ).pipe(
+  Command.withDescription("Read and mutate Linear issues"),
   Command.withSubcommands([
     issueListCommand,
     issueViewCommand,

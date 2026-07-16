@@ -1,13 +1,10 @@
 import { Console, Effect } from "effect";
-import { Command, Flag } from "effect/unstable/cli";
+import { Command } from "effect/unstable/cli";
+import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 
-const jsonOption = Flag.boolean("json").pipe(
-  Flag.withDescription("Emit stable JSON for scripts and agents"),
-);
-
-export const projectListCommand = Command.make("list", { json: jsonOption }, ({ json }) =>
+export const projectListCommand = Command.make("list", { json: jsonFlag }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
     const projects = yield* linear.getProjects;
@@ -38,8 +35,17 @@ export const projectListCommand = Command.make("list", { json: jsonOption }, ({ 
     }
     yield* Console.log("");
   }),
+).pipe(
+  Command.withDescription("List Linear projects"),
+  Command.withExamples([
+    { command: "linear project list", description: "List all projects" },
+    { command: "linear project list --json", description: "List all projects as JSON" },
+  ]),
 );
 
 export const project = Command.make("project", {}, () =>
   Console.log("Use 'linear project list' to list projects. See --help for more."),
-).pipe(Command.withSubcommands([projectListCommand]));
+).pipe(
+  Command.withDescription("Manage Linear projects"),
+  Command.withSubcommands([projectListCommand]),
+);

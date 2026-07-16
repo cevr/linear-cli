@@ -1,5 +1,8 @@
 import { Schema } from "effect";
 
+export const IssueSelector = Schema.String.pipe(Schema.brand("IssueSelector"));
+export type IssueSelector = Schema.Schema.Type<typeof IssueSelector>;
+
 export class ViewerStatus extends Schema.Class<ViewerStatus>("ViewerStatus")({
   emoji: Schema.optional(Schema.String),
   label: Schema.optional(Schema.String),
@@ -115,13 +118,6 @@ export class StartedIssue extends Schema.Class<StartedIssue>("StartedIssue")({
 
 export class CreatedIssue extends IssueReference.extend<CreatedIssue>("CreatedIssue")({}) {}
 
-export interface IssueFilter {
-  readonly teamId?: string;
-  readonly state?: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled";
-  readonly assigneeId?: string;
-  readonly limit?: number;
-}
-
 export interface IssueDetailsOptions {
   readonly comments: boolean;
   readonly children: boolean;
@@ -132,7 +128,7 @@ export interface CreateIssueInput {
   readonly title: string;
   readonly teamId: string;
   readonly description?: string;
-  readonly parentId?: string;
+  readonly parent?: IssueSelector;
   readonly projectId?: string;
   readonly priority?: number;
 }

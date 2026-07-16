@@ -49,10 +49,7 @@ describe("ConfigService", () => {
         const home = yield* fs.makeTempDirectoryScoped({ prefix: "linear-config-" });
         const configDir = path.join(home, ".config", "linear");
         yield* fs.makeDirectory(configDir, { recursive: true });
-        yield* fs.writeFileString(
-          path.join(configDir, "config.toml"),
-          'team_id = "ENG"\nworkspace = "acme"\nissue_sort = "priority"\n',
-        );
+        yield* fs.writeFileString(path.join(configDir, "config.toml"), 'team_id = "ENG"\n');
 
         const configProvider = ConfigProvider.layer(ConfigProvider.fromUnknown({ HOME: home }));
         const config = yield* Effect.gen(function* () {
@@ -61,8 +58,6 @@ describe("ConfigService", () => {
         }).pipe(Effect.provide(ConfigService.layer), Effect.provide(configProvider));
 
         expect(config.teamId).toBe("ENG");
-        expect(config.workspace).toBe("acme");
-        expect(config.issueSort).toBe("priority");
       }).pipe(Effect.provide(BunServicesLayer)),
     );
 

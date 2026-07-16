@@ -39,13 +39,3 @@ export class InvalidInputError extends Schema.TaggedErrorClass<InvalidInputError
     message: Schema.String,
   },
 ) {}
-
-export const AppError = Schema.Union([
-  ConfigError,
-  LinearApiError,
-  TokenNotFoundError,
-  InvalidTokenError,
-  NoIssuesError,
-  InvalidInputError,
-]);
-export type AppError = typeof AppError.Type;

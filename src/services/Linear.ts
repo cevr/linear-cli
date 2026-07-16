@@ -6,8 +6,8 @@ import type {
   CreatedIssue,
   IssueDetails,
   IssueDetailsOptions,
-  IssueFilter,
   IssueReference,
+  IssueSelector,
   IssueSummary,
   Project,
   StartedIssue,
@@ -25,18 +25,21 @@ interface LinearOperations {
   readonly getViewer: Effect.Effect<Viewer, LinearError>;
   readonly getTeams: Effect.Effect<readonly Team[], LinearError>;
   readonly getProjects: Effect.Effect<readonly Project[], LinearError>;
-  readonly getIssues: (filter: IssueFilter) => Effect.Effect<readonly IssueSummary[], LinearError>;
   readonly getMyIssues: (filter?: {
     readonly state?: string;
+    readonly limit?: number;
   }) => Effect.Effect<readonly IssueSummary[], LinearError>;
   readonly getIssueDetails: (
-    id: string,
+    id: IssueSelector,
     options: IssueDetailsOptions,
   ) => Effect.Effect<IssueDetails, LinearError>;
-  readonly startIssue: (id: string) => Effect.Effect<StartedIssue, LinearError | InvalidInputError>;
+  readonly startIssue: (
+    id: IssueSelector,
+    options: { readonly dryRun: boolean },
+  ) => Effect.Effect<StartedIssue, LinearError | InvalidInputError>;
   readonly createIssue: (input: CreateIssueInput) => Effect.Effect<CreatedIssue, LinearError>;
   readonly createComment: (
-    issueId: string,
+    issueId: IssueSelector,
     body: string,
   ) => Effect.Effect<{ readonly id: string; readonly url: string }, LinearError>;
   readonly rawQuery: (
@@ -97,28 +100,14 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         Effect.withSpan("LinearService.getProjects"),
       );
 
-      const getIssues = Effect.fn("LinearService.getIssues")(function* (filter: IssueFilter) {
-        const connection = yield* withClient((client) =>
-          client.issues({
-            first: filter.limit ?? 50,
-            filter: {
-              team: filter.teamId === undefined ? undefined : { id: { eq: filter.teamId } },
-              state: filter.state === undefined ? undefined : { type: { eq: filter.state } },
-              assignee:
-                filter.assigneeId === undefined ? undefined : { id: { eq: filter.assigneeId } },
-            },
-          }),
-        );
-        return yield* Effect.forEach(connection.nodes, toIssueSummary, { concurrency: 4 });
-      });
-
       const getMyIssues = Effect.fn("LinearService.getMyIssues")(function* (filter?: {
         readonly state?: string;
+        readonly limit?: number;
       }) {
         const viewer = yield* withClient((client) => client.viewer);
         const connection = yield* resolveLinearFetch(
           viewer.assignedIssues({
-            first: 50,
+            first: filter?.limit ?? 50,
             filter:
               filter?.state === undefined ? undefined : { state: { type: { eq: filter.state } } },
           }),
@@ -126,10 +115,10 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         return yield* Effect.forEach(connection.nodes, toIssueSummary, { concurrency: 4 });
       });
 
-      const getIssue = (id: string) => withClient((client) => client.issue(normalizeIssueId(id)));
+      const getIssue = (id: IssueSelector) => withClient((client) => client.issue(id));
 
       const getIssueDetails = Effect.fn("LinearService.getIssueDetails")(function* (
-        id: string,
+        id: IssueSelector,
         options: IssueDetailsOptions,
       ) {
         const issue = yield* getIssue(id);
@@ -230,7 +219,10 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         } satisfies IssueDetails;
       });
 
-      const startIssue = Effect.fn("LinearService.startIssue")(function* (id: string) {
+      const startIssue = Effect.fn("LinearService.startIssue")(function* (
+        id: IssueSelector,
+        options: { readonly dryRun: boolean },
+      ) {
         const issue = yield* getIssue(id);
         const team = yield* resolveOptionalFetch(issue.team);
         if (team === undefined) {
@@ -247,7 +239,9 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
             message: `No started state exists for team ${team.key}`,
           });
         }
-        yield* withClient((client) => client.updateIssue(issue.id, { stateId: started.id }));
+        if (!options.dryRun) {
+          yield* withClient((client) => client.updateIssue(issue.id, { stateId: started.id }));
+        }
         return {
           issue: toIssueReference(issue),
           state: { id: started.id, name: started.name, type: started.type },
@@ -258,7 +252,18 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
       const createIssue = Effect.fn("LinearService.createIssue")(function* (
         input: CreateIssueInput,
       ) {
-        const payload = yield* withClient((client) => client.createIssue(input));
+        const parentId =
+          input.parent === undefined ? undefined : (yield* getIssue(input.parent)).id;
+        const payload = yield* withClient((client) =>
+          client.createIssue({
+            title: input.title,
+            teamId: input.teamId,
+            description: input.description,
+            parentId,
+            projectId: input.projectId,
+            priority: input.priority,
+          }),
+        );
         if (payload.issue === undefined) {
           return yield* LinearApiError.make({ message: "Linear did not return the created issue" });
         }
@@ -266,12 +271,10 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
       });
 
       const createComment = Effect.fn("LinearService.createComment")(function* (
-        issueId: string,
+        issueId: IssueSelector,
         body: string,
       ) {
-        const payload = yield* withClient((client) =>
-          client.createComment({ issueId: normalizeIssueId(issueId), body }),
-        );
+        const payload = yield* withClient((client) => client.createComment({ issueId, body }));
         const comment = yield* resolveOptionalFetch(payload.comment);
         return comment === undefined
           ? yield* LinearApiError.make({ message: "Linear did not return the created comment" })
@@ -293,7 +296,6 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         getViewer,
         getTeams,
         getProjects,
-        getIssues,
         getMyIssues,
         getIssueDetails,
         startIssue,
@@ -324,7 +326,6 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
           }),
           getTeams: Effect.succeed([]),
           getProjects: Effect.succeed([]),
-          getIssues: () => Effect.succeed([]),
           getMyIssues: () => Effect.succeed([]),
           getIssueDetails: (id) =>
             Effect.succeed({
@@ -362,11 +363,6 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
       ),
     );
 }
-
-const normalizeIssueId = (input: string): string => {
-  const match = input.match(/\/issue\/([A-Za-z]+-\d+)(?:\/|$)/);
-  return match?.[1] ?? input;
-};
 
 const toLinearError = (error: unknown): InvalidTokenError | LinearApiError => {
   const message = String(error);

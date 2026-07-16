@@ -4,14 +4,10 @@ import { ConfigError, TokenNotFoundError } from "../lib/errors.js";
 
 export class LinearConfig extends Schema.Class<LinearConfig>("LinearConfig")({
   teamId: Schema.optional(Schema.String),
-  workspace: Schema.optional(Schema.String),
-  issueSort: Schema.optional(Schema.Literals(["manual", "priority"])),
 }) {}
 
 class LinearConfigFile extends Schema.Class<LinearConfigFile>("LinearConfigFile")({
   team_id: Schema.optional(Schema.String),
-  workspace: Schema.optional(Schema.String),
-  issue_sort: Schema.optional(Schema.Literals(["manual", "priority"])),
 }) {}
 
 export class ConfigService extends Context.Service<
@@ -152,8 +148,6 @@ const readConfigFile = Effect.fn("ConfigService.readConfigFile")(function* (
   return Option.some(
     new LinearConfig({
       teamId: decoded.team_id,
-      workspace: decoded.workspace,
-      issueSort: decoded.issue_sort,
     }),
   );
 });

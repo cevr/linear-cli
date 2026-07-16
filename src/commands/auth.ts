@@ -1,14 +1,11 @@
-import { Command, Flag, Prompt } from "effect/unstable/cli";
+import { Command, Prompt } from "effect/unstable/cli";
 import { ChildProcess } from "effect/unstable/process";
 import { Console, Effect } from "effect";
+import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 
 const LINEAR_API_KEY_URL = "https://linear.app/settings/account/security";
-
-const jsonOption = Flag.boolean("json").pipe(
-  Flag.withDescription("Emit stable JSON for scripts and agents"),
-);
 
 // linear auth - Interactive authentication flow
 export const authCommand = Command.make("auth", {}, () =>
@@ -40,10 +37,15 @@ export const authCommand = Command.make("auth", {}, () =>
 
     yield* Console.log(`\nAuthenticated as ${viewer.name} (${viewer.email})`);
   }),
+).pipe(
+  Command.withDescription("Authenticate with Linear"),
+  Command.withExamples([
+    { command: "linear auth", description: "Authenticate using a Linear API key" },
+  ]),
 );
 
 // linear auth whoami - Show current user
-export const whoamiCommand = Command.make("whoami", { json: jsonOption }, ({ json }) =>
+export const whoamiCommand = Command.make("whoami", { json: jsonFlag }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
     const viewer = yield* linear.getViewer;
@@ -69,6 +71,12 @@ export const whoamiCommand = Command.make("whoami", { json: jsonOption }, ({ jso
       yield* Console.log(`  Status: ${viewer.status.emoji ?? ""} ${viewer.status.label}`);
     }
   }),
+).pipe(
+  Command.withDescription("Show the authenticated Linear user"),
+  Command.withExamples([
+    { command: "linear auth whoami", description: "Show the authenticated user" },
+    { command: "linear auth whoami --json", description: "Show the authenticated user as JSON" },
+  ]),
 );
 
 // Combined auth command with subcommands

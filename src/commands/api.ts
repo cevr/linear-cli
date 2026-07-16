@@ -1,4 +1,4 @@
-import { Console, Effect, FileSystem, Option, Schema } from "effect";
+import { Console, Effect, FileSystem, Option, Path, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
 import { InvalidInputError } from "../lib/errors.js";
 import { encodeJson } from "../lib/json.js";
@@ -21,6 +21,29 @@ const variablesOption = Flag.string("variables").pipe(
 
 const VariablesJson = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 const decodeVariables = Schema.decodeUnknownEffect(VariablesJson);
+const maximumInputLength = 1_000_000;
+
+const readWorkspaceQueryFile = Effect.fn("ApiCommand.readWorkspaceQueryFile")(function* (
+  requestedPath: string,
+) {
+  const fileSystem = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const workspace = yield* fileSystem.realPath(path.resolve("."));
+  const queryFile = yield* fileSystem.realPath(path.resolve(requestedPath));
+  const relative = path.relative(workspace, queryFile);
+  if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    return yield* InvalidInputError.make({
+      message: `--query-file must stay within the current workspace: ${requestedPath}`,
+    });
+  }
+  const document = yield* fileSystem.readFileString(queryFile);
+  if (document.length > maximumInputLength) {
+    return yield* InvalidInputError.make({
+      message: `GraphQL query files cannot exceed ${maximumInputLength} characters`,
+    });
+  }
+  return document;
+});
 
 export const graphqlCommand = Command.make(
   "graphql",
@@ -40,17 +63,27 @@ export const graphqlCommand = Command.make(
             onNone: () =>
               InvalidInputError.make({ message: "--query or --query-file is required" }),
             onSome: (path) =>
-              FileSystem.FileSystem.use((fileSystem) =>
-                fileSystem.readFileString(path).pipe(
-                  Effect.mapError((error) =>
-                    InvalidInputError.make({
-                      message: `Could not read GraphQL query file ${path}: ${error}`,
-                    }),
-                  ),
+              readWorkspaceQueryFile(path).pipe(
+                Effect.mapError((error) =>
+                  error._tag === "InvalidInputError"
+                    ? error
+                    : InvalidInputError.make({
+                        message: `Could not read GraphQL query file ${path}: ${error}`,
+                      }),
                 ),
               ),
           }),
       });
+      if (document.length > maximumInputLength) {
+        return yield* InvalidInputError.make({
+          message: `GraphQL documents cannot exceed ${maximumInputLength} characters`,
+        });
+      }
+      if (variables.length > maximumInputLength) {
+        return yield* InvalidInputError.make({
+          message: `--variables cannot exceed ${maximumInputLength} characters`,
+        });
+      }
       const parsedVariables = yield* decodeVariables(variables).pipe(
         Effect.mapError((error) =>
           InvalidInputError.make({ message: `--variables must be a JSON object: ${error}` }),
@@ -60,8 +93,23 @@ export const graphqlCommand = Command.make(
       const data = yield* linear.rawQuery(document, parsedVariables);
       yield* Console.log(encodeJson(data));
     }),
+).pipe(
+  Command.withDescription("Execute an authenticated Linear GraphQL operation"),
+  Command.withExamples([
+    {
+      command: 'linear api graphql --query "query { viewer { id name } }"',
+      description: "Run an inline GraphQL query",
+    },
+    {
+      command: "linear api graphql --query-file query.graphql --variables '{}'",
+      description: "Run a GraphQL query from a file with variables",
+    },
+  ]),
 );
 
 export const api = Command.make("api", {}, () =>
   Console.log("Use 'linear api graphql' for GraphQL operations not covered by typed commands."),
-).pipe(Command.withSubcommands([graphqlCommand]));
+).pipe(
+  Command.withDescription("Access the Linear GraphQL API"),
+  Command.withSubcommands([graphqlCommand]),
+);

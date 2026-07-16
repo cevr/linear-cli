@@ -1,4 +1,3 @@
-// @effect-diagnostics strictEffectProvide:off
 import { Command } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer } from "effect";

@@ -1,14 +1,11 @@
-import { Command, Flag } from "effect/unstable/cli";
+import { Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
+import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 
-const jsonOption = Flag.boolean("json").pipe(
-  Flag.withDescription("Emit stable JSON for scripts and agents"),
-);
-
 // linear team list - List all teams
-export const teamListCommand = Command.make("list", { json: jsonOption }, ({ json }) =>
+export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
     const teams = yield* linear.getTeams;
@@ -44,9 +41,15 @@ export const teamListCommand = Command.make("list", { json: jsonOption }, ({ jso
 
     yield* Console.log("");
   }),
+).pipe(
+  Command.withDescription("List Linear teams"),
+  Command.withExamples([
+    { command: "linear team list", description: "List all teams" },
+    { command: "linear team list --json", description: "List all teams as JSON" },
+  ]),
 );
 
 // Combined team command with subcommands
 export const team = Command.make("team", {}, () =>
   Console.log("Use 'linear team list' to list teams. See --help for more."),
-).pipe(Command.withSubcommands([teamListCommand]));
+).pipe(Command.withDescription("Manage Linear teams"), Command.withSubcommands([teamListCommand]));
