@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { TestConsole } from "effect/testing";
 import { Command } from "effect/unstable/cli";
 import { issueCommentCommand } from "../../src/commands/issue.js";
@@ -19,9 +19,9 @@ describe("linear issue comment", () => {
         '{"dryRun":true,"operation":"issue.comment","input":{"id":"BITE-123","body":"Ready for review"}}',
       );
     }).pipe(
-      Effect.provide(LinearService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(LinearService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 });

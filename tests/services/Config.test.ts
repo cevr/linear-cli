@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { ConfigProvider, Effect, FileSystem, Path, Redacted } from "effect";
+import { ConfigProvider, Effect, FileSystem, Layer, Path, Redacted } from "effect";
 import { ConfigService } from "../../src/services/Config.js";
 
 describe("ConfigService", () => {
@@ -55,7 +55,7 @@ describe("ConfigService", () => {
         const config = yield* Effect.gen(function* () {
           const service = yield* ConfigService;
           return yield* service.getConfig;
-        }).pipe(Effect.provide(ConfigService.layer), Effect.provide(configProvider));
+        }).pipe(Effect.provide(ConfigService.layer.pipe(Layer.provide(configProvider))));
 
         expect(config.teamId).toBe("ENG");
       }).pipe(Effect.provide(BunServicesLayer)),
@@ -76,7 +76,7 @@ describe("ConfigService", () => {
         const token = yield* Effect.gen(function* () {
           const service = yield* ConfigService;
           return yield* service.getToken;
-        }).pipe(Effect.provide(ConfigService.layer), Effect.provide(configProvider));
+        }).pipe(Effect.provide(ConfigService.layer.pipe(Layer.provide(configProvider))));
 
         expect(Redacted.value(token)).toBe("file-token");
         expect(String(token)).toBe("<redacted>");

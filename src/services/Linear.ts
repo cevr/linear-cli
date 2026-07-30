@@ -18,6 +18,7 @@ import type {
 } from "../domain/Linear.js";
 import type { ConfigError, TokenNotFoundError } from "../lib/errors.js";
 import { InvalidInputError, InvalidTokenError, LinearApiError } from "../lib/errors.js";
+import { succeedUndefined } from "../lib/effect.js";
 import { ConfigService } from "./Config.js";
 
 type LinearError = ConfigError | InvalidTokenError | LinearApiError | TokenNotFoundError;
@@ -409,7 +410,7 @@ const resolveOptionalFetch = <T>(
   fetch: PromiseLike<T> | undefined,
 ): Effect.Effect<T | undefined, LinearApiError> => {
   if (fetch === undefined) {
-    return Effect.succeed(undefined);
+    return succeedUndefined;
   }
   return resolveLinearFetch(fetch);
 };
@@ -434,7 +435,7 @@ const toDetailedComments = (
   comments: ReadonlyArray<Comment> | undefined,
 ): Effect.Effect<ReadonlyArray<IssueComment> | undefined, LinearApiError> => {
   if (comments === undefined) {
-    return Effect.succeed(undefined);
+    return succeedUndefined;
   }
   return Effect.forEach(
     comments,
@@ -469,7 +470,7 @@ const toRelations = (
   inbound: ReadonlyArray<SdkIssueRelation> | undefined,
 ): Effect.Effect<ReadonlyArray<IssueRelation> | undefined, LinearApiError> => {
   if (outbound === undefined || inbound === undefined) {
-    return Effect.succeed(undefined);
+    return succeedUndefined;
   }
   const entries = outbound
     .map<RelationWithDirection>((relation) => ({ relation, direction: "outbound" }))
@@ -501,7 +502,7 @@ const loadConnectionWhen = <T>(
   load: () => PromiseLike<PaginatedConnection<T>>,
 ): Effect.Effect<ReadonlyArray<T> | undefined, LinearApiError> => {
   if (!enabled) {
-    return Effect.succeed(undefined);
+    return succeedUndefined;
   }
   return loadConnection(load);
 };

@@ -2,6 +2,7 @@ import { Argument, Command, Flag, Prompt } from "effect/unstable/cli";
 import { Console, Effect, Option } from "effect";
 import type { IssueDetails } from "../domain/Linear.js";
 import { parseIssueSelector, validateText } from "../domain/Input.js";
+import { succeedUndefined } from "../lib/effect.js";
 import { InvalidInputError, NoIssuesError } from "../lib/errors.js";
 import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
@@ -328,7 +329,7 @@ export const issueCreateCommand = Command.make(
         teamId,
         description: emptyToUndefined(validatedDescription),
         parent: yield* Option.match(parent, {
-          onNone: () => Effect.succeed(undefined),
+          onNone: () => succeedUndefined,
           onSome: parseIssueSelector,
         }),
         projectId,

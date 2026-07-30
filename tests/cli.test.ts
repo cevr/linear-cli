@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { Crypto, Effect, FileSystem, Path, Ref } from "effect";
+import { Crypto, Effect, FileSystem, Layer, Path, Ref } from "effect";
 import { TestConsole } from "effect/testing";
 import { runCli } from "../src/cli.js";
 import { ConfigService } from "../src/services/Config.js";
@@ -18,24 +18,26 @@ describe("linear CLI", () => {
       );
     }).pipe(
       Effect.provide(
-        LinearService.layerTest({
-          getMyIssues: () =>
-            Effect.succeed([
-              {
-                id: "issue-1",
-                identifier: "TEST-1",
-                title: "Agent-safe output",
-                url: "https://linear.app/issue/TEST-1",
-                branchName: "test-1-agent-safe-output",
-                priority: { value: 2, label: "High" },
-                state: { id: "started", name: "In Progress", type: "started" },
-              },
-            ]),
-        }),
+        Layer.mergeAll(
+          LinearService.layerTest({
+            getMyIssues: () =>
+              Effect.succeed([
+                {
+                  id: "issue-1",
+                  identifier: "TEST-1",
+                  title: "Agent-safe output",
+                  url: "https://linear.app/issue/TEST-1",
+                  branchName: "test-1-agent-safe-output",
+                  priority: { value: 2, label: "High" },
+                  state: { id: "started", name: "In Progress", type: "started" },
+                },
+              ]),
+          }),
+          ConfigService.layerTest(),
+          TestConsole.layer,
+          BunServicesLayer,
+        ),
       ),
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
     ),
   );
 
@@ -48,10 +50,14 @@ describe("linear CLI", () => {
         expect(result.failure._tag).toBe("InvalidInputError");
       }
     }).pipe(
-      Effect.provide(LinearService.layerTest()),
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(
+          LinearService.layerTest(),
+          ConfigService.layerTest(),
+          TestConsole.layer,
+          BunServicesLayer,
+        ),
+      ),
     ),
   );
 
@@ -86,9 +92,9 @@ describe("linear CLI", () => {
         '{"dryRun":true,"operation":"issue.start","input":{"id":"TEST-1"},"result":{"issue":{"id":"TEST-1","identifier":"TEST-1","title":"Safe preview","url":"https://linear.app/issue/TEST-1"},"state":{"id":"started","name":"In Progress","type":"started"},"branchName":"test-1-safe-preview"}}',
       ]);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -107,9 +113,9 @@ describe("linear CLI", () => {
       expect(result._tag).toBe("Failure");
       expect(yield* Ref.get(loadedTeams)).toBe(false);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -131,9 +137,9 @@ describe("linear CLI", () => {
       expect(result._tag).toBe("Failure");
       expect(yield* Ref.get(called)).toBe(false);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -165,9 +171,9 @@ describe("linear CLI", () => {
         expect(yield* Ref.get(called)).toBe(false);
       }),
     ).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -187,9 +193,9 @@ describe("linear CLI", () => {
       expect(result._tag).toBe("Failure");
       expect(yield* Ref.get(called)).toBe(false);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -206,9 +212,9 @@ describe("linear CLI", () => {
 
       expect(yield* TestConsole.logLines).toEqual(['{"issueArchive":{"success":true}}']);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 
@@ -227,9 +233,9 @@ describe("linear CLI", () => {
       expect(result._tag).toBe("Failure");
       expect(yield* Ref.get(called)).toBe(false);
     }).pipe(
-      Effect.provide(ConfigService.layerTest()),
-      Effect.provide(TestConsole.layer),
-      Effect.provide(BunServicesLayer),
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+      ),
     ),
   );
 });

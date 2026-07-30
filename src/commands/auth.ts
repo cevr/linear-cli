@@ -21,7 +21,7 @@ export const authCommand = Command.make("auth", {}, () =>
       return (yield* process.exitCode) === 0;
     }).pipe(
       Effect.scoped,
-      Effect.catch(() => Effect.succeed(false)),
+      Effect.orElseSucceed(() => false),
     );
     if (!browserOpened) {
       yield* Console.log(`Could not open browser. Please visit the URL manually.`);

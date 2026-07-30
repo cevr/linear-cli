@@ -45,7 +45,7 @@ export class IssueState extends Schema.Class<IssueState>("IssueState")({
 }) {}
 
 export class IssuePriority extends Schema.Class<IssuePriority>("IssuePriority")({
-  value: Schema.Number,
+  value: Schema.Finite,
   label: Schema.String,
 }) {}
 
