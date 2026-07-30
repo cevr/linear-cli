@@ -16,7 +16,5 @@ reporting zero Effect diagnostics. Running the patched `tsc` binary revealed
 - Catch-then-succeed recovery uses `Effect.orElseSucceed`.
 - The finite issue priority value uses `Schema.Finite`.
 
-The typecheck script still runs `tsgo`. Switching it to the patched `tsc`
-binary is blocked on the `strictEffectProvide` warning at the CLI entry point
-in `src/main.ts`, which fails the build because
-`ignoreEffectWarningsInTscExitCode` is `false`.
+The typecheck script now runs the patched `tsc` binary, so these diagnostics
+are enforced from here on.

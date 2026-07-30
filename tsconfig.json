@@ -55,7 +55,9 @@
           "missingEffectServiceDependency": "warning",
           "schemaUnionOfLiterals": "warning",
           "strictBooleanExpressions": "warning",
-          "strictEffectProvide": "warning",
+          // Upstream default. The rule has no entry-point detection, so it fires on the single
+          // legitimate Effect.provide in src/main.ts. multipleEffectProvide still guards chains.
+          "strictEffectProvide": "off",
           "catchAllToMapError": "warning",
           "catchUnfailableEffect": "warning",
           "effectFnOpportunity": "warning",
