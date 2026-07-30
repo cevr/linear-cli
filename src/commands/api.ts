@@ -87,13 +87,14 @@ export const graphqlCommand = Command.make(
               InvalidInputError.make({ message: "--query or --query-file is required" }),
             onSome: (path) =>
               readWorkspaceQueryFile(path).pipe(
-                Effect.mapError((error) =>
-                  error._tag === "InvalidInputError"
-                    ? error
-                    : InvalidInputError.make({
-                        message: `Could not read GraphQL query file ${path}: ${error}`,
-                      }),
-                ),
+                Effect.mapError((error) => {
+                  if (error._tag === "InvalidInputError") {
+                    return error;
+                  }
+                  return InvalidInputError.make({
+                    message: `Could not read GraphQL query file ${path}: ${error}`,
+                  });
+                }),
               ),
           }),
       });

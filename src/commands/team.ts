@@ -11,7 +11,11 @@ export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json 
     const teams = yield* linear.getTeams;
 
     if (teams.length === 0) {
-      yield* Console.log(json ? "[]" : "No teams found.");
+      if (json) {
+        yield* Console.log("[]");
+      } else {
+        yield* Console.log("No teams found.");
+      }
       return;
     }
 
@@ -34,9 +38,7 @@ export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json 
     for (const team of teams) {
       const key = team.key;
       const name = team.name;
-      const description =
-        team.description !== undefined && team.description !== null ? ` - ${team.description}` : "";
-      yield* Console.log(`  ${key.padEnd(8)} ${name}${description}`);
+      yield* Console.log(`  ${key.padEnd(8)} ${name}${formatDescription(team.description)}`);
     }
 
     yield* Console.log("");
@@ -53,3 +55,10 @@ export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json 
 export const team = Command.make("team", {}, () =>
   Console.log("Use 'linear team list' to list teams. See --help for more."),
 ).pipe(Command.withDescription("Manage Linear teams"), Command.withSubcommands([teamListCommand]));
+
+function formatDescription(description: string | null | undefined): string {
+  if (description === undefined || description === null) {
+    return "";
+  }
+  return ` - ${description}`;
+}

@@ -82,10 +82,7 @@ export class ConfigService extends Context.Service<
 
   static readonly layerTest = (options?: { token?: string; config?: LinearConfig }) =>
     Layer.succeed(ConfigService, {
-      getToken:
-        options?.token === undefined
-          ? Effect.fail(TokenNotFoundError.default)
-          : Effect.succeed(Redacted.make(options.token)),
+      getToken: makeTestGetToken(options?.token),
       saveToken: () => Effect.void,
       getConfig: Effect.succeed(options?.config ?? new LinearConfig({})),
     });
@@ -99,20 +96,35 @@ const readTokenFile = (
     Effect.mapError((error) =>
       ConfigError.make({ message: `Failed to inspect token file: ${error}` }),
     ),
-    Effect.flatMap((exists) =>
-      exists
-        ? fs.readFileString(tokenPath).pipe(
-            Effect.mapError((error) =>
-              ConfigError.make({ message: `Failed to read token file: ${error}` }),
-            ),
-            Effect.map((token) => token.trim()),
-            Effect.map((token) =>
-              token.length === 0 ? Option.none() : Option.some(Redacted.make(token)),
-            ),
-          )
-        : Effect.succeed(Option.none()),
-    ),
+    Effect.flatMap((exists) => {
+      if (!exists) {
+        return Effect.succeed(Option.none());
+      }
+      return fs.readFileString(tokenPath).pipe(
+        Effect.mapError((error) =>
+          ConfigError.make({ message: `Failed to read token file: ${error}` }),
+        ),
+        Effect.map((token) => token.trim()),
+        Effect.map(toOptionalToken),
+      );
+    }),
   );
+
+const toOptionalToken = (token: string): Option.Option<Redacted.Redacted<string>> => {
+  if (token.length === 0) {
+    return Option.none();
+  }
+  return Option.some(Redacted.make(token));
+};
+
+const makeTestGetToken = (
+  token: string | undefined,
+): Effect.Effect<Redacted.Redacted<string>, TokenNotFoundError> => {
+  if (token === undefined) {
+    return Effect.fail(TokenNotFoundError.default);
+  }
+  return Effect.succeed(Redacted.make(token));
+};
 
 const readConfigFile = Effect.fn("ConfigService.readConfigFile")(function* (
   fs: Context.Service.Shape<typeof FileSystem.FileSystem>,

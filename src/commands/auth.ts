@@ -66,7 +66,7 @@ export const whoamiCommand = Command.make("whoami", { json: jsonFlag }, ({ json 
     yield* Console.log(`\nLogged in as:`);
     yield* Console.log(`  Name:  ${viewer.name}`);
     yield* Console.log(`  Email: ${viewer.email}`);
-    yield* Console.log(`  Admin: ${viewer.admin ? "Yes" : "No"}`);
+    yield* Console.log(`  Admin: ${formatYesNo(viewer.admin)}`);
     if (viewer.status?.label !== undefined) {
       yield* Console.log(`  Status: ${viewer.status.emoji ?? ""} ${viewer.status.label}`);
     }
@@ -81,3 +81,10 @@ export const whoamiCommand = Command.make("whoami", { json: jsonFlag }, ({ json 
 
 // Combined auth command with subcommands
 export const auth = authCommand.pipe(Command.withSubcommands([whoamiCommand]));
+
+function formatYesNo(value: boolean): string {
+  if (value) {
+    return "Yes";
+  }
+  return "No";
+}

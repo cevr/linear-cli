@@ -1,12 +1,14 @@
 import { LinearClient } from "@linear/sdk";
-import type { Issue, IssueRelation as SdkIssueRelation, User } from "@linear/sdk";
+import type { Comment, Issue, IssueRelation as SdkIssueRelation, User } from "@linear/sdk";
 import { Context, Effect, Layer, Redacted } from "effect";
 import type {
   CreateIssueInput,
   CreatedIssue,
+  IssueComment,
   IssueDetails,
   IssueDetailsOptions,
   IssueReference,
+  IssueRelation,
   IssueSelector,
   IssueSummary,
   Project,
@@ -67,7 +69,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         getClient.pipe(
           Effect.flatMap((client) =>
             Effect.tryPromise({
-              try: () => Promise.resolve(operation(client)),
+              try: () => operation(client),
               catch: toLinearError,
             }),
           ),
@@ -110,8 +112,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         const connection = yield* resolveLinearFetch(
           viewer.assignedIssues({
             first: filter?.limit ?? 50,
-            filter:
-              filter?.state === undefined ? undefined : { state: { type: { eq: filter.state } } },
+            filter: toStateFilter(filter?.state),
           }),
         );
         return yield* Effect.forEach(connection.nodes, toIssueSummary, { concurrency: 4 });
@@ -133,67 +134,15 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
           loadConnection(() => issue.labels()),
         ]);
 
-        const children = options.children
-          ? yield* loadConnection(() => issue.children())
-          : undefined;
-        const comments = options.comments
-          ? yield* loadConnection(() => issue.comments())
-          : undefined;
-        const outbound = options.relations
-          ? yield* loadConnection(() => issue.relations())
-          : undefined;
-        const inbound = options.relations
-          ? yield* loadConnection(() => issue.inverseRelations())
-          : undefined;
+        const children = yield* loadConnectionWhen(options.children, () => issue.children());
+        const comments = yield* loadConnectionWhen(options.comments, () => issue.comments());
+        const outbound = yield* loadConnectionWhen(options.relations, () => issue.relations());
+        const inbound = yield* loadConnectionWhen(options.relations, () =>
+          issue.inverseRelations(),
+        );
 
-        const detailedComments =
-          comments === undefined
-            ? undefined
-            : yield* Effect.forEach(
-                comments,
-                (comment) =>
-                  resolveOptionalFetch(comment.user).pipe(
-                    Effect.map((author) => ({
-                      id: comment.id,
-                      body: comment.body,
-                      createdAt: comment.createdAt.toISOString(),
-                      url: comment.url,
-                      author:
-                        author === undefined ? undefined : { id: author.id, name: author.name },
-                    })),
-                  ),
-                { concurrency: 4 },
-              );
-
-        const relations =
-          outbound === undefined || inbound === undefined
-            ? undefined
-            : yield* Effect.forEach(
-                outbound
-                  .map<{
-                    readonly relation: SdkIssueRelation;
-                    readonly direction: "outbound" | "inbound";
-                  }>((relation) => ({ relation, direction: "outbound" }))
-                  .concat(inbound.map((relation) => ({ relation, direction: "inbound" }))),
-                Effect.fn("LinearService.resolveRelation")(function* ({ direction, relation }) {
-                  const related = yield* resolveOptionalFetch(
-                    direction === "outbound" ? relation.relatedIssue : relation.issue,
-                  );
-                  return related === undefined
-                    ? undefined
-                    : {
-                        id: relation.id,
-                        type: relation.type,
-                        direction,
-                        issue: toIssueReference(related),
-                      };
-                }),
-                { concurrency: 4 },
-              ).pipe(
-                Effect.map((items) =>
-                  items.filter((item): item is NonNullable<typeof item> => item !== undefined),
-                ),
-              );
+        const detailedComments = yield* toDetailedComments(comments);
+        const relations = yield* toRelations(outbound, inbound);
 
         return {
           id: summary.id,
@@ -204,16 +153,18 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
           priority: summary.priority,
           state: summary.state,
           description: issue.description ?? undefined,
-          team: team === undefined ? undefined : { id: team.id, key: team.key, name: team.name },
-          assignee:
-            assignee === undefined
-              ? undefined
-              : { id: assignee.id, name: assignee.name, email: assignee.email },
-          project:
-            project === undefined
-              ? undefined
-              : { id: project.id, name: project.name, url: project.url },
-          parent: parent === undefined ? undefined : toIssueReference(parent),
+          team: mapDefined(team, (value) => ({ id: value.id, key: value.key, name: value.name })),
+          assignee: mapDefined(assignee, (value) => ({
+            id: value.id,
+            name: value.name,
+            email: value.email,
+          })),
+          project: mapDefined(project, (value) => ({
+            id: value.id,
+            name: value.name,
+            url: value.url,
+          })),
+          parent: mapDefined(parent, toIssueReference),
           labels: labels.map((label) => ({ id: label.id, name: label.name })),
           children: children?.map(toIssueReference),
           comments: detailedComments,
@@ -251,11 +202,20 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         };
       });
 
+      const resolveParentId = Effect.fn("LinearService.resolveParentId")(function* (
+        parent: IssueSelector | undefined,
+      ) {
+        if (parent === undefined) {
+          return undefined;
+        }
+        const parentIssue = yield* getIssue(parent);
+        return parentIssue.id;
+      });
+
       const createIssue = Effect.fn("LinearService.createIssue")(function* (
         input: CreateIssueInput,
       ) {
-        const parentId =
-          input.parent === undefined ? undefined : (yield* getIssue(input.parent)).id;
+        const parentId = yield* resolveParentId(input.parent);
         const payload = yield* withClient((client) =>
           client.createIssue({
             title: input.title,
@@ -278,9 +238,12 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
       ) {
         const payload = yield* withClient((client) => client.createComment({ issueId, body }));
         const comment = yield* resolveOptionalFetch(payload.comment);
-        return comment === undefined
-          ? yield* LinearApiError.make({ message: "Linear did not return the created comment" })
-          : { id: comment.id, url: comment.url };
+        if (comment === undefined) {
+          return yield* LinearApiError.make({
+            message: "Linear did not return the created comment",
+          });
+        }
+        return { id: comment.id, url: comment.url };
       });
 
       const rawQuery = Effect.fn("LinearService.rawQuery")(function* (
@@ -368,9 +331,27 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
 
 const toLinearError = (error: unknown): InvalidTokenError | LinearApiError => {
   const message = String(error);
-  return message.includes("Authentication") || message.includes("401")
-    ? InvalidTokenError.make({ message: "Invalid API token" })
-    : LinearApiError.make({ message });
+  if (message.includes("Authentication") || message.includes("401")) {
+    return InvalidTokenError.make({ message: "Invalid API token" });
+  }
+  return LinearApiError.make({ message });
+};
+
+const mapDefined = <T, U>(value: T | undefined, transform: (value: T) => U): U | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+  return transform(value);
+};
+
+const toViewerStatus = (viewer: User): Viewer["status"] => {
+  if (viewer.statusEmoji === undefined && viewer.statusLabel === undefined) {
+    return undefined;
+  }
+  return {
+    emoji: viewer.statusEmoji ?? undefined,
+    label: viewer.statusLabel ?? undefined,
+  };
 };
 
 const toViewer = (viewer: User): Viewer => ({
@@ -378,13 +359,7 @@ const toViewer = (viewer: User): Viewer => ({
   name: viewer.name,
   email: viewer.email,
   admin: viewer.admin,
-  status:
-    viewer.statusEmoji === undefined && viewer.statusLabel === undefined
-      ? undefined
-      : {
-          emoji: viewer.statusEmoji ?? undefined,
-          label: viewer.statusLabel ?? undefined,
-        },
+  status: toViewerStatus(viewer),
 });
 
 const toTeam = (team: Awaited<ReturnType<LinearClient["team"]>>): Team => ({
@@ -420,20 +395,116 @@ const toIssueSummary = Effect.fn("LinearService.toIssueSummary")(function* (
     url: issue.url,
     branchName: issue.branchName,
     priority: { value: issue.priority, label: issue.priorityLabel },
-    state: state === undefined ? undefined : { id: state.id, name: state.name, type: state.type },
+    state: mapDefined(state, (value) => ({ id: value.id, name: value.name, type: value.type })),
   };
 });
 
 const resolveLinearFetch = <T>(fetch: PromiseLike<T>): Effect.Effect<T, LinearApiError> =>
   Effect.tryPromise({
-    try: () => Promise.resolve(fetch),
+    try: () => fetch,
     catch: (error) => LinearApiError.make({ message: String(error) }),
   });
 
 const resolveOptionalFetch = <T>(
   fetch: PromiseLike<T> | undefined,
-): Effect.Effect<T | undefined, LinearApiError> =>
-  fetch === undefined ? Effect.succeed(undefined) : resolveLinearFetch(fetch);
+): Effect.Effect<T | undefined, LinearApiError> => {
+  if (fetch === undefined) {
+    return Effect.succeed(undefined);
+  }
+  return resolveLinearFetch(fetch);
+};
+
+const toStateFilter = (
+  state: string | undefined,
+): { readonly state: { readonly type: { readonly eq: string } } } | undefined => {
+  if (state === undefined) {
+    return undefined;
+  }
+  return { state: { type: { eq: state } } };
+};
+
+const toCommentAuthor = (author: User | undefined): IssueComment["author"] => {
+  if (author === undefined) {
+    return undefined;
+  }
+  return { id: author.id, name: author.name };
+};
+
+const toDetailedComments = (
+  comments: ReadonlyArray<Comment> | undefined,
+): Effect.Effect<ReadonlyArray<IssueComment> | undefined, LinearApiError> => {
+  if (comments === undefined) {
+    return Effect.succeed(undefined);
+  }
+  return Effect.forEach(
+    comments,
+    (comment) =>
+      resolveOptionalFetch(comment.user).pipe(
+        Effect.map((author) => ({
+          id: comment.id,
+          body: comment.body,
+          createdAt: comment.createdAt.toISOString(),
+          url: comment.url,
+          author: toCommentAuthor(author),
+        })),
+      ),
+    { concurrency: 4 },
+  );
+};
+
+interface RelationWithDirection {
+  readonly relation: SdkIssueRelation;
+  readonly direction: "outbound" | "inbound";
+}
+
+const relatedIssueFetch = (entry: RelationWithDirection): PromiseLike<Issue> | undefined => {
+  if (entry.direction === "outbound") {
+    return entry.relation.relatedIssue;
+  }
+  return entry.relation.issue;
+};
+
+const toRelations = (
+  outbound: ReadonlyArray<SdkIssueRelation> | undefined,
+  inbound: ReadonlyArray<SdkIssueRelation> | undefined,
+): Effect.Effect<ReadonlyArray<IssueRelation> | undefined, LinearApiError> => {
+  if (outbound === undefined || inbound === undefined) {
+    return Effect.succeed(undefined);
+  }
+  const entries = outbound
+    .map<RelationWithDirection>((relation) => ({ relation, direction: "outbound" }))
+    .concat(inbound.map((relation) => ({ relation, direction: "inbound" })));
+  return Effect.forEach(
+    entries,
+    Effect.fn("LinearService.resolveRelation")(function* ({ direction, relation }) {
+      const related = yield* resolveOptionalFetch(relatedIssueFetch({ direction, relation }));
+      if (related === undefined) {
+        return undefined;
+      }
+      return {
+        id: relation.id,
+        type: relation.type,
+        direction,
+        issue: toIssueReference(related),
+      };
+    }),
+    { concurrency: 4 },
+  ).pipe(
+    Effect.map((items) =>
+      items.filter((item): item is NonNullable<typeof item> => item !== undefined),
+    ),
+  );
+};
+
+const loadConnectionWhen = <T>(
+  enabled: boolean,
+  load: () => PromiseLike<PaginatedConnection<T>>,
+): Effect.Effect<ReadonlyArray<T> | undefined, LinearApiError> => {
+  if (!enabled) {
+    return Effect.succeed(undefined);
+  }
+  return loadConnection(load);
+};
 
 interface PaginatedConnection<T> {
   readonly nodes: ReadonlyArray<T>;

@@ -94,7 +94,7 @@ export const issueListCommand = Command.make(
       const issues = yield* linear.getMyIssues({ state: stateFilter, limit });
 
       if (issues.length === 0) {
-        yield* Console.log(json ? "[]" : "No issues found.");
+        yield* logEmptyList(json, "No issues found.");
         return;
       }
 
@@ -151,10 +151,11 @@ export const issueViewCommand = Command.make(
             "Issue identifier required in non-interactive mode. Usage: linear issue view ISSUE-123 --json",
         });
       }
-      const selectedIds = yield* Effect.forEach(
-        ids.length === 0 ? [yield* selectIssue] : ids,
-        parseIssueSelector,
-      );
+      let requestedIds: ReadonlyArray<string> = ids;
+      if (requestedIds.length === 0) {
+        requestedIds = [yield* selectIssue];
+      }
+      const selectedIds = yield* Effect.forEach(requestedIds, parseIssueSelector);
       const linear = yield* LinearService;
       const details = yield* Effect.forEach(
         selectedIds,
@@ -198,13 +199,15 @@ export const issueStartCommand = Command.make(
   ({ id, dryRun, json, interactive }) =>
     Effect.gen(function* () {
       const selectedIssue = yield* Option.match(id, {
-        onNone: () =>
-          interactive
-            ? selectIssue
-            : InvalidInputError.make({
-                message:
-                  "Issue identifier required in non-interactive mode. Usage: linear issue start ISSUE-123 --dry-run",
-              }),
+        onNone: () => {
+          if (interactive) {
+            return selectIssue;
+          }
+          return InvalidInputError.make({
+            message:
+              "Issue identifier required in non-interactive mode. Usage: linear issue start ISSUE-123 --dry-run",
+          });
+        },
         onSome: Effect.succeed,
       });
       const issueId = yield* parseIssueSelector(selectedIssue);
@@ -288,13 +291,15 @@ export const issueCreateCommand = Command.make(
         onSome: Effect.succeed,
       });
       const issueDescription = yield* Option.match(description, {
-        onNone: () =>
-          isInteractive
-            ? Prompt.text({
-                message: "Description (optional, press Enter to skip)",
-                default: "",
-              })
-            : Effect.succeed(""),
+        onNone: () => {
+          if (isInteractive) {
+            return Prompt.text({
+              message: "Description (optional, press Enter to skip)",
+              default: "",
+            });
+          }
+          return Effect.succeed("");
+        },
         onSome: Effect.succeed,
       });
       const validatedTitle = yield* validateText({
@@ -314,14 +319,14 @@ export const issueCreateCommand = Command.make(
       }
 
       const projectSelector = Option.getOrUndefined(project);
-      const projectId =
-        projectSelector === undefined
-          ? undefined
-          : yield* resolveProjectId(yield* linear.getProjects, projectSelector);
+      let projectId: string | undefined = undefined;
+      if (projectSelector !== undefined) {
+        projectId = yield* resolveProjectId(yield* linear.getProjects, projectSelector);
+      }
       const input = {
         title: validatedTitle,
         teamId,
-        description: validatedDescription.length === 0 ? undefined : validatedDescription,
+        description: emptyToUndefined(validatedDescription),
         parent: yield* Option.match(parent, {
           onNone: () => Effect.succeed(undefined),
           onSome: parseIssueSelector,
@@ -429,8 +434,10 @@ export const issue = Command.make("issue", {}, () =>
 
 const selectIssue = Effect.gen(function* () {
   const linear = yield* LinearService;
-  const issues = yield* linear.getMyIssues({ state: "started" });
-  const allIssues = issues.length > 0 ? issues : yield* linear.getMyIssues({ state: "unstarted" });
+  let allIssues = yield* linear.getMyIssues({ state: "started" });
+  if (allIssues.length === 0) {
+    allIssues = yield* linear.getMyIssues({ state: "unstarted" });
+  }
 
   if (allIssues.length === 0) {
     return yield* NoIssuesError.default;
@@ -515,19 +522,24 @@ const resolveTeamId = Effect.fn("IssueCommand.resolveTeamId")(function* (
     const selected = teams.find(
       (team) => team.id === selector || team.key.toLowerCase() === normalized,
     );
-    return selected === undefined
-      ? yield* InvalidInputError.make({ message: `Unknown team: ${selector}` })
-      : selected.id;
+    if (selected === undefined) {
+      return yield* InvalidInputError.make({ message: `Unknown team: ${selector}` });
+    }
+    return selected.id;
   }
   if (teams.length === 1) {
     const [team] = teams;
-    return team === undefined
-      ? yield* InvalidInputError.make({ message: "No team available" })
-      : team.id;
+    if (team === undefined) {
+      return yield* InvalidInputError.make({ message: "No team available" });
+    }
+    return team.id;
   }
-  return interactive
-    ? yield* selectTeam(teams)
-    : yield* InvalidInputError.make({ message: "--team is required when multiple teams exist" });
+  if (interactive) {
+    return yield* selectTeam(teams);
+  }
+  return yield* InvalidInputError.make({
+    message: "--team is required when multiple teams exist",
+  });
 });
 
 const resolveProjectId = Effect.fn("IssueCommand.resolveProjectId")(function* (
@@ -541,9 +553,10 @@ const resolveProjectId = Effect.fn("IssueCommand.resolveProjectId")(function* (
       project.name.toLowerCase() === normalized ||
       project.slug.toLowerCase() === normalized,
   );
-  return selected === undefined
-    ? yield* InvalidInputError.make({ message: `Unknown project: ${selector}` })
-    : selected.id;
+  if (selected === undefined) {
+    return yield* InvalidInputError.make({ message: `Unknown project: ${selector}` });
+  }
+  return selected.id;
 });
 
 const toCreatedIssue = (created: {
@@ -559,7 +572,24 @@ const toCreatedIssue = (created: {
 });
 
 function truncate(str: string, len: number): string {
-  return str.length > len ? str.slice(0, len - 1) + "…" : str;
+  if (str.length > len) {
+    return str.slice(0, len - 1) + "…";
+  }
+  return str;
+}
+
+function emptyToUndefined(value: string): string | undefined {
+  if (value.length === 0) {
+    return undefined;
+  }
+  return value;
+}
+
+function logEmptyList(json: boolean, message: string): Effect.Effect<void> {
+  if (json) {
+    return Console.log("[]");
+  }
+  return Console.log(message);
 }
 
 function getPriorityIcon(priority: number): string {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { Effect, FileSystem, Path, Ref } from "effect";
+import { Crypto, Effect, FileSystem, Path, Ref } from "effect";
 import { TestConsole } from "effect/testing";
 import { runCli } from "../src/cli.js";
 import { ConfigService } from "../src/services/Config.js";
@@ -144,10 +144,9 @@ describe("linear CLI", () => {
         const path = yield* Path.Path;
         const outside = yield* fileSystem.makeTempFileScoped({ suffix: ".graphql" });
         yield* fileSystem.writeFileString(outside, "query { viewer { id } }");
-        const link = path.join(
-          path.resolve("."),
-          `.linear-query-test-${crypto.randomUUID()}.graphql`,
-        );
+        const cryptoService = yield* Crypto.Crypto;
+        const linkId = yield* cryptoService.randomUUIDv4;
+        const link = path.join(path.resolve("."), `.linear-query-test-${linkId}.graphql`);
         yield* Effect.acquireRelease(fileSystem.symlink(outside, link), () =>
           fileSystem.remove(link).pipe(Effect.orDie),
         );
