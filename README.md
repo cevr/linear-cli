@@ -71,6 +71,13 @@ linear team list
 | `linear issue start [id]` | Start work, with `--dry-run` and `--json` support   |
 | `linear issue create`     | Create a new issue                                  |
 | `linear issue comment ID` | Add a comment, with `--dry-run` support             |
+| `linear issue files ID`   | List uploads; `--download` saves them               |
+
+### Files
+
+| Command                     | Description                                         |
+| --------------------------- | --------------------------------------------------- |
+| `linear file download URL…` | Download `uploads.linear.app` files with your token |
 
 ### Teams
 
@@ -96,6 +103,7 @@ linear team list
 - Keep `--query-file` paths inside the current workspace; traversal and escaping symlinks are rejected.
 - Raw GraphQL mutations require the explicit `--allow-mutation` flag.
 - Never read or interpolate the token directly; the CLI owns authentication.
+- Download attachments with `linear issue files ID --download` or `linear file download URL`. The token is sent only to `uploads.linear.app`, never to a redirect target. Existing files are kept unless `--overwrite` is passed.
 
 ## Configuration
 

@@ -4,6 +4,7 @@ import { Context, Effect, Layer, Redacted } from "effect";
 import type {
   CreateIssueInput,
   CreatedIssue,
+  DownloadedFile,
   IssueComment,
   IssueDetails,
   IssueDetailsOptions,
@@ -14,8 +15,10 @@ import type {
   Project,
   StartedIssue,
   Team,
+  UploadUrl,
   Viewer,
 } from "../domain/Linear.js";
+import { fileNameFromContentDisposition } from "../domain/Files.js";
 import type { ConfigError, TokenNotFoundError } from "../lib/errors.js";
 import { InvalidInputError, InvalidTokenError, LinearApiError } from "../lib/errors.js";
 import { succeedUndefined } from "../lib/effect.js";
@@ -49,6 +52,7 @@ interface LinearOperations {
     query: string,
     variables: Readonly<Record<string, unknown>>,
   ) => Effect.Effect<unknown, LinearError>;
+  readonly downloadFile: (url: UploadUrl) => Effect.Effect<DownloadedFile, LinearError>;
 }
 
 export class LinearService extends Context.Service<LinearService, LinearOperations>()(
@@ -257,6 +261,11 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         return response.data;
       });
 
+      const downloadFile = Effect.fn("LinearService.downloadFile")(function* (url: UploadUrl) {
+        const token = yield* config.getToken;
+        return yield* fetchUpload(url, token);
+      });
+
       return LinearService.of({
         authenticate,
         getViewer,
@@ -268,6 +277,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
         createIssue,
         createComment,
         rawQuery,
+        downloadFile,
       });
     }),
   );
@@ -324,6 +334,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
           createComment: () =>
             Effect.succeed({ id: "comment", url: "https://linear.app/comment/comment" }),
           rawQuery: () => Effect.succeed({}),
+          downloadFile: () => Effect.succeed({ bytes: new Uint8Array() }),
         } satisfies LinearOperations,
         overrides,
       ),
@@ -337,6 +348,57 @@ const toLinearError = (error: unknown): InvalidTokenError | LinearApiError => {
   }
   return LinearApiError.make({ message });
 };
+
+type FetchImplementation = (input: string | URL, init?: RequestInit) => Promise<Response>;
+
+const isRedirect = (status: number): boolean => status >= 300 && status < 400;
+
+const requestUpload = (
+  fetchImplementation: FetchImplementation,
+  input: string | URL,
+  init: RequestInit,
+): Effect.Effect<Response, LinearApiError> =>
+  Effect.tryPromise({
+    try: () => fetchImplementation(input, init),
+    catch: (error) => LinearApiError.make({ message: `Download failed: ${String(error)}` }),
+  });
+
+// Linear serves uploads behind the API key and may redirect to signed storage. The key goes
+// only to the upload host; a redirect is followed without it so it never reaches a third party.
+export const fetchUpload = Effect.fn("LinearService.fetchUpload")(function* (
+  url: UploadUrl,
+  token: Redacted.Redacted<string>,
+  fetchImplementation: FetchImplementation = fetch,
+) {
+  let response = yield* requestUpload(fetchImplementation, url, {
+    headers: { Authorization: Redacted.value(token) },
+    redirect: "manual",
+  });
+  const location = response.headers.get("location");
+  if (isRedirect(response.status) && location !== null) {
+    response = yield* requestUpload(fetchImplementation, new URL(location, url), {
+      redirect: "follow",
+    });
+  }
+  if (response.status === 401) {
+    return yield* InvalidTokenError.make({ message: "Invalid API token" });
+  }
+  if (!response.ok) {
+    return yield* LinearApiError.make({
+      message: `Download failed with HTTP ${response.status} for ${url}`,
+      code: String(response.status),
+    });
+  }
+  const body = yield* Effect.tryPromise({
+    try: () => response.arrayBuffer(),
+    catch: (error) => LinearApiError.make({ message: `Download failed: ${String(error)}` }),
+  });
+  return {
+    bytes: new Uint8Array(body),
+    contentType: response.headers.get("content-type") ?? undefined,
+    fileName: fileNameFromContentDisposition(response.headers.get("content-disposition")),
+  } satisfies DownloadedFile;
+});
 
 const mapDefined = <T, U>(value: T | undefined, transform: (value: T) => U): U | undefined => {
   if (value === undefined) {

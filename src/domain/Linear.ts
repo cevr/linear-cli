@@ -3,6 +3,9 @@ import { Schema } from "effect";
 export const IssueSelector = Schema.String.pipe(Schema.brand("IssueSelector"));
 export type IssueSelector = Schema.Schema.Type<typeof IssueSelector>;
 
+export const UploadUrl = Schema.String.pipe(Schema.brand("UploadUrl"));
+export type UploadUrl = Schema.Schema.Type<typeof UploadUrl>;
+
 export class ViewerStatus extends Schema.Class<ViewerStatus>("ViewerStatus")({
   emoji: Schema.optional(Schema.String),
   label: Schema.optional(Schema.String),
@@ -131,4 +134,25 @@ export interface CreateIssueInput {
   readonly parent?: IssueSelector;
   readonly projectId?: string;
   readonly priority?: number;
+}
+
+export class IssueFile extends Schema.Class<IssueFile>("IssueFile")({
+  name: Schema.String,
+  url: Schema.String,
+  /** `description`, or the ID of the comment that links the file. */
+  source: Schema.String,
+}) {}
+
+export class SavedFile extends Schema.Class<SavedFile>("SavedFile")({
+  url: Schema.String,
+  path: Schema.String,
+  bytes: Schema.Finite,
+  contentType: Schema.optional(Schema.String),
+}) {}
+
+export interface DownloadedFile {
+  readonly bytes: Uint8Array;
+  readonly contentType?: string;
+  /** From the `Content-Disposition` header, when the server sends one. */
+  readonly fileName?: string;
 }

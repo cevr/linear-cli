@@ -39,3 +39,7 @@ export class InvalidInputError extends Schema.TaggedErrorClass<InvalidInputError
     message: Schema.String,
   },
 ) {}
+
+export class FileWriteError extends Schema.TaggedErrorClass<FileWriteError>()("FileWriteError", {
+  message: Schema.String,
+}) {}

@@ -29,6 +29,7 @@ cli.pipe(
   ),
   Effect.tapErrorTag("NoIssuesError", (e) => Console.error(e.message)),
   Effect.tapErrorTag("InvalidInputError", (e) => Console.error(`Invalid input: ${e.message}`)),
+  Effect.tapErrorTag("FileWriteError", (e) => Console.error(`File Error: ${e.message}`)),
   Effect.provide(MainLayer),
   BunRuntime.runMain({ disableErrorReporting: true }),
 );

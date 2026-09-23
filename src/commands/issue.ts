@@ -1,10 +1,13 @@
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli";
 import { Console, Effect, Option } from "effect";
 import type { IssueDetails } from "../domain/Linear.js";
-import { parseIssueSelector, validateText } from "../domain/Input.js";
+import { extractUploadLinks, uniqueByUrl } from "../domain/Files.js";
+import { parseIssueSelector, parseUploadUrl, validateText } from "../domain/Input.js";
+import { saveDownloads } from "../lib/downloads.js";
 import { succeedUndefined } from "../lib/effect.js";
 import { InvalidInputError, NoIssuesError } from "../lib/errors.js";
-import { jsonFlag } from "../lib/flags.js";
+import { jsonFlag, outputDirFlag, overwriteFlag } from "../lib/flags.js";
+import { logSavedFiles } from "./file.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 import { ConfigService } from "../services/Config.js";
@@ -417,6 +420,68 @@ export const issueCommentCommand = Command.make(
   ]),
 );
 
+const downloadOption = Flag.boolean("download").pipe(
+  Flag.withDescription("Save every listed file into --output-dir"),
+);
+
+// linear issue files <id> - List (and optionally download) files uploaded to an issue
+export const issueFilesCommand = Command.make(
+  "files",
+  {
+    id: Argument.string("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
+    download: downloadOption,
+    outputDir: outputDirFlag,
+    overwrite: overwriteFlag,
+    json: jsonFlag,
+  },
+  ({ id, download, outputDir, overwrite, json }) =>
+    Effect.gen(function* () {
+      const issueId = yield* parseIssueSelector(id);
+      const linear = yield* LinearService;
+      const details = yield* linear.getIssueDetails(issueId, {
+        comments: true,
+        children: false,
+        relations: false,
+      });
+      const files = uniqueByUrl([
+        ...extractUploadLinks(details.description, "description"),
+        ...(details.comments ?? []).flatMap((comment) =>
+          extractUploadLinks(comment.body, comment.id),
+        ),
+      ]);
+
+      if (!download) {
+        if (json) {
+          yield* Console.log(encodeJson(files));
+          return;
+        }
+        if (files.length === 0) {
+          yield* Console.log(`No files found on ${details.identifier}.`);
+          return;
+        }
+        for (const issueFile of files) {
+          yield* Console.log(`${issueFile.name}\t${issueFile.source}\t${issueFile.url}`);
+        }
+        return;
+      }
+
+      const requests = yield* Effect.forEach(files, (issueFile) =>
+        parseUploadUrl(issueFile.url).pipe(Effect.map((url) => ({ url, name: issueFile.name }))),
+      );
+      const savedFiles = yield* saveDownloads({ requests, outputDir, overwrite });
+      yield* logSavedFiles(savedFiles, json);
+    }),
+).pipe(
+  Command.withDescription("List files uploaded to an issue's description and comments"),
+  Command.withExamples([
+    { command: "linear issue files ENG-123 --json", description: "List uploads as JSON" },
+    {
+      command: "linear issue files ENG-123 --download --output-dir ./files --json",
+      description: "Save every upload under its Markdown name",
+    },
+  ]),
+);
+
 // Combined issue command with subcommands
 export const issue = Command.make("issue", {}, () =>
   Console.log("Use 'linear issue list' to list issues. See --help for more."),
@@ -428,6 +493,7 @@ export const issue = Command.make("issue", {}, () =>
     issueStartCommand,
     issueCreateCommand,
     issueCommentCommand,
+    issueFilesCommand,
   ]),
 );
 

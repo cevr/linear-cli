@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { IssueSelector } from "./Linear.js";
+import { IssueSelector, UploadUrl } from "./Linear.js";
 import { InvalidInputError } from "../lib/errors.js";
 
 const issueIdentifierPattern = /^[A-Za-z][A-Za-z0-9]*-\d+$/;
@@ -52,4 +52,17 @@ export const validateText = Effect.fn("Input.validateText")(function* (options: 
     });
   }
   return options.value;
+});
+
+const uploadHost = "uploads.linear.app";
+
+// The stored token is sent with the download, so only Linear's own upload host is accepted.
+export const parseUploadUrl = Effect.fn("Input.parseUploadUrl")(function* (input: string) {
+  const url = URL.parse(input);
+  if (url === null || url.protocol !== "https:" || url.hostname !== uploadHost) {
+    return yield* InvalidInputError.make({
+      message: `Invalid upload URL: ${input}. Expected https://${uploadHost}/...`,
+    });
+  }
+  return UploadUrl.make(url.href);
 });
