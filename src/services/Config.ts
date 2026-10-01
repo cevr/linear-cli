@@ -98,7 +98,7 @@ const readTokenFile = (
     ),
     Effect.flatMap((exists) => {
       if (!exists) {
-        return Effect.succeed(Option.none());
+        return Effect.succeedNone;
       }
       return fs.readFileString(tokenPath).pipe(
         Effect.mapError((error) =>
