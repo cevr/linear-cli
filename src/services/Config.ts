@@ -23,8 +23,8 @@ export class ConfigService extends Context.Service<
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const homeDir = yield* Config.string("HOME").pipe(Config.withDefault(""));
-      const envToken = yield* Config.redacted("LINEAR_API_KEY").pipe(Config.option);
+      const homeDir = yield* Config.String("HOME").pipe(Config.withDefault(""));
+      const envToken = yield* Config.Redacted("LINEAR_API_KEY").pipe(Config.option);
       const configDir = path.join(homeDir, ".config", "linear");
       const tokenPath = path.join(configDir, "token");
       const configPath = path.join(configDir, "config.toml");
