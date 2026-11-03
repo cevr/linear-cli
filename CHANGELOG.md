@@ -1,5 +1,13 @@
 # @cvr/linear
 
+## 0.6.0
+
+### Minor Changes
+
+- [`ca0ac6b`](https://github.com/cevr/linear-cli/commit/ca0ac6b5f881bc7268918bcb95be37724b4e5d32) Thanks [@cevr](https://github.com/cevr)! - Upgrade to Effect 4.1.2 while preserving existing command defaults, JSON output, and token/config locations. Configuration files now use Effect's TOML parser instead of a separate dependency.
+
+  The upgraded CLI parser rejects repeated single-value flags and unexpected positional arguments. Pass flags such as `--limit` only once and remove surplus arguments from scripts.
+
 ## 0.5.1
 
 ### Patch Changes
