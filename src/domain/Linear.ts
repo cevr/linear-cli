@@ -177,5 +177,5 @@ export interface SavedFile extends SchemaType.Type<typeof SavedFile> {}
 export interface DownloadedFile {
   readonly bytes: Uint8Array;
   readonly contentType?: string;
-  readonly fileName?: string;
+  readonly contentDispositionFileName?: string;
 }

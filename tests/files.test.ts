@@ -106,7 +106,7 @@ describe("fetchUpload", () => {
         { url: "https://storage.example.com/signed?sig=1", authorization: null },
       ]);
       expect(new TextDecoder().decode(file.bytes)).toBe("pdf-bytes");
-      expect(file.fileName).toBe("Spec.pdf");
+      expect(file.contentDispositionFileName).toBe("Spec.pdf");
     }),
   );
 

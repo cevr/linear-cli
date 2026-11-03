@@ -64,6 +64,8 @@ const projectOption = Flag.String("project").pipe(
   Flag.optional,
 );
 
+const LinearPriority = { None: 0, Urgent: 1, High: 2, Medium: 3, Low: 4 } as const;
+
 const priorityOption = Flag.Int("priority").pipe(
   Flag.withDescription("Priority from 0 (none) to 4 (low)"),
   Flag.optional,
@@ -319,7 +321,10 @@ export const issueCreateCommand = Command.make(
         allowEmpty: true,
       });
       const priorityValue = Option.getOrUndefined(priority);
-      if (priorityValue !== undefined && (priorityValue < 0 || priorityValue > 4)) {
+      if (
+        priorityValue !== undefined &&
+        (priorityValue < LinearPriority.None || priorityValue > LinearPriority.Low)
+      ) {
         return yield* InvalidInputError.make({ message: "--priority must be between 0 and 4" });
       }
 
@@ -466,7 +471,9 @@ export const issueFilesCommand = Command.make(
       }
 
       const requests = yield* Effect.forEach(files, (issueFile) =>
-        parseUploadUrl(issueFile.url).pipe(Effect.map((url) => ({ url, name: issueFile.name }))),
+        parseUploadUrl(issueFile.url).pipe(
+          Effect.map((url) => ({ url, linkName: issueFile.name })),
+        ),
       );
       const savedFiles = yield* saveDownloads({ requests, outputDir, overwrite });
       yield* logSavedFiles(savedFiles, json);
@@ -657,15 +664,15 @@ function logEmptyList(json: boolean, message: string): Effect.Effect<void> {
 
 function getPriorityIcon(priority: number): string {
   switch (priority) {
-    case 0:
+    case LinearPriority.None:
       return "○";
-    case 1:
+    case LinearPriority.Urgent:
       return "⬆";
-    case 2:
+    case LinearPriority.High:
       return "↑";
-    case 3:
+    case LinearPriority.Medium:
       return "─";
-    case 4:
+    case LinearPriority.Low:
       return "↓";
     default:
       return "○";

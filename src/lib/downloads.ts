@@ -7,7 +7,7 @@ import { FileWriteError, InvalidInputError } from "./errors.js";
 
 export interface DownloadRequest {
   readonly url: UploadUrl;
-  readonly name?: string;
+  readonly linkName?: string;
 }
 
 const toFileWriteError = (error: unknown): FileWriteError =>
@@ -21,8 +21,8 @@ const nonEmpty = (value: string | undefined): string | undefined => {
 };
 
 const preferredFileName = (request: DownloadRequest, download: DownloadedFile): string =>
-  nonEmpty(request.name) ??
-  nonEmpty(download.fileName) ??
+  nonEmpty(request.linkName) ??
+  nonEmpty(download.contentDispositionFileName) ??
   new URL(request.url).pathname.split("/").pop() ??
   "download";
 

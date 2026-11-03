@@ -394,7 +394,9 @@ export const fetchUpload = Effect.fn("LinearService.fetchUpload")(function* (
   return {
     bytes: new Uint8Array(body),
     contentType: response.headers.get("content-type") ?? undefined,
-    fileName: fileNameFromContentDisposition(response.headers.get("content-disposition")),
+    contentDispositionFileName: fileNameFromContentDisposition(
+      response.headers.get("content-disposition"),
+    ),
   } satisfies DownloadedFile;
 });
 
