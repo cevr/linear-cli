@@ -61,6 +61,33 @@ describe("ConfigService", () => {
       }).pipe(Effect.provide(BunServicesLayer)),
     );
 
+    it.effect("decodes quoted TOML strings, escapes, comments, and CRLF", () =>
+      readGlobalConfig('team_id = "ENG\\u002dplatform" # team default\r\n').pipe(
+        Effect.tap((config) => Effect.sync(() => expect(config.teamId).toBe("ENG-platform"))),
+        Effect.asVoid,
+        Effect.provide(BunServicesLayer),
+      ),
+    );
+
+    for (const content of ['team_id = "unterminated', "team_id = 42"]) {
+      it.effect(`rejects invalid config as ConfigError: ${content}`, () =>
+        readGlobalConfig(content).pipe(
+          Effect.result,
+          Effect.tap((result) =>
+            Effect.sync(() => {
+              expect(result._tag).toBe("Failure");
+              if (result._tag === "Failure") {
+                expect(result.failure._tag).toBe("ConfigError");
+                expect(result.failure.message).toContain("config.toml");
+              }
+            }),
+          ),
+          Effect.asVoid,
+          Effect.provide(BunServicesLayer),
+        ),
+      );
+    }
+
     it.effect("keeps file tokens redacted and gives them precedence over the environment", () =>
       Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
@@ -83,4 +110,19 @@ describe("ConfigService", () => {
       }).pipe(Effect.provide(BunServicesLayer)),
     );
   });
+});
+
+// Real filesystem and decoder; only the environment is isolated from the owner account.
+const readGlobalConfig = Effect.fn("ConfigTest.readGlobalConfig")(function* (content: string) {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const home = yield* fs.makeTempDirectoryScoped({ prefix: "linear-config-" });
+  const configDir = path.join(home, ".config", "linear");
+  yield* fs.makeDirectory(configDir, { recursive: true });
+  yield* fs.writeFileString(path.join(configDir, "config.toml"), content);
+  const configProvider = ConfigProvider.layer(ConfigProvider.fromUnknown({ HOME: home }));
+  return yield* Effect.gen(function* () {
+    const config = yield* ConfigService;
+    return yield* config.getConfig;
+  }).pipe(Effect.provide(ConfigService.layer.pipe(Layer.provide(configProvider))));
 });

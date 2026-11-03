@@ -1,27 +1,28 @@
 import { Console, Effect, FileSystem, Option, Path, Schema } from "effect";
-import { Command, Flag } from "effect/unstable/cli";
+import { Command, Flag } from "effect/cli";
 import { Kind } from "graphql/language/kinds.js";
 import { parse } from "graphql/language/parser.js";
 import { InvalidInputError } from "../lib/errors.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 
-const queryOption = Flag.string("query").pipe(
+const queryOption = Flag.String("query").pipe(
   Flag.withDescription("GraphQL document"),
   Flag.optional,
 );
 
-const queryFileOption = Flag.string("query-file").pipe(
+const queryFileOption = Flag.String("query-file").pipe(
   Flag.withDescription("Read the GraphQL document from a file"),
   Flag.optional,
 );
 
-const variablesOption = Flag.string("variables").pipe(
+const variablesOption = Flag.String("variables").pipe(
   Flag.withDescription("GraphQL variables as a JSON object"),
   Flag.withDefault("{}"),
 );
 
-const allowMutationOption = Flag.boolean("allow-mutation").pipe(
+const allowMutationOption = Flag.Boolean("allow-mutation").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Explicitly authorize a raw GraphQL mutation"),
 );
 

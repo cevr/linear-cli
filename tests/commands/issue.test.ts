@@ -2,7 +2,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
 import { Effect, Layer } from "effect";
 import { TestConsole } from "effect/testing";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import { issueCommentCommand } from "../../src/commands/issue.js";
 import { LinearService } from "../../src/services/Linear.js";
 

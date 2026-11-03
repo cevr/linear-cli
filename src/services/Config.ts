@@ -1,14 +1,17 @@
-import { parse } from "toml";
+import type { Schema as SchemaType } from "effect/Schema";
+import { Toml } from "effect/encoding";
 import { Config, Context, Effect, FileSystem, Layer, Option, Path, Redacted, Schema } from "effect";
 import { ConfigError, TokenNotFoundError } from "../lib/errors.js";
 
-export class LinearConfig extends Schema.Class<LinearConfig>("LinearConfig")({
+export const LinearConfig = Schema.Struct({
   teamId: Schema.optional(Schema.String),
-}) {}
+});
 
-class LinearConfigFile extends Schema.Class<LinearConfigFile>("LinearConfigFile")({
+export interface LinearConfig extends SchemaType.Type<typeof LinearConfig> {}
+
+const LinearConfigFile = Schema.Struct({
   team_id: Schema.optional(Schema.String),
-}) {}
+});
 
 export class ConfigService extends Context.Service<
   ConfigService,
@@ -23,8 +26,8 @@ export class ConfigService extends Context.Service<
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const homeDir = yield* Config.string("HOME").pipe(Config.withDefault(""));
-      const envToken = yield* Config.redacted("LINEAR_API_KEY").pipe(Config.option);
+      const homeDir = yield* Config.String("HOME").pipe(Config.withDefault(""));
+      const envToken = yield* Config.Redacted("LINEAR_API_KEY").pipe(Config.option);
       const configDir = path.join(homeDir, ".config", "linear");
       const tokenPath = path.join(configDir, "token");
       const configPath = path.join(configDir, "config.toml");
@@ -73,7 +76,7 @@ export class ConfigService extends Context.Service<
           }
         }
 
-        return Option.getOrElse(yield* readConfigFile(fs, configPath), () => new LinearConfig({}));
+        return Option.getOrElse(yield* readConfigFile(fs, configPath), () => LinearConfig.make({}));
       }).pipe(Effect.withSpan("ConfigService.getConfig"));
 
       return ConfigService.of({ getToken, saveToken, getConfig });
@@ -84,7 +87,7 @@ export class ConfigService extends Context.Service<
     Layer.succeed(ConfigService, {
       getToken: makeTestGetToken(options?.token),
       saveToken: () => Effect.void,
-      getConfig: Effect.succeed(options?.config ?? new LinearConfig({})),
+      getConfig: Effect.succeed(options?.config ?? LinearConfig.make({})),
     });
 }
 
@@ -98,7 +101,7 @@ const readTokenFile = (
     ),
     Effect.flatMap((exists) => {
       if (!exists) {
-        return Effect.succeed(Option.none());
+        return Effect.succeedNone;
       }
       return fs.readFileString(tokenPath).pipe(
         Effect.mapError((error) =>
@@ -148,17 +151,18 @@ const readConfigFile = Effect.fn("ConfigService.readConfigFile")(function* (
         ConfigError.make({ message: `Failed to read ${filePath}: ${error}` }),
       ),
     );
-  const parsed = yield* Effect.try({
-    try: () => parse(content),
-    catch: (error) => ConfigError.make({ message: `Failed to parse ${filePath}: ${error}` }),
-  });
-  const decoded = yield* Schema.decodeUnknownEffect(LinearConfigFile)(parsed).pipe(
+  const parsed = yield* Effect.fromResult(Toml.parse(content)).pipe(
+    Effect.mapError((error) =>
+      ConfigError.make({ message: `Failed to parse ${filePath}: ${error}` }),
+    ),
+  );
+  const decoded = yield* Schema.decodeEffect(LinearConfigFile)(parsed).pipe(
     Effect.mapError((error) =>
       ConfigError.make({ message: `Invalid Linear config in ${filePath}: ${error}` }),
     ),
   );
   return Option.some(
-    new LinearConfig({
+    LinearConfig.make({
       teamId: decoded.team_id,
     }),
   );

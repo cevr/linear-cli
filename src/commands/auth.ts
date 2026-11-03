@@ -1,5 +1,5 @@
-import { Command, Prompt } from "effect/unstable/cli";
-import { ChildProcess } from "effect/unstable/process";
+import { Command, Prompt } from "effect/cli";
+import { ChildProcess } from "effect/process";
 import { Console, Effect } from "effect";
 import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
@@ -27,7 +27,7 @@ export const authCommand = Command.make("auth", {}, () =>
       yield* Console.log(`Could not open browser. Please visit the URL manually.`);
     }
 
-    const token = yield* Prompt.hidden({ message: "Paste your API key" });
+    const token = yield* Prompt.Hidden({ message: "Paste your API key" });
 
     // Validate token by making an API call
     yield* Console.log("\nValidating token...");

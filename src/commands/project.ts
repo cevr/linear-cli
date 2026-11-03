@@ -1,5 +1,5 @@
 import { Console, Effect } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";

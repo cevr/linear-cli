@@ -1,4 +1,4 @@
-import { Argument, Command, Flag, Prompt } from "effect/unstable/cli";
+import { Argument, Command, Flag, Prompt } from "effect/cli";
 import { Console, Effect, Option } from "effect";
 import type { IssueDetails } from "../domain/Linear.js";
 import { extractUploadLinks, uniqueByUrl } from "../domain/Files.js";
@@ -13,70 +13,77 @@ import { LinearService } from "../services/Linear.js";
 import { ConfigService } from "../services/Config.js";
 
 // Options
-const stateOption = Flag.string("state").pipe(
+const stateOption = Flag.String("state").pipe(
   Flag.withAlias("s"),
   Flag.withDescription("Filter by state type (started, unstarted, backlog, etc.)"),
   Flag.optional,
 );
 
-const limitOption = Flag.integer("limit").pipe(
+const limitOption = Flag.Int("limit").pipe(
   Flag.withAlias("n"),
   Flag.withDefault(20),
   Flag.withDescription("Number of issues to show"),
 );
 
-const commentsOption = Flag.boolean("comments").pipe(
+const commentsOption = Flag.Boolean("comments").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Include issue comments"),
 );
 
-const childrenOption = Flag.boolean("children").pipe(Flag.withDescription("Include sub-issues"));
+const childrenOption = Flag.Boolean("children").pipe(
+  Flag.withDefault(false),
+  Flag.withDescription("Include sub-issues"),
+);
 
-const relationsOption = Flag.boolean("relations").pipe(
+const relationsOption = Flag.Boolean("relations").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Include inbound and outbound issue relations"),
 );
 
-const titleOption = Flag.string("title").pipe(
+const titleOption = Flag.String("title").pipe(
   Flag.withDescription("Issue title; enables non-interactive creation"),
   Flag.optional,
 );
 
-const descriptionOption = Flag.string("description").pipe(
+const descriptionOption = Flag.String("description").pipe(
   Flag.withDescription("Issue description in Markdown"),
   Flag.optional,
 );
 
-const teamOption = Flag.string("team").pipe(
+const teamOption = Flag.String("team").pipe(
   Flag.withDescription("Team key or UUID"),
   Flag.optional,
 );
 
-const parentOption = Flag.string("parent").pipe(
+const parentOption = Flag.String("parent").pipe(
   Flag.withDescription("Parent issue identifier or UUID"),
   Flag.optional,
 );
 
-const projectOption = Flag.string("project").pipe(
+const projectOption = Flag.String("project").pipe(
   Flag.withDescription("Project name, slug, or UUID"),
   Flag.optional,
 );
 
-const priorityOption = Flag.integer("priority").pipe(
+const priorityOption = Flag.Int("priority").pipe(
   Flag.withDescription("Priority from 0 (none) to 4 (low)"),
   Flag.optional,
 );
 
-const dryRunOption = Flag.boolean("dry-run").pipe(
+const dryRunOption = Flag.Boolean("dry-run").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Validate and print the mutation without writing"),
 );
 
-const interactiveOption = Flag.boolean("interactive").pipe(
+const interactiveOption = Flag.Boolean("interactive").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Allow prompts when required input is missing"),
 );
 
-const bodyOption = Flag.string("body").pipe(Flag.withDescription("Comment body in Markdown"));
+const bodyOption = Flag.String("body").pipe(Flag.withDescription("Comment body in Markdown"));
 
 // Args
-const issueIdsArg = Argument.string("id").pipe(
+const issueIdsArg = Argument.String("id").pipe(
   Argument.withDescription("Issue ID, URL, or identifier (repeat for bulk reads)"),
   Argument.variadic(),
 );
@@ -187,7 +194,7 @@ export const issueViewCommand = Command.make(
 );
 
 // linear issue start [id] - Start working on an issue
-const optionalIssueIdArg = Argument.string("id").pipe(
+const optionalIssueIdArg = Argument.String("id").pipe(
   Argument.withDescription("Issue ID, URL, or identifier"),
   Argument.optional,
 );
@@ -291,13 +298,13 @@ export const issueCreateCommand = Command.make(
       const requestedTeam = Option.getOrUndefined(team) ?? linearConfig.teamId;
       const teamId = yield* resolveTeamId(teams, requestedTeam, isInteractive);
       const issueTitle = yield* Option.match(title, {
-        onNone: () => Prompt.text({ message: "Issue title" }),
+        onNone: () => Prompt.String({ message: "Issue title" }),
         onSome: Effect.succeed,
       });
       const issueDescription = yield* Option.match(description, {
         onNone: () => {
           if (isInteractive) {
-            return Prompt.text({
+            return Prompt.String({
               message: "Description (optional, press Enter to skip)",
               default: "",
             });
@@ -374,7 +381,7 @@ export const issueCreateCommand = Command.make(
 export const issueCommentCommand = Command.make(
   "comment",
   {
-    id: Argument.string("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
+    id: Argument.String("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
     body: bodyOption,
     dryRun: dryRunOption,
     json: jsonFlag,
@@ -420,7 +427,8 @@ export const issueCommentCommand = Command.make(
   ]),
 );
 
-const downloadOption = Flag.boolean("download").pipe(
+const downloadOption = Flag.Boolean("download").pipe(
+  Flag.withDefault(false),
   Flag.withDescription("Save every listed file into --output-dir"),
 );
 
@@ -428,7 +436,7 @@ const downloadOption = Flag.boolean("download").pipe(
 export const issueFilesCommand = Command.make(
   "files",
   {
-    id: Argument.string("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
+    id: Argument.String("id").pipe(Argument.withDescription("Issue ID, URL, or identifier")),
     download: downloadOption,
     outputDir: outputDirFlag,
     overwrite: overwriteFlag,
@@ -517,7 +525,7 @@ const selectIssue = Effect.gen(function* () {
     description: candidate.state?.name ?? "Unknown state",
   }));
 
-  const selected = yield* Prompt.select({
+  const selected = yield* Prompt.Select({
     message: "Select an issue",
     choices,
   });
@@ -570,7 +578,7 @@ const renderIssueDetails = Effect.fn("IssueCommand.renderDetails")(function* (
 });
 
 function selectTeam(teams: readonly { id: string; key: string; name: string }[]) {
-  return Prompt.select({
+  return Prompt.Select({
     message: "Select a team",
     choices: teams.map((team) => ({
       title: `${team.key}: ${team.name}`,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { Crypto, Effect, FileSystem, Layer, Path, Ref } from "effect";
+import { Effect, FileSystem, Layer, Path, Ref } from "effect";
+import { SecureRandom } from "effect/crypto";
 import { TestConsole } from "effect/testing";
 import { runCli } from "../src/cli.js";
 import { ConfigService } from "../src/services/Config.js";
@@ -37,6 +38,34 @@ describe("linear CLI", () => {
           TestConsole.layer,
           BunServicesLayer,
         ),
+      ),
+    ),
+  );
+
+  it.effect("rejects repeated single-value flags before calling Linear", () =>
+    Effect.gen(function* () {
+      const called = yield* Ref.make(false);
+      const result = yield* runCli(["issue", "list", "--limit", "1", "--limit", "2"]).pipe(
+        Effect.provide(
+          LinearService.layerTest({
+            getMyIssues: () => Ref.set(called, true).pipe(Effect.as([])),
+          }),
+        ),
+        Effect.result,
+      );
+      expect(result._tag).toBe("Failure");
+      if (result._tag === "Failure") {
+        expect(result.failure._tag).toBe("ShowHelp");
+        if (result.failure._tag === "ShowHelp") {
+          expect(result.failure.errors).toMatchObject([
+            { _tag: "InvalidValue", option: "limit", value: "2 occurrences" },
+          ]);
+        }
+      }
+      expect(yield* Ref.get(called)).toBe(false);
+    }).pipe(
+      Effect.provide(
+        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
       ),
     ),
   );
@@ -150,8 +179,8 @@ describe("linear CLI", () => {
         const path = yield* Path.Path;
         const outside = yield* fileSystem.makeTempFileScoped({ suffix: ".graphql" });
         yield* fileSystem.writeFileString(outside, "query { viewer { id } }");
-        const cryptoService = yield* Crypto.Crypto;
-        const linkId = yield* cryptoService.randomUUIDv4;
+        const random = yield* SecureRandom.SecureRandom;
+        const linkId = yield* random.uuidV4();
         const link = path.join(path.resolve("."), `.linear-query-test-${linkId}.graphql`);
         yield* Effect.acquireRelease(fileSystem.symlink(outside, link), () =>
           fileSystem.remove(link).pipe(Effect.orDie),
@@ -172,7 +201,12 @@ describe("linear CLI", () => {
       }),
     ).pipe(
       Effect.provide(
-        Layer.mergeAll(ConfigService.layerTest(), TestConsole.layer, BunServicesLayer),
+        Layer.mergeAll(
+          ConfigService.layerTest(),
+          TestConsole.layer,
+          BunServicesLayer,
+          SecureRandom.layerWebCrypto,
+        ),
       ),
     ),
   );

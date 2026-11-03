@@ -1,4 +1,4 @@
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import packageJson from "../package.json" with { type: "json" };
 import { api } from "./commands/api.js";
 import { auth } from "./commands/auth.js";

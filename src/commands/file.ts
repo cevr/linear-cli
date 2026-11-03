@@ -1,4 +1,4 @@
-import { Argument, Command } from "effect/unstable/cli";
+import { Argument, Command } from "effect/cli";
 import { Console, Effect } from "effect";
 import type { SavedFile } from "../domain/Linear.js";
 import { parseUploadUrl } from "../domain/Input.js";
@@ -7,7 +7,7 @@ import { InvalidInputError } from "../lib/errors.js";
 import { jsonFlag, outputDirFlag, overwriteFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 
-const uploadUrlsArg = Argument.string("url").pipe(
+const uploadUrlsArg = Argument.String("url").pipe(
   Argument.withDescription("https://uploads.linear.app/... URL (repeat for several files)"),
   Argument.variadic(),
 );

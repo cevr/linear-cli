@@ -49,7 +49,6 @@
           "processEnv": "off",
           "processEnvInEffect": "off",
           "deterministicKeys": "error",
-          "importFromBarrel": "warning",
           "instanceOfSchema": "warning",
           "missedPipeableOpportunity": "suggestion",
           "missingEffectServiceDependency": "warning",
@@ -64,7 +63,8 @@
           "effectMapVoid": "warning",
           "effectSucceedWithVoid": "warning",
           "leakingRequirements": "warning",
-          "preferSchemaOverJson": "off",
+          "globalJson": "off",
+          "globalJsonInEffect": "off",
           "redundantSchemaTagIdentifier": "warning",
           "returnEffectInGen": "warning",
           "runEffectInsideEffect": "error",
@@ -76,6 +76,15 @@
           "unnecessaryPipe": "warning",
           "unnecessaryPipeChain": "warning"
         },
+        // These platform and CLI APIs are intentionally used with Effect pinned exactly.
+        "allowedUnstableApis": [
+          "effect/cli",
+          "effect/process",
+          "effect/FileSystem",
+          "effect/Path",
+          "effect/encoding/Toml",
+          "@effect/platform-bun"
+        ],
         "keyPatterns": [
           {
             "target": "service",
@@ -92,6 +101,17 @@
           {
             "include": ["**/tests/**/*.ts", "**/*.test.ts"],
             "options": {
+              "allowedUnstableApis": [
+                "effect/cli",
+                "effect/process",
+                "effect/FileSystem",
+                "effect/Path",
+                "effect/encoding/Toml",
+                "@effect/platform-bun",
+                "@effect/vitest",
+                "effect/testing",
+                "effect/crypto/SecureRandom"
+              ],
               "diagnosticSeverity": {
                 "strictEffectProvide": "off"
               }
