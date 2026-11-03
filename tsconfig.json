@@ -50,6 +50,9 @@
           "processEnvInEffect": "off",
           "deterministicKeys": "error",
           "instanceOfSchema": "warning",
+          // Effect 4.0.0 marks the whole effect/cli module @stability unstable. This CLI is
+          // built on it, so the rule would flag every command, flag, and prompt definition.
+          "unstableApiUsage": "off",
           "missedPipeableOpportunity": "suggestion",
           "missingEffectServiceDependency": "warning",
           "schemaUnionOfLiterals": "warning",

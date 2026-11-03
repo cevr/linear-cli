@@ -1,5 +1,11 @@
 # @cvr/linear
 
+## 0.5.1
+
+### Patch Changes
+
+- [`c9cfbab`](https://github.com/cevr/linear-cli/commit/c9cfbab102542420327a03885c8142627b176d58) Thanks [@cevr](https://github.com/cevr)! - Move to Effect 4.0.0.
+
 ## 0.5.0
 
 ### Minor Changes

@@ -145,7 +145,7 @@ Built with:
 
 - **[Bun](https://bun.sh)**: Fast JavaScript runtime with native compilation
 - **[Effect](https://effect.website)**: TypeScript library for type-safe, composable code
-- **[Effect CLI](https://github.com/Effect-TS/effect/tree/main/packages/effect/src/unstable/cli)**: CLI framework with prompts and argument parsing
+- **[Effect CLI](https://github.com/Effect-TS/effect/tree/main/packages/effect/src/cli)**: CLI framework with prompts and argument parsing
 - **[@linear/sdk](https://github.com/linear/linear)**: Official Linear GraphQL SDK
 
 ## Credits
