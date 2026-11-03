@@ -363,8 +363,6 @@ const requestUpload = (
     catch: (error) => LinearApiError.make({ message: `Download failed: ${String(error)}` }),
   });
 
-// Linear serves uploads behind the API key and may redirect to signed storage. The key goes
-// only to the upload host; a redirect is followed without it so it never reaches a third party.
 export const fetchUpload = Effect.fn("LinearService.fetchUpload")(function* (
   url: UploadUrl,
   token: Redacted.Redacted<string>,

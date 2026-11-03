@@ -7,7 +7,6 @@ import { LinearService } from "../services/Linear.js";
 
 const LINEAR_API_KEY_URL = "https://linear.app/settings/account/security";
 
-// linear auth - Interactive authentication flow
 export const authCommand = Command.make("auth", {}, () =>
   Effect.gen(function* () {
     yield* Console.log(`\nTo authenticate, you'll need a Linear API key.`);
@@ -29,7 +28,6 @@ export const authCommand = Command.make("auth", {}, () =>
 
     const token = yield* Prompt.Hidden({ message: "Paste your API key" });
 
-    // Validate token by making an API call
     yield* Console.log("\nValidating token...");
 
     const linear = yield* LinearService;
@@ -44,7 +42,6 @@ export const authCommand = Command.make("auth", {}, () =>
   ]),
 );
 
-// linear auth whoami - Show current user
 export const whoamiCommand = Command.make("whoami", { json: jsonFlag }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
@@ -79,7 +76,6 @@ export const whoamiCommand = Command.make("whoami", { json: jsonFlag }, ({ json 
   ]),
 );
 
-// Combined auth command with subcommands
 export const auth = authCommand.pipe(Command.withSubcommands([whoamiCommand]));
 
 function formatYesNo(value: boolean): string {

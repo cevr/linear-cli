@@ -1,7 +1,6 @@
 import { Result } from "effect";
 import { IssueFile } from "./Linear.js";
 
-// Markdown links and images whose target is a Linear upload: `[name](url)` or `![name](url)`.
 const uploadLinkPattern = /!?\[([^\]]*)\]\(<?(https:\/\/uploads\.linear\.app\/[^)\s>]+)>?\)/g;
 
 export const extractUploadLinks = (
@@ -16,7 +15,6 @@ export const extractUploadLinks = (
   );
 };
 
-/** Keeps the first link to each URL. */
 export const uniqueByUrl = (files: ReadonlyArray<IssueFile>): ReadonlyArray<IssueFile> => {
   const seenUrls = new Set<string>();
   return files.filter((file) => {
@@ -30,7 +28,6 @@ export const uniqueByUrl = (files: ReadonlyArray<IssueFile>): ReadonlyArray<Issu
 
 const unsafeFileNameCharacters = /[^A-Za-z0-9._ ()-]/g;
 
-/** A plain file name that cannot leave the output directory. */
 export const toSafeFileName = (candidate: string): string => {
   const baseName = candidate.split(/[/\\]/).pop() ?? "";
   const cleaned = baseName
@@ -53,7 +50,6 @@ const splitExtension = (
   return { stem: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
 };
 
-/** `report.pdf`, then `report-2.pdf`, `report-3.pdf`, ... for names already taken in this run. */
 export const withUniqueSuffix = (fileName: string, takenNames: ReadonlySet<string>): string => {
   if (!takenNames.has(fileName)) {
     return fileName;

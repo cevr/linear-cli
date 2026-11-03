@@ -56,7 +56,6 @@ export const validateText = Effect.fn("Input.validateText")(function* (options: 
 
 const uploadHost = "uploads.linear.app";
 
-// The stored token is sent with the download, so only Linear's own upload host is accepted.
 export const parseUploadUrl = Effect.fn("Input.parseUploadUrl")(function* (input: string) {
   const url = URL.parse(input);
   if (url === null || url.protocol !== "https:" || url.hostname !== uploadHost) {

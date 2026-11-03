@@ -73,7 +73,6 @@ describe("upload helpers", () => {
   });
 });
 
-// Fetch fakes must return a promise; build it through Effect.
 const response = (body: BodyInit | null, init: ResponseInit): Promise<Response> =>
   Effect.runPromise(Effect.succeed(new Response(body, init)));
 

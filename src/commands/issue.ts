@@ -12,7 +12,6 @@ import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 import { ConfigService } from "../services/Config.js";
 
-// Options
 const stateOption = Flag.String("state").pipe(
   Flag.withAlias("s"),
   Flag.withDescription("Filter by state type (started, unstarted, backlog, etc.)"),
@@ -82,13 +81,11 @@ const interactiveOption = Flag.Boolean("interactive").pipe(
 
 const bodyOption = Flag.String("body").pipe(Flag.withDescription("Comment body in Markdown"));
 
-// Args
 const issueIdsArg = Argument.String("id").pipe(
   Argument.withDescription("Issue ID, URL, or identifier (repeat for bulk reads)"),
   Argument.variadic(),
 );
 
-// linear issue list - List issues
 export const issueListCommand = Command.make(
   "list",
   { state: stateOption, limit: limitOption, json: jsonFlag },
@@ -143,7 +140,6 @@ export const issueListCommand = Command.make(
   ]),
 );
 
-// linear issue view [id] - View issue details
 export const issueViewCommand = Command.make(
   "view",
   {
@@ -193,7 +189,6 @@ export const issueViewCommand = Command.make(
   ]),
 );
 
-// linear issue start [id] - Start working on an issue
 const optionalIssueIdArg = Argument.String("id").pipe(
   Argument.withDescription("Issue ID, URL, or identifier"),
   Argument.optional,
@@ -260,7 +255,6 @@ export const issueStartCommand = Command.make(
   ]),
 );
 
-// linear issue create - Create a new issue
 export const issueCreateCommand = Command.make(
   "create",
   {
@@ -351,7 +345,6 @@ export const issueCreateCommand = Command.make(
         return;
       }
 
-      // Create the issue
       const created = yield* linear.createIssue(input);
 
       if (json) {
@@ -432,7 +425,6 @@ const downloadOption = Flag.Boolean("download").pipe(
   Flag.withDescription("Save every listed file into --output-dir"),
 );
 
-// linear issue files <id> - List (and optionally download) files uploaded to an issue
 export const issueFilesCommand = Command.make(
   "files",
   {
@@ -490,7 +482,6 @@ export const issueFilesCommand = Command.make(
   ]),
 );
 
-// Combined issue command with subcommands
 export const issue = Command.make("issue", {}, () =>
   Console.log("Use 'linear issue list' to list issues. See --help for more."),
 ).pipe(
@@ -505,8 +496,6 @@ export const issue = Command.make("issue", {}, () =>
   ]),
 );
 
-// Helper functions
-
 const selectIssue = Effect.gen(function* () {
   const linear = yield* LinearService;
   let allIssues = yield* linear.getMyIssues({ state: "started" });
@@ -518,7 +507,6 @@ const selectIssue = Effect.gen(function* () {
     return yield* NoIssuesError.default;
   }
 
-  // Build choices with state info
   const choices = allIssues.slice(0, 20).map((candidate) => ({
     title: `${candidate.identifier}: ${truncate(candidate.title, 40)}`,
     value: candidate.identifier,
@@ -670,15 +658,15 @@ function logEmptyList(json: boolean, message: string): Effect.Effect<void> {
 function getPriorityIcon(priority: number): string {
   switch (priority) {
     case 0:
-      return "○"; // No priority
+      return "○";
     case 1:
-      return "⬆"; // Urgent
+      return "⬆";
     case 2:
-      return "↑"; // High
+      return "↑";
     case 3:
-      return "─"; // Medium
+      return "─";
     case 4:
-      return "↓"; // Low
+      return "↓";
     default:
       return "○";
   }

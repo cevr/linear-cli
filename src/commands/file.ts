@@ -23,7 +23,6 @@ export const logSavedFiles = (savedFiles: ReadonlyArray<SavedFile>, json: boolea
     }
   });
 
-// linear file download <url>... - Download files uploaded to Linear
 export const fileDownloadCommand = Command.make(
   "download",
   { urls: uploadUrlsArg, outputDir: outputDirFlag, overwrite: overwriteFlag, json: jsonFlag },

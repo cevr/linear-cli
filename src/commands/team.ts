@@ -4,7 +4,6 @@ import { jsonFlag } from "../lib/flags.js";
 import { encodeJson } from "../lib/json.js";
 import { LinearService } from "../services/Linear.js";
 
-// linear team list - List all teams
 export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json }) =>
   Effect.gen(function* () {
     const linear = yield* LinearService;
@@ -51,7 +50,6 @@ export const teamListCommand = Command.make("list", { json: jsonFlag }, ({ json 
   ]),
 );
 
-// Combined team command with subcommands
 export const team = Command.make("team", {}, () =>
   Console.log("Use 'linear team list' to list teams. See --help for more."),
 ).pipe(Command.withDescription("Manage Linear teams"), Command.withSubcommands([teamListCommand]));

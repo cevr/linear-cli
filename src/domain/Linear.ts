@@ -162,7 +162,6 @@ export interface CreateIssueInput {
 export const IssueFile = Schema.Struct({
   name: Schema.String,
   url: Schema.String,
-  /** `description`, or the ID of the comment that links the file. */
   source: Schema.String,
 });
 export interface IssueFile extends SchemaType.Type<typeof IssueFile> {}
@@ -178,6 +177,5 @@ export interface SavedFile extends SchemaType.Type<typeof SavedFile> {}
 export interface DownloadedFile {
   readonly bytes: Uint8Array;
   readonly contentType?: string;
-  /** From the `Content-Disposition` header, when the server sends one. */
   readonly fileName?: string;
 }

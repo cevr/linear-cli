@@ -112,7 +112,6 @@ describe("ConfigService", () => {
   });
 });
 
-// Real filesystem and decoder; only the environment is isolated from the owner account.
 const readGlobalConfig = Effect.fn("ConfigTest.readGlobalConfig")(function* (content: string) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;

@@ -6,20 +6,13 @@ import { linear } from "./cli.js";
 import { ConfigService } from "./services/Config.js";
 import { LinearService } from "./services/Linear.js";
 
-// Build the CLI runner
 const cli = Command.run(linear, { version: packageJson.version });
 
-// Layer composition:
-// - BunServices provides FileSystem, Path, Terminal, Stdio, and child processes
-// - ConfigService depends on FileSystem, Path
-// - LinearService depends on ConfigService
-// Build layers with dependencies
 const MainLayer = LinearService.layer.pipe(
   Layer.provideMerge(ConfigService.layer),
   Layer.provideMerge(BunServices.layer),
 );
 
-// Run the CLI
 cli.pipe(
   Effect.tapErrorTag("TokenNotFoundError", (e) => Console.error(`Error: ${e.message}`)),
   Effect.tapErrorTag("LinearApiError", (e) => Console.error(`Linear API Error: ${e.message}`)),

@@ -7,7 +7,6 @@ import { FileWriteError, InvalidInputError } from "./errors.js";
 
 export interface DownloadRequest {
   readonly url: UploadUrl;
-  /** The name the Markdown link gave the file, when there is one. */
   readonly name?: string;
 }
 
