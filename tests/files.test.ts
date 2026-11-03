@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { layer as BunServicesLayer } from "@effect/platform-bun/BunServices";
-import { Effect, FileSystem, Layer, Path, Redacted, Ref } from "effect";
+import { Context, Effect, FileSystem, Layer, Path, Redacted, Ref } from "effect";
+import { FetchHttpClient, HttpClient, HttpClientResponse } from "effect/http";
 import { TestConsole } from "effect/testing";
 import { runCli } from "../src/cli.js";
 import {
@@ -73,37 +74,67 @@ describe("upload helpers", () => {
   });
 });
 
-const response = (body: BodyInit | null, init: ResponseInit): Promise<Response> =>
-  Effect.runPromise(Effect.succeed(new Response(body, init)));
+type FakeResponse = { readonly body: BodyInit | null; readonly init: ResponseInit };
+
+interface RecordedRequest {
+  readonly url: string;
+  readonly authorization: string | undefined;
+  readonly redirect: RequestRedirect | undefined;
+}
+
+const fakeHttpClient = (
+  respond: (requestNumber: number) => FakeResponse,
+  recorded: Array<RecordedRequest> = [],
+) =>
+  Layer.succeed(
+    HttpClient.HttpClient,
+    HttpClient.make((request, url, _signal, fiber) => {
+      recorded.push({
+        url: url.toString(),
+        authorization: request.headers["authorization"],
+        redirect: Context.getOrUndefined(fiber.context, FetchHttpClient.RequestInit)?.redirect,
+      });
+      const { body, init } = respond(recorded.length);
+      return Effect.succeed(HttpClientResponse.fromWeb(request, new Response(body, init)));
+    }),
+  );
 
 describe("fetchUpload", () => {
   it.effect("sends the key to the upload host but not to the redirect target", () =>
     Effect.gen(function* () {
-      const requests: Array<{ url: string; authorization: string | null }> = [];
-      const fakeFetch = (input: string | URL, init?: RequestInit): Promise<Response> => {
-        requests.push({
-          url: String(input),
-          authorization: new Headers(init?.headers).get("authorization"),
-        });
-        if (requests.length === 1) {
-          return response(null, {
-            status: 302,
-            headers: { location: "https://storage.example.com/signed?sig=1" },
-          });
+      const requests: Array<RecordedRequest> = [];
+      const client = fakeHttpClient((requestNumber): FakeResponse => {
+        if (requestNumber === 1) {
+          return {
+            body: null,
+            init: {
+              status: 302,
+              headers: { location: "https://storage.example.com/signed?sig=1" },
+            },
+          };
         }
-        return response("pdf-bytes", {
-          headers: {
-            "content-type": "application/pdf",
-            "content-disposition": 'attachment; filename="Spec.pdf"',
+        return {
+          body: "pdf-bytes",
+          init: {
+            headers: {
+              "content-type": "application/pdf",
+              "content-disposition": 'attachment; filename="Spec.pdf"',
+            },
           },
-        });
-      };
+        };
+      }, requests);
 
-      const file = yield* fetchUpload(UploadUrl.make(uploadA), Redacted.make("lin_key"), fakeFetch);
+      const file = yield* fetchUpload(UploadUrl.make(uploadA), Redacted.make("lin_key")).pipe(
+        Effect.provide(client),
+      );
 
       expect(requests).toEqual([
-        { url: uploadA, authorization: "lin_key" },
-        { url: "https://storage.example.com/signed?sig=1", authorization: null },
+        { url: uploadA, authorization: "lin_key", redirect: "manual" },
+        {
+          url: "https://storage.example.com/signed?sig=1",
+          authorization: undefined,
+          redirect: undefined,
+        },
       ]);
       expect(new TextDecoder().decode(file.bytes)).toBe("pdf-bytes");
       expect(file.contentDispositionFileName).toBe("Spec.pdf");
@@ -112,12 +143,11 @@ describe("fetchUpload", () => {
 
   it.effect("fails with a tagged error on a non-success status", () =>
     Effect.gen(function* () {
-      const fakeFetch = (): Promise<Response> => response(null, { status: 404 });
-      const result = yield* fetchUpload(
-        UploadUrl.make(uploadA),
-        Redacted.make("lin_key"),
-        fakeFetch,
-      ).pipe(Effect.result);
+      const client = fakeHttpClient(() => ({ body: null, init: { status: 404 } }));
+      const result = yield* fetchUpload(UploadUrl.make(uploadA), Redacted.make("lin_key")).pipe(
+        Effect.provide(client),
+        Effect.result,
+      );
 
       expect(result._tag).toBe("Failure");
       if (result._tag === "Failure") {

@@ -1,6 +1,8 @@
 import { LinearClient } from "@linear/sdk";
 import type { Comment, Issue, IssueRelation as SdkIssueRelation, User } from "@linear/sdk";
 import { Context, Effect, Layer, Redacted } from "effect";
+import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import type { HttpClientError } from "effect/http";
 import type {
   CreateIssueInput,
   CreatedIssue,
@@ -62,6 +64,7 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
     LinearService,
     Effect.gen(function* () {
       const config = yield* ConfigService;
+      const httpClient = yield* HttpClient.HttpClient;
       const getClient = yield* Effect.cached(
         config.getToken.pipe(
           Effect.map((token) => new LinearClient({ apiKey: Redacted.value(token) })),
@@ -263,7 +266,9 @@ export class LinearService extends Context.Service<LinearService, LinearOperatio
 
       const downloadFile = Effect.fn("LinearService.downloadFile")(function* (url: UploadUrl) {
         const token = yield* config.getToken;
-        return yield* fetchUpload(url, token);
+        return yield* fetchUpload(url, token).pipe(
+          Effect.provideService(HttpClient.HttpClient, httpClient),
+        );
       });
 
       return LinearService.of({
@@ -349,53 +354,47 @@ const toLinearError = (error: unknown): InvalidTokenError | LinearApiError => {
   return LinearApiError.make({ message });
 };
 
-type FetchImplementation = (input: string | URL, init?: RequestInit) => Promise<Response>;
-
 const isRedirect = (status: number): boolean => status >= 300 && status < 400;
 
-const requestUpload = (
-  fetchImplementation: FetchImplementation,
-  input: string | URL,
-  init: RequestInit,
-): Effect.Effect<Response, LinearApiError> =>
-  Effect.tryPromise({
-    try: () => fetchImplementation(input, init),
-    catch: (error) => LinearApiError.make({ message: `Download failed: ${String(error)}` }),
-  });
+const toDownloadError = (error: HttpClientError.HttpClientError): LinearApiError =>
+  LinearApiError.make({ message: `Download failed: ${String(error)}` });
 
 export const fetchUpload = Effect.fn("LinearService.fetchUpload")(function* (
   url: UploadUrl,
   token: Redacted.Redacted<string>,
-  fetchImplementation: FetchImplementation = fetch,
 ) {
-  let response = yield* requestUpload(fetchImplementation, url, {
-    headers: { Authorization: Redacted.value(token) },
-    redirect: "manual",
-  });
-  const location = response.headers.get("location");
-  if (isRedirect(response.status) && location !== null) {
-    response = yield* requestUpload(fetchImplementation, new URL(location, url), {
-      redirect: "follow",
-    });
+  const client = yield* HttpClient.HttpClient;
+  let response = yield* client
+    .execute(
+      HttpClientRequest.get(url).pipe(
+        HttpClientRequest.setHeader("Authorization", Redacted.value(token)),
+      ),
+    )
+    .pipe(
+      Effect.provideService(FetchHttpClient.RequestInit, { redirect: "manual" }),
+      Effect.mapError(toDownloadError),
+    );
+  const location = response.headers["location"];
+  if (isRedirect(response.status) && location !== undefined) {
+    response = yield* client
+      .execute(HttpClientRequest.get(new URL(location, url)))
+      .pipe(Effect.mapError(toDownloadError));
   }
   if (response.status === 401) {
     return yield* InvalidTokenError.make({ message: "Invalid API token" });
   }
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     return yield* LinearApiError.make({
       message: `Download failed with HTTP ${response.status} for ${url}`,
       code: String(response.status),
     });
   }
-  const body = yield* Effect.tryPromise({
-    try: () => response.arrayBuffer(),
-    catch: (error) => LinearApiError.make({ message: `Download failed: ${String(error)}` }),
-  });
+  const body = yield* response.arrayBuffer.pipe(Effect.mapError(toDownloadError));
   return {
     bytes: new Uint8Array(body),
-    contentType: response.headers.get("content-type") ?? undefined,
+    contentType: response.headers["content-type"],
     contentDispositionFileName: fileNameFromContentDisposition(
-      response.headers.get("content-disposition"),
+      response.headers["content-disposition"] ?? null,
     ),
   } satisfies DownloadedFile;
 });

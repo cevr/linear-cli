@@ -1,5 +1,5 @@
 import { Command } from "effect/cli";
-import { BunRuntime, BunServices } from "@effect/platform-bun";
+import { BunHttpClient, BunRuntime, BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer } from "effect";
 import packageJson from "../package.json" with { type: "json" };
 import { linear } from "./cli.js";
@@ -11,6 +11,7 @@ const cli = Command.run(linear, { version: packageJson.version });
 const MainLayer = LinearService.layer.pipe(
   Layer.provideMerge(ConfigService.layer),
   Layer.provideMerge(BunServices.layer),
+  Layer.provideMerge(BunHttpClient.layer),
 );
 
 cli.pipe(
