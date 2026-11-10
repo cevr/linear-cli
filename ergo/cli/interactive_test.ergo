@@ -47,13 +47,13 @@ func ran(issues []linear.Details, teams []linear.Team, keys []term.Key, args []s
 	let terminal = term.NewScript(keys, term.Window{Cols: 80, Rows: 24})
 	let writes = memory.NewWrites()
 	let disk = fstest.NewMemory()
-	let failure = with context { linear.Tracker: memory.New(ada, teams, []linear.Project{}), linear.Reader: memory.NewReadSnapshot(issues), linear.Workflow: memory.NewWorkflowSnapshot([]linear.WorkflowState{started}), linear.Writer: writes, linear.Uploads: NoUploads, io.Stdout: out, io.Stderr: prompts, term.Terminal: terminal, fs.Files: disk, fs.Writes: disk } {
+	let failure = with context { linear.Settings: memory.NewSettings(None), linear.Tracker: memory.New(ada, teams, []linear.Project{}), linear.Reader: memory.NewReadSnapshot(issues), linear.Workflow: memory.NewWorkflowSnapshot([]linear.WorkflowState{started}), linear.Writer: writes, linear.Uploads: NoUploads, io.Stdout: out, io.Stderr: prompts, term.Terminal: terminal, fs.Files: disk, fs.Writes: disk } {
 		attempt(args)
 	}
 	Outcome{Out: out.Text(), Prompts: prompts.Text(), Failure: failure, Modes: len(terminal.Modes()), Writes: len(writes.Events())}
 }
 
-func attempt(args []string) string needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
+func attempt(args []string) string needs linear.Settings | linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
 	let parsed = invocation(args) catch {
 	case os.Exit as e:
 		return "exit: " + e.Message

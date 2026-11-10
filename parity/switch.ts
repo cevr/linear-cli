@@ -89,6 +89,7 @@ async function verify(script: string) {
     "project list",
     "issue list",
     "issue view",
+    "issue create",
     "issue files",
     "issue start",
     "issue comment",
@@ -101,8 +102,7 @@ async function verify(script: string) {
     await expect([...args, "--interactive"], "ergo");
     await expect([...args, "--log-level=debug"], "ts");
   }
-  for (const args of [[], ["issue"], ["issue", "create", "--title", "x"], ["unknown", "list"]])
-    await expect(args, "ts");
+  for (const args of [[], ["issue"], ["unknown", "list"]]) await expect(args, "ts");
   for (const arg of ["--help", "-h", "--version"]) await expect([arg], "ergo");
   await expect(["auth"], "ergo");
   await expect(["auth", "--help"], "ts");
@@ -146,7 +146,7 @@ if (process.argv.includes("--mutants")) {
   const mutants = [
     ["interactive-routes-to-ts", "--wizard|--wizard=*|", "--interactive|--wizard|--wizard=*|"],
     ["auth-routes-to-ts", "auth:|auth:whoami", "auth:whoami"],
-    ["config-create-routes-to-ergo", "auth:whoami|team:list", "issue:create|auth:whoami|team:list"],
+    ["create-routes-to-ts", "issue:start|issue:create|", "issue:start|"],
     [
       "override-ignored",
       'ts) exec "$bindir/linear-ts" "$@"',

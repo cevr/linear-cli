@@ -16,10 +16,10 @@ for arg do
   esac
 done
 
-# Parity table: L1-L5 leaves and bare auth. Create stays TS until TOML config parity.
+# Parity table: every ported leaf (L1-L6) and bare auth.
 impl=ts
 case ${1-}:${2-} in
-  auth:|auth:whoami|team:list|project:list|issue:list|issue:view|issue:files|issue:start|issue:comment|file:download|api:graphql) impl=ergo ;;
+  auth:|auth:whoami|team:list|project:list|issue:list|issue:view|issue:files|issue:start|issue:create|issue:comment|file:download|api:graphql) impl=ergo ;;
   --version:|--help:|-h:) impl=ergo ;;
 esac
 # A TS-only build remains usable. Explicit ergo never silently falls back.

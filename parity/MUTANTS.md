@@ -95,3 +95,13 @@ the Ergo-side record.
 - `auth-saves-before-verify`, `auth-ignores-open-status`: a refused key is kept; a failed `open` is not reported. Test `AuthChecksBeforeKeeping`.
 - `no-terminal-reported-as-cancel`, `view-ignores-interactive`: a prompt with no terminal is reported as a cancel; `--interactive` is ignored. Process case `view-interactive-no-terminal`.
 - Switch: `interactive-routes-to-ts` (the flag scan sends `--interactive` to TS again) and `auth-routes-to-ts` (bare `auth` leaves the table).
+
+# L6 guards (config files)
+
+The five config cases were recorded at L0 and run natively from L6. No earlier
+law reads the file order.
+
+- `config-global-first`, `config-skips-linear-toml`: the global file wins, or `linear.toml` is not read. Law `ProjectFileFirst` over all 8 presence sets (the fixed cases each hold one file).
+- `config-ignored-by-create`: create does not use the configured team. Case `config-global`.
+- `config-error-swallowed`: a malformed file reads as no defaults. Case `config-malformed`.
+- Switch: `create-routes-to-ts` (create leaves the table; replaces L4b's `config-create-routes-to-ergo`, whose rule is gone).

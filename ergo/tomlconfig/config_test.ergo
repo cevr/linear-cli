@@ -1,0 +1,36 @@
+import filepath
+import fstest
+import linearport/credential
+
+// ProjectFileFirst: the defaults are those of the first file that is there,
+// in Candidates order, whatever the later files say.
+law ProjectFileFirst(project bool, local bool, global bool) {
+	let disk = fstest.NewMemory()
+	let f = File{files: disk, cwd: "w", home: "h"}
+	// The order is stated here, not read from Candidates.
+	let names = []string{"w/.linear.toml", "w/linear.toml", "h/.config/linear/config.toml"}
+	let present = []bool{project, local, global}
+	let mut want Option[string] = None
+	for i, name in names {
+		if present[i] {
+			disk.MkdirAll(filepath.Dir(name)) catch {
+			case _:
+				return false
+			}
+			disk.WriteFile(name, "team_id = \"T\(i)\"\n") catch {
+			case _:
+				return false
+			}
+			match want {
+			case None:
+				want = Some[string]{Value: "T\(i)"}
+			case Some[string]:
+			}
+		}
+	}
+	let got = Defaults(f) catch {
+	case credential.ConfigError:
+		return false
+	}
+	got.TeamId == want
+}

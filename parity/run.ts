@@ -336,6 +336,19 @@ for (const c of selected) {
         throw new Error("graphql-invalid: parser diagnostic prefix or detail is absent");
       expected.err = actual.err;
     }
+    // The text after a config failure's path is each TOML parser's own.
+    const configPrefix: Record<string, string> = {
+      "config-malformed": "Config Error: Failed to parse $CASE/.linear.toml: ",
+      "config-invalid-type": "Config Error: Invalid Linear config in $CASE/.linear.toml: ",
+    };
+    const prefix = configPrefix[c.name];
+    if (prefix && !tsCheck) {
+      if (!expected.err.startsWith(prefix) || !actual.err.startsWith(prefix))
+        throw new Error(`${c.name}: config failure lost its kind or path`);
+      if (actual.err.length <= prefix.length + 1)
+        throw new Error(`${c.name}: config failure has no detail`);
+      expected.err = actual.err;
+    }
     if (noTerminal.has(c.name) && !tsCheck) {
       const refusal = "Invalid input: prompts need a terminal on standard input\n";
       if (expected.status !== 130 || actual.out !== "" || actual.err !== refusal)

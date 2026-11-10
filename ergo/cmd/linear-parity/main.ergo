@@ -6,11 +6,13 @@ import linearport/cli
 import linearport/credential
 import linearport/graphqlhttp
 import linearport/linear
+import linearport/tomlconfig
 import linearport/uploadhttp
 import os
 import strconv
 import strings
 import term
+import go path/filepath
 
 // loopback admits only a literal IPv4 loopback HTTP origin with a port.
 func loopback(value Option[string]) string fails os.Exit {
@@ -60,7 +62,13 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 	// The offline entry never starts a program: opening the key page always
 	// fails here, so a run cannot reach a browser.
 	let opener = exec.Script{Results: Map[string, exec.Result]{}}
-	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
+	// std os has no working directory; Go's Abs reads it (getcwd).
+	let cwd = filepath.Abs(".") catch {
+	case _:
+		"."
+	}
+	let settings = tomlconfig.New(disk, cwd, home)
+	with context { linear.Settings: settings, linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
 		try cli.Run(process.Args())
 	}
 }

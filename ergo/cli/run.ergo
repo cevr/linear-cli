@@ -37,7 +37,7 @@ func wireViewer(v linear.Viewer) WireViewer {
 	WireViewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
 }
 
-func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
+func Run(args []string) fails os.Exit needs linear.Settings | linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
 	run(args) catch {
 	case os.Exit as e:
 		return e
@@ -64,7 +64,7 @@ func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | lin
 	}
 }
 
-func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
+func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Settings | linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
 	// std flag has no command that both runs and holds subcommands, so the
 	// bare group name is the one argv this CLI reads before the tree.
 	if len(args) == 1 && args[0] == "auth" {
@@ -106,7 +106,7 @@ func invocation(args []string) Option[Invocation] fails os.Exit needs io.Stdout 
 
 // dispatch runs every command but api graphql, whose workspace check is the
 // one foreign Go call; tests run dispatch over memory providers.
-func dispatch(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
+func dispatch(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Settings | linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
 	if command == "file download" {
 		try fileDownload(v)
 		return

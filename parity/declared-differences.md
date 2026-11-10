@@ -49,7 +49,16 @@ Prompts and auth (L5):
 - `auth` reads the bare argv `auth` before the command tree: std flag has no
   command that both runs and has subcommands (neutral gap in the pilot's notes).
 
-TOML config (L6) and performance receipts (L7) are not native-parity claims.
-The local switch and its parity table are described in `routing.md`; create
-remains TypeScript by default until L6. No installed command is changed by this
-branch.
+Config files (L6):
+
+- The files, their order (`./.linear.toml`, `./linear.toml`, then
+  `~/.config/linear/config.toml`; the first that is there counts) and the
+  `team_id` key are the original's. TOML is std `toml` (TOML 1.0).
+- After `Failed to parse PATH: ` and `Invalid Linear config in PATH: ` the text
+  is the port's (`line 1, key team_id: unclosed string`;
+  `expected a string at team_id`); the prefix, the path and status 1 are kept.
+- Unknown keys are skipped, as the original's schema does.
+
+Performance receipts (L7) are not native-parity claims. The local switch and
+its parity table are described in `routing.md`. No installed command is changed
+by this branch.

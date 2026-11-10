@@ -48,9 +48,17 @@ a prompt. Prompts draw on standard error; with no terminal they fail
 and `exec.NewHost()`; the parity entry binds an empty `exec.Script`, so it
 never starts `open`. Tests in `cli` and `credential` play scripted keys.
 
+L6 reads `linear.Settings` (the default team of `issue create`) from TOML with
+std `toml`: `./.linear.toml`, else `./linear.toml`, else
+`~/.config/linear/config.toml`; the first file that is there counts, and a bad
+one is a `ConfigError` (law `ProjectFileFirst` in `tomlconfig`). The file's
+`team_id` key is the record field `Team_id`, because the derived codec lowers
+only leading capitals. `main` reads the working directory with Go's
+`filepath.Abs`, since std `os` has none.
+
 Use an explicit private GOPATH/GOMODCACHE as well as GOCACHE for isolated HOME
 builds. Clean a private read-only module cache with Go's `clean -modcache`, not
-permission changes. TOML and installed-command linking remain L6–L7.
+permission changes. Installed-command linking and receipts remain L7.
 The local switch in `bin/linear` uses the parity table in `parity/routing.md`.
 `bun run build` builds `linear-ts`, never replaces the shim; `build:ergo` builds
 `linear-ergo` with the compiler from `ERGO` (or PATH). The offline gate runs the

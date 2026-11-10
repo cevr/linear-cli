@@ -6,9 +6,11 @@ import linearport/cli
 import linearport/credential
 import linearport/graphqlhttp
 import linearport/linear
+import linearport/tomlconfig
 import linearport/uploadhttp
 import os
 import term
+import go path/filepath
 
 // Only this entry chooses the production origins. No environment variable can
 // redirect an API credential. GraphQL redirects remain responses; only the
@@ -39,7 +41,13 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 	let uploads = uploadhttp.New(remote, linear.UploadOrigin(), "", credentials)
 	// auth runs `open` on the key page, as the original does.
 	let opener = exec.NewHost()
-	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
+	// std os has no working directory; Go's Abs reads it (getcwd).
+	let cwd = filepath.Abs(".") catch {
+	case _:
+		"."
+	}
+	let settings = tomlconfig.New(disk, cwd, home)
+	with context { linear.Settings: settings, linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
 		try cli.Run(process.Args())
 	}
 }

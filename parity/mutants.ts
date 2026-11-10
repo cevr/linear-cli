@@ -368,6 +368,41 @@ const mutants: Mutant[] = [
     guard: "no-terminal refusal lost its message or status",
     args: ["--phase=5", "--case=view-interactive-no-terminal"],
   },
+  // L6: config files through std toml.
+  {
+    name: "config-global-first",
+    file: "tomlconfig/config.ergo",
+    from: "for path in Candidates(f) {",
+    to: "for path in []string{Candidates(f)[2], Candidates(f)[0], Candidates(f)[1]} {",
+    pkg: "tomlconfig",
+    guard: "ProjectFileFirst",
+  },
+  {
+    name: "config-skips-linear-toml",
+    file: "tomlconfig/config.ergo",
+    from: 'filepath.Join([]string{f.cwd, "linear.toml"}), ',
+    to: "",
+    pkg: "tomlconfig",
+    guard: "ProjectFileFirst",
+  },
+  {
+    name: "config-ignored-by-create",
+    file: "cli/write.ergo",
+    from: "} else { configured }",
+    to: "} else { None }",
+    pkg: "",
+    guard: "expected exit 0, got 1",
+    args: ["--phase=6", "--case=config-global"],
+  },
+  {
+    name: "config-error-swallowed",
+    file: "tomlconfig/config.ergo",
+    from: "return try parse(path, text.Value)",
+    to: "return parse(path, text.Value) catch {\n\t\t\tcase _:\n\t\t\t\tlinear.Defaults{TeamId: None}\n\t\t\t}",
+    pkg: "",
+    guard: "config failure lost its kind or path",
+    args: ["--phase=6", "--case=config-malformed"],
+  },
 ];
 // --only=<name> runs one mutant while a phase is built; the gate runs all.
 const only = process.argv.find((arg) => arg.startsWith("--only="))?.slice("--only=".length);
