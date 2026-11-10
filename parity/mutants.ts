@@ -4,7 +4,8 @@ import { cp, mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promis
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
-const scratch = "/tmp/opencode/linear-port";
+// One owned scratch per pilot step; the default is the original pilot folder.
+const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port";
 const compiler = join(scratch, "ergo");
 await mkdir(scratch, { recursive: true });
 const env = {
@@ -16,6 +17,7 @@ const env = {
   GOCACHE: join(scratch, "gocache"),
   GOPATH: join(scratch, "go"),
   GOMODCACHE: join(scratch, "go/pkg/mod"),
+  LINEAR_PARITY_SCRATCH: scratch,
 };
 
 async function run(command: string, args: string[], cwd: string) {

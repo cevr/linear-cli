@@ -4,7 +4,8 @@ import { chmod, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
-const scratch = "/tmp/opencode/linear-port";
+// One owned scratch per pilot step; the default is the original pilot folder.
+const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port";
 await mkdir(scratch, { recursive: true });
 const sourcePath =
   process.argv.find((arg) => arg.startsWith("--shim="))?.slice(7) ?? join(root, "bin/linear");

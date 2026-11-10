@@ -19,7 +19,8 @@ import { fakeLinear } from "./fake-linear";
 import { world } from "./world";
 
 const root = resolve(import.meta.dir, "..");
-const scratch = "/tmp/opencode/linear-port";
+// One owned scratch per pilot step; the default is the original pilot folder.
+const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port";
 const candidate = process.argv.find((x) => x.startsWith("--binary="))?.slice("--binary=".length);
 if (candidate && !(await realpath(candidate)).startsWith(`${scratch}/`))
   throw new Error("Candidate binary must be under the pilot scratch directory");
