@@ -4,6 +4,10 @@ import { cp, mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promis
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
+// The package version; scripts/version.ts writes the same into the CLI's root.
+const packageVersion: string = JSON.parse(
+  await readFile(join(root, "package.json"), "utf8"),
+).version;
 // One owned scratch per pilot step; the default is the original pilot folder.
 const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port";
 const compiler = join(scratch, "ergo");
@@ -272,7 +276,7 @@ const mutants: Mutant[] = [
   {
     name: "root-version-undeclared",
     file: "cli/arguments.ergo",
-    from: 'Version: Some[string]{Value: "linear v0.6.0"}',
+    from: `Version: Some[string]{Value: "linear v${packageVersion}"}`,
     to: "Version: None",
     pkg: "",
     guard: "root-version-undeclared: version differs",

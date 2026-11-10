@@ -38,7 +38,7 @@
   "ignorePatterns": ["**/dist/**", "**/node_modules/**", "**/*.d.ts", "**/bin/**"],
   "overrides": [
     {
-      "files": ["parity/**/*.ts", "scripts/build.ts"],
+      "files": ["parity/**/*.ts", "scripts/*.ts"],
       "rules": {
         "no-await-in-loop": "off",
         "node/no-process-env": "off",

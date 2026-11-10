@@ -143,6 +143,8 @@ vite.config.ts.timestamp-*
 # Build output
 bin/*
 !bin/linear
+# scripts/release.ts: the native binaries the package ships
+npm/
 
 # OS
 .DS_Store
