@@ -125,6 +125,14 @@ async function snapshot(folder: string, prefix = ""): Promise<unknown[]> {
   return entries;
 }
 
+function processArgs(command: string, args: string[], c: Case) {
+  if (!c.argvBytes) return { command, args };
+  const rawArgs = args.map(
+    (arg, i) => c.argvBytes![i - (args.length - c.args.length)] ?? Buffer.from(arg).toString("hex"),
+  );
+  return { command: "python3", args: [join(root, "parity/argv.py"), command, ...rawArgs] };
+}
+
 async function run(c: Case, implementation: "ts" | "ergo", throughShim = false): Promise<Result> {
   const w = world(c.seed ?? 1);
   if (c.scenario === "empty") {
@@ -189,22 +197,13 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
       : c.args;
   let out = "",
     err = "";
-  const rawArgs = c.argvBytes
-    ? args.map(
-        (arg, i) =>
-          c.argvBytes![i - (args.length - c.args.length)] ?? Buffer.from(arg).toString("hex"),
-      )
-    : undefined;
-  const child = spawn(
-    rawArgs ? "python3" : command,
-    rawArgs ? [join(root, "parity/argv.py"), command, ...rawArgs] : args,
-    {
-      cwd: dir,
-      env,
-      detached: true,
-      stdio: ["pipe", "pipe", "pipe"],
-    },
-  );
+  const launch = processArgs(command, args, c);
+  const child = spawn(launch.command, launch.args, {
+    cwd: dir,
+    env,
+    detached: true,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
   let active = true;
   const stop = () => {
     if (active && child.pid) {
