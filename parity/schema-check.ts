@@ -23,7 +23,9 @@ if (process.argv.includes("--fetch")) {
 }
 const schema = buildSchema(text);
 const source = await readFile(join(root, "node_modules/@linear/sdk/dist/index.mjs"), "utf8");
-const documents = [...source.matchAll(/const (\w+Document) = new TypedDocumentString\(`([\s\S]*?)`\);/g)];
+const documents = [
+  ...source.matchAll(/const (\w+Document) = new TypedDocumentString\(`([\s\S]*?)`\);/g),
+];
 if (documents.length === 0) throw new Error("No SDK documents found; extractor needs review");
 const failures: { document: string; errors: string[] }[] = [];
 for (const [, name, query] of documents) {
@@ -40,8 +42,15 @@ const report = {
   failures,
   negativeControl: "schema-accepts-unknown-field killed",
 };
-await writeFile(join(import.meta.dir, "schema-result.json"), `${JSON.stringify(report, null, 2)}\n`);
-console.log(`SDK ${pin.sdk}: ${documents.length} documents, ${failures.length} invalid; negative control killed`);
+if (process.argv.includes("--fetch")) {
+  await writeFile(
+    join(import.meta.dir, "schema-result.json"),
+    `${JSON.stringify(report, null, 2)}\n`,
+  );
+}
+console.log(
+  `SDK ${pin.sdk}: ${documents.length} documents, ${failures.length} invalid; negative control killed`,
+);
 if (failures.length) {
   console.error(JSON.stringify(failures.slice(0, 3), null, 2));
   process.exitCode = 1;

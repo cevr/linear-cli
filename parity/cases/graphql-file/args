@@ -1,0 +1,6 @@
+api
+graphql
+--query-file
+query.graphql
+--variables
+{}

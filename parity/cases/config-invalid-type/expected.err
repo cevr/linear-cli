@@ -1,0 +1,2 @@
+Config Error: Invalid Linear config in $CASE/.linear.toml: SchemaError(Expected string | undefined
+  at ["team_id"])

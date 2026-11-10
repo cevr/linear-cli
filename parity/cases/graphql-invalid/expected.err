@@ -1,0 +1,5 @@
+Invalid input: Invalid GraphQL document: Syntax Error: Expected Name, found <EOF>.
+
+GraphQL request:1:17
+1 | query { viewer {
+  |                 ^

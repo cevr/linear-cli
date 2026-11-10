@@ -12,5 +12,21 @@
 - `preload-allows-real-host`: allow a third HTTPS origin. The offline transport guard must reject it before fetch.
 - `runner-uses-owner-home`: omit isolated HOME. The runner must assert that HOME equals its case directory before launch.
 - `dry-run-sends-mutation`: let dry runs send writes. Recorded mutation logs must be empty.
+- `coverage-ignores-flags`: remove every case of a skill's flag combination. Coverage must reject the missing invocation, not just count leaf names.
+- `read-flag-loads-every-relation`: load and print children/comments/relations even when their individual flag is absent. The individual read cases distinguish that from the all-flags case.
+- `native-ignores-disposition`: a native downloader ignores plain or encoded
+  Content-Disposition. The two download-disposition cases carry the original
+  helper tests across the process boundary; TS-only unit tests cannot kill a
+  mutation in the future native downloader.
 
 L0 schema validation is a prerequisite, not proof of API parity.
+
+## L1 guards
+
+- `memory-keeps-empty-identity`: include a fixture team with an empty id or key.
+  `Tracker.IdentityFields` runs on generated constructor inputs, including empty
+  strings. The fixed process corpus does not exercise invalid memory fixtures.
+- `http-stops-at-first-page`: omit the next-page loop. The schema-backed team
+  and project cases plus generated page sizes lose data.
+- `ship-origin-override`: read a transport-origin environment variable in the
+  production entry. The fixed-origin source/build review must reject it.

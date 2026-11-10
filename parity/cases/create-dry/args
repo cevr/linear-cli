@@ -1,0 +1,15 @@
+issue
+create
+--team
+ENG
+--title
+Route
+--description
+Packet
+--parent
+ENG-123
+--project
+router
+--priority
+2
+--dry-run

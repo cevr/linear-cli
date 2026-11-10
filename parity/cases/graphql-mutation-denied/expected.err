@@ -1,0 +1,1 @@
+Invalid input: Raw GraphQL mutations require explicit authorization with --allow-mutation. Preview and inspect the document before retrying.

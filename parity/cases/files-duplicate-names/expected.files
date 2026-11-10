@@ -1,0 +1,17 @@
+[
+  {
+    "path": "files/log.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+  },
+  {
+    "path": "files/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+  },
+  {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+  }
+]

@@ -1,0 +1,4 @@
+api
+graphql
+--query
+mutation { issueArchive(id: "ENG-123") { success } }

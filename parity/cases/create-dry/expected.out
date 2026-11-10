@@ -1,0 +1,1 @@
+{"dryRun":true,"operation":"issue.create","input":{"title":"Route","teamId":"00000000-0000-4000-8000-000000000004","description":"Packet","parent":"ENG-123","projectId":"00000000-0000-4000-8000-000000000006","priority":2}}

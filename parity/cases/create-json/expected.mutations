@@ -1,0 +1,13 @@
+[
+  {
+    "operation": "issue.create",
+    "input": {
+      "description": "Packet",
+      "parentId": "00000000-0000-4000-8000-000000000010",
+      "priority": 0,
+      "projectId": "00000000-0000-4000-8000-000000000006",
+      "teamId": "00000000-0000-4000-8000-000000000004",
+      "title": "Route"
+    }
+  }
+]
