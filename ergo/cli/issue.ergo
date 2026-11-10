@@ -6,8 +6,10 @@ import linearport/credential
 import linearport/files
 import linearport/linear
 import os
+import prompt
 import strings
 import tasks
+import term
 
 let stateFlag = flag.String("state", "", "Filter by state type").Repeated().WithAlias("s")
 let limitFlag = flag.Int("limit", 20, "Number of issues").Repeated().WithAlias("n")
@@ -59,12 +61,13 @@ func wireDetails(d linear.Details) WireDetails {
 	WireDetails{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State), Description: wireOption(d.Description), Team: wireOption(d.Team), Assignee: wireOption(d.Assignee), Project: wireOption(d.Project), Parent: wireOption(d.Parent), Labels: d.Labels, Children: wireOption(d.Children), Comments: comments, Relations: wireOption(d.Relations)}
 }
 
-func issueRead(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout {
+func issueRead(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout | term.Terminal | io.Stderr {
 	if command == "list" {
 		try issueList(v)
 		return
 	}
-	let ids = flag.Rest(v)
+	let mut ids = flag.Rest(v)
+	if len(ids) == 0 && command == "view" && enabled(interactiveFlag, v) { ids = []string{try pickIssue()} }
 	if len(ids) == 0 { return linear.InvalidInput{Message: "Issue identifier required in non-interactive mode. Usage: linear issue view ISSUE-123 --json"} }
 	let mut selectors = []linear.Selector{}
 	for id in ids { selectors = selectors.Append(try linear.ParseSelector(id)) }

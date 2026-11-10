@@ -37,10 +37,10 @@ func commands() flag.Root[Invocation, DuplicateFlag] {
 		flag.Group("project", "Projects", []flag.Command[Invocation, DuplicateFlag]{leaf("list", "project list", []flag.Flag{asJson}, []flag.ArgSpec{})}),
 		flag.Group("issue", "Issues", []flag.Command[Invocation, DuplicateFlag]{
 			leaf("list", "issue list", []flag.Flag{asJson, stateFlag, limitFlag}, []flag.ArgSpec{}),
-			leaf("view", "issue view", []flag.Flag{asJson, commentsFlag, childrenFlag, relationsFlag}, []flag.ArgSpec{idsArg}),
+			leaf("view", "issue view", []flag.Flag{asJson, interactiveFlag, commentsFlag, childrenFlag, relationsFlag}, []flag.ArgSpec{idsArg}),
 			leaf("files", "issue files", []flag.Flag{asJson, downloadFlag, outputDirFlag, overwriteFlag}, []flag.ArgSpec{idsArg}),
-			leaf("start", "issue start", []flag.Flag{asJson, dryRunFlag}, []flag.ArgSpec{idsArg}),
-			leaf("create", "issue create", []flag.Flag{asJson, dryRunFlag, titleFlag, descriptionFlag, teamFlag, parentFlag, projectFlag, priorityFlag}, []flag.ArgSpec{}),
+			leaf("start", "issue start", []flag.Flag{asJson, interactiveFlag, dryRunFlag}, []flag.ArgSpec{idsArg}),
+			leaf("create", "issue create", []flag.Flag{asJson, interactiveFlag, dryRunFlag, titleFlag, descriptionFlag, teamFlag, parentFlag, projectFlag, priorityFlag}, []flag.ArgSpec{}),
 			leaf("comment", "issue comment", []flag.Flag{asJson, dryRunFlag, bodyFlag}, []flag.ArgSpec{idsArg}),
 		}),
 		flag.Group("file", "Files", []flag.Command[Invocation, DuplicateFlag]{leaf("download", "file download", []flag.Flag{asJson, outputDirFlag, overwriteFlag}, []flag.ArgSpec{urlsArg})}),

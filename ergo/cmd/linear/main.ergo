@@ -1,3 +1,4 @@
+import exec
 import fs
 import http
 import io
@@ -7,6 +8,7 @@ import linearport/graphqlhttp
 import linearport/linear
 import linearport/uploadhttp
 import os
+import term
 
 // Only this entry chooses the production origins. No environment variable can
 // redirect an API credential. GraphQL redirects remain responses; only the
@@ -21,7 +23,7 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 	case None:
 		""
 	}
-	let credentials = credential.New(disk, home, process.Getenv("LINEAR_API_KEY"))
+	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
 	let net = http.NewClient("https://api.linear.app", http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
@@ -35,7 +37,9 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid upload network"}
 	}
 	let uploads = uploadhttp.New(remote, linear.UploadOrigin(), "", credentials)
-	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, fs.Files: disk, fs.Writes: disk } {
+	// auth runs `open` on the key page, as the original does.
+	let opener = exec.NewHost()
+	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
 		try cli.Run(process.Args())
 	}
 }

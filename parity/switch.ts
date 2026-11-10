@@ -98,18 +98,14 @@ async function verify(script: string) {
   for (const command of native) {
     const args = command.split(" ");
     await expect(args, "ergo");
-    await expect([...args, "--interactive"], "ts");
+    await expect([...args, "--interactive"], "ergo");
     await expect([...args, "--log-level=debug"], "ts");
   }
-  for (const args of [
-    [],
-    ["auth"],
-    ["issue"],
-    ["issue", "create", "--title", "x"],
-    ["unknown", "list"],
-  ])
+  for (const args of [[], ["issue"], ["issue", "create", "--title", "x"], ["unknown", "list"]])
     await expect(args, "ts");
   for (const arg of ["--help", "-h", "--version"]) await expect([arg], "ergo");
+  await expect(["auth"], "ergo");
+  await expect(["auth", "--help"], "ts");
   // Seeded opaque argv includes empty, whitespace, shell metacharacters, Unicode
   // and a terminator. The shim must forward bytes, not interpret any of them.
   let seed = 42;
@@ -148,7 +144,8 @@ if (native) {
 }
 if (process.argv.includes("--mutants")) {
   const mutants = [
-    ["default-routes-interactive-to-ergo", "--interactive|--interactive=*|", ""],
+    ["interactive-routes-to-ts", "--wizard|--wizard=*|", "--interactive|--wizard|--wizard=*|"],
+    ["auth-routes-to-ts", "auth:|auth:whoami", "auth:whoami"],
     ["config-create-routes-to-ergo", "auth:whoami|team:list", "issue:create|auth:whoami|team:list"],
     [
       "override-ignored",

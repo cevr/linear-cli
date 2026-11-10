@@ -17,6 +17,6 @@ func NewClient(ids []string) Client {
 	let net = http.InMemory(func(_ http.Request) http.Response needs http.Streaming {
 		http.Response{Status: 200, Header: []http.Field{}, Body: reply}
 	})
-	let credentials = credential.New(fstest.NewMemory(), ".", Some[string]{Value: "synthetic-law-token"})
+	let credentials = credential.New(fstest.NewMemory(), fstest.NewMemory(), ".", Some[string]{Value: "synthetic-law-token"})
 	Client{net: net, credentials: credentials}
 }

@@ -75,6 +75,12 @@ func CreateStep(state CreateState, signal CreateSignal) Decision[CreateState, st
 }
 type Create machine[CreateState, CreateSignal] { initial: NeedTeam, step: CreateStep }
 
+// Feed steps the create machine by one input, so a caller can take each
+// input from a flag or from a person in the machine's order.
+func Feed(state CreateState, signal CreateSignal) CreateState fails InvalidInput {
+	machines.Next(state, try CreateStep(state, signal))
+}
+
 func PrepareCreate(teamId string, title string, description string) Ready fails InvalidInput {
 	let result = machines.Run(Create{}, []CreateSignal{TeamGiven{Id: teamId}, TitleGiven{Text: title}, DescriptionGiven{Text: description}}) catch {
 	case InvalidInput as e:

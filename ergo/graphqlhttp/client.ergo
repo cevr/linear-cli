@@ -18,7 +18,11 @@ func query(c Client, document string) json.Value fails linear.ApiError | linear.
 }
 
 func queryVariables(c Client, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
-	let token = try c.credentials.Load()
+	try send(c, try c.credentials.Load(), document, variables)
+}
+
+// send posts one document with token. Only the API origin's client sends it.
+func send(c Client, token credential.Token, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError {
 	let request = credential.Authorize(token, http.Request{Method: "POST", Path: "/graphql", Query: []http.Field{},
 		Header: []http.Field{http.Field{Name: "Content-Type", Value: "application/json"}},
 		Body:   http.Buffered{Text: json.Encode(json.Codec[Ask]{MaxBytes: 0, MaxDepth: 0}, Ask{Query: document, Variables: variables})}})
@@ -111,8 +115,18 @@ func Projects(c Client) []linear.Project fails linear.ApiError | linear.AuthErro
 type ViewerNode { Id string, Name string, Email string, Admin bool, StatusEmoji json.Nullable[string], StatusLabel json.Nullable[string] }
 type ViewerData { Viewer ViewerNode }
 
+let viewerDocument = "query { viewer { id name email admin statusEmoji statusLabel } }"
+
 func Viewer(c Client) linear.Viewer fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
-	let value = try c.query("query { viewer { id name email admin statusEmoji statusLabel } }")
+	try viewerOf(try c.query(viewerDocument))
+}
+
+// Verify reads the viewer with a token a person gave, not the stored one.
+func Verify(c Client, token credential.Token) linear.Viewer fails linear.ApiError | linear.AuthError {
+	try viewerOf(try send(c, token, viewerDocument, json.Object{Members: []json.Member{}}))
+}
+
+func viewerOf(value json.Value) linear.Viewer fails linear.ApiError {
 	let data = json.Decode(json.Codec[ViewerData]{MaxBytes: 8000000, MaxDepth: 32}, json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, value)) catch {
 	case _:
 		return linear.ApiError{Message: "unexpected viewer response"}

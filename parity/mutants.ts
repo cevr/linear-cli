@@ -269,8 +269,110 @@ const mutants: Mutant[] = [
     guard: "parity mismatch",
     args: ["--phase=4", "--property=1000", "--case=seed-1000-download"],
   },
+  // L5: prompts (scripted keys over std term's Script) and auth.
+  {
+    name: "token-file-not-private",
+    file: "credential/token.ergo",
+    from: "t.value, fs.Private())",
+    to: "t.value, fs.Shared())",
+    pkg: "credential",
+    guard: "SavedTokenIsOwnerOnly",
+  },
+  {
+    name: "token-saved-elsewhere",
+    file: "credential/token.ergo",
+    from: 'f.writes.WriteFileMode(filepath.Join([]string{folder(f), "token"})',
+    to: 'f.writes.WriteFileMode(filepath.Join([]string{folder(f), "token.json"})',
+    pkg: "credential",
+    guard: "law refuted",
+  },
+  {
+    name: "pick-ignores-choice",
+    file: "cli/interactive.ergo",
+    from: 'shown[try prompt.Select("Select an issue", labels)].Identifier',
+    to: 'shown[0 * (try prompt.Select("Select an issue", labels))].Identifier',
+    pkg: "cli",
+    guard: "ViewAsksForAnIssue",
+  },
+  {
+    name: "pick-offers-every-issue",
+    file: "linear/session.ergo",
+    from: "issues[:if len(issues) < 20 { len(issues) } else { 20 }]",
+    to: "issues[:len(issues)]",
+    pkg: "cli",
+    guard: "ViewAsksForAnIssue",
+  },
+  {
+    name: "pick-skips-unstarted",
+    file: "cli/interactive.ergo",
+    from: 'if len(issues) == 0 { issues = try linear.Reader.MyIssues(Some[string]{Value: "unstarted"}, 50) }',
+    to: 'if false { issues = try linear.Reader.MyIssues(Some[string]{Value: "unstarted"}, 50) }',
+    pkg: "cli",
+    guard: "StartFallsBackToUnstarted",
+  },
+  {
+    name: "pick-without-issues-prompts",
+    file: "linear/session.ergo",
+    from: 'if len(issues) == 0 { return NoIssues{Message: "No issues found to select from."} }',
+    to: 'if false { return NoIssues{Message: "No issues found to select from."} }',
+    pkg: "cli",
+    guard: "StartFallsBackToUnstarted",
+  },
+  {
+    name: "create-never-asks-team",
+    file: "cli/write.ergo",
+    from: "try chooseTeam(teams, selector, asking)",
+    to: "try chooseTeam(teams, selector, false)",
+    pkg: "cli",
+    guard: "CreateAsksInMachineOrder",
+  },
+  {
+    name: "create-skips-description",
+    file: "cli/write.ergo",
+    from: '} else if asking { try prompt.Line("Description',
+    to: '} else if false { try prompt.Line("Description',
+    pkg: "cli",
+    guard: "CreateAsksInMachineOrder",
+  },
+  {
+    name: "auth-saves-before-verify",
+    file: "cli/interactive.ergo",
+    from: "let viewer = try linear.Sessions.Verify(token)\n\ttry credential.Credentials.Save(token)",
+    to: "try credential.Credentials.Save(token)\n\tlet viewer = try linear.Sessions.Verify(token)",
+    pkg: "cli",
+    guard: "AuthChecksBeforeKeeping",
+  },
+  {
+    name: "auth-ignores-open-status",
+    file: "cli/interactive.ergo",
+    from: "result.Status == 0",
+    to: "result.Status == 0 || true",
+    pkg: "cli",
+    guard: "AuthChecksBeforeKeeping",
+  },
+  {
+    name: "no-terminal-reported-as-cancel",
+    file: "cli/run.ergo",
+    from: 'Message: "Invalid input: prompts need a terminal on standard input"',
+    to: 'Message: "Cancelled"',
+    pkg: "",
+    guard: "no-terminal refusal lost its message or status",
+    args: ["--phase=5", "--case=view-interactive-no-terminal"],
+  },
+  {
+    name: "view-ignores-interactive",
+    file: "cli/issue.ergo",
+    from: 'command == "view" && enabled(interactiveFlag, v)',
+    to: 'command == "view" && false',
+    pkg: "",
+    guard: "no-terminal refusal lost its message or status",
+    args: ["--phase=5", "--case=view-interactive-no-terminal"],
+  },
 ];
+// --only=<name> runs one mutant while a phase is built; the gate runs all.
+const only = process.argv.find((arg) => arg.startsWith("--only="))?.slice("--only=".length);
 for (const mutant of mutants) {
+  if (only && mutant.name !== only) continue;
   const dir = await mkdtemp(join(scratch, "mutant-"));
   const module = join(dir, "ergo");
   await cp(join(root, "ergo"), module, { recursive: true });
@@ -306,6 +408,10 @@ for (const mutant of mutants) {
   if (result.code === 0 || !result.output.includes(mutant.guard))
     throw new Error(`${mutant.name}: survived or failed for the wrong reason: ${result.output}`);
   console.log(`killed ${mutant.name}: ${mutant.guard}`);
+}
+if (only) {
+  console.log(`EXIT: 0 (mutant ${only} only)`);
+  process.exit(0);
 }
 console.log("EXIT: 0 (all phase mutants killed)");
 

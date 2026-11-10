@@ -1,3 +1,4 @@
+import exec
 import fs
 import http
 import io
@@ -9,6 +10,7 @@ import linearport/uploadhttp
 import os
 import strconv
 import strings
+import term
 
 // loopback admits only a literal IPv4 loopback HTTP origin with a port.
 func loopback(value Option[string]) string fails os.Exit {
@@ -44,7 +46,7 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 	}
 	let origin = try loopback(process.Getenv("LINEAR_PARITY_ORIGIN"))
 	let storage = try loopback(process.Getenv("LINEAR_PARITY_STORAGE_ORIGIN"))
-	let credentials = credential.New(disk, home, process.Getenv("LINEAR_API_KEY"))
+	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
 	let net = http.NewClient(origin, http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
@@ -55,7 +57,10 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
 	}
 	let uploads = uploadhttp.New(remote, origin, "/uploads", credentials)
-	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, fs.Files: disk, fs.Writes: disk } {
+	// The offline entry never starts a program: opening the key page always
+	// fails here, so a run cannot reach a browser.
+	let opener = exec.Script{Results: Map[string, exec.Result]{}}
+	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
 		try cli.Run(process.Args())
 	}
 }

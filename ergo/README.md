@@ -38,9 +38,19 @@ std `http.Remote` that only `main` builds, under its origin and redirect policy
 token is an `http.Credential` of the upload origin, so a redirect target never
 gets it. `files` chooses safe, unique names and saves under `--output-dir`.
 
+L5 asks a person with std `prompt` on std `term`: `auth` (a secret prompt, then
+`open` on the key page), and `--interactive` on `issue view`, `issue start` and
+`issue create`. `linear.Sessions` checks a pasted key before
+`credential.Credentials.Save` keeps it 0600 (law `SavedIsLoaded`). Interactive
+create feeds the create machine in its order, each input from its flag or from
+a prompt. Prompts draw on standard error; with no terminal they fail
+`prompt.NotInteractive`. Only `main` binds `term.NewHost()`, `io.NewErrors()`
+and `exec.NewHost()`; the parity entry binds an empty `exec.Script`, so it
+never starts `open`. Tests in `cli` and `credential` play scripted keys.
+
 Use an explicit private GOPATH/GOMODCACHE as well as GOCACHE for isolated HOME
 builds. Clean a private read-only module cache with Go's `clean -modcache`, not
-permission changes. Prompts, TOML and installed-command linking remain L5–L7.
+permission changes. TOML and installed-command linking remain L6–L7.
 The local switch in `bin/linear` uses the parity table in `parity/routing.md`.
 `bun run build` builds `linear-ts`, never replaces the shim; `build:ergo` builds
 `linear-ergo` with the compiler from `ERGO` (or PATH). The offline gate runs the

@@ -253,6 +253,22 @@ export const cases: Case[] = [
     ["issue", "files", "ENG-123", "--download", "--output-dir", "files", "--json"],
     { scenario: "duplicate-names" },
   ),
+  // --interactive is accepted and changes nothing when the input is given.
+  c("view-interactive-id", 5, ["issue", "view", "ENG-123", "--interactive", "--json"]),
+  c("start-interactive-id", 5, ["issue", "start", "ENG-123", "--interactive", "--dry-run"]),
+  c("create-interactive-title", 5, [
+    "issue",
+    "create",
+    "--interactive",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--dry-run",
+  ]),
+  // A prompt with no terminal on standard input (the runner's stdin is a pipe).
+  c("view-interactive-no-terminal", 5, ["issue", "view", "--interactive", "--json"]),
+  c("create-interactive-no-terminal", 5, ["issue", "create", "--interactive", "--dry-run"]),
   c("config-global", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
     files: { ".config/linear/config.toml": 'team_id = "ENG"\n' },
   }),

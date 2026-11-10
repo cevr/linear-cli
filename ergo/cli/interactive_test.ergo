@@ -1,0 +1,179 @@
+import exec
+import fs
+import fstest
+import http
+import io
+import linearport/credential
+import linearport/graphqlhttp
+import linearport/linear
+import linearport/memory
+import os
+import prompt
+import strings
+import term
+
+// The prompts run on std term's Script (scripted keys, no terminal) and draw
+// on an io.Recorder. Providers are memory snapshots; no host, no process.
+
+// NoUploads is an Uploads provider for runs that never download.
+type NoUploads {}
+
+func Download(_ NoUploads, _ linear.UploadURL) linear.Downloaded fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	linear.ApiError{Message: "no uploads in this test"}
+}
+
+func issue(identifier string, stateType string) linear.Details {
+	linear.Details{Id: "id-" + identifier, Identifier: identifier, Title: "Title of " + identifier, Url: "https://linear.app/pilot/issue/" + identifier, BranchName: "b-" + identifier,
+		Priority:    linear.Priority{Value: 0, Label: "No priority"},
+		State:       Some[linear.WorkflowState]{Value: linear.WorkflowState{Id: "state-" + stateType, Name: "Name " + stateType, Type: stateType}},
+		Description: None, Team: Some[linear.IssueTeam]{Value: linear.IssueTeam{Id: "team-eng", Key: "ENG", Name: "Engineering"}},
+		Assignee:    None, Project: None, Parent: None, Labels: []linear.Label{}, Children: None, Comments: None, Relations: None}
+}
+
+func typed(keys []term.Key, text string) []term.Key {
+	let mut all = keys
+	for c in strings.Split(text, "") { all = all.Append(term.Char{Text: c}) }
+	all
+}
+
+type Outcome { Out string, Prompts string, Failure string, Modes int, Writes int }
+
+let ada = linear.Viewer{Id: "user-1", Name: "Ada", Email: "ada@example.com", Admin: false, Status: None}
+let started = linear.WorkflowState{Id: "state-started", Name: "In Progress", Type: "started"}
+
+func ran(issues []linear.Details, teams []linear.Team, keys []term.Key, args []string) Outcome {
+	let out = io.NewRecorder()
+	let prompts = io.NewRecorder()
+	let terminal = term.NewScript(keys, term.Window{Cols: 80, Rows: 24})
+	let writes = memory.NewWrites()
+	let disk = fstest.NewMemory()
+	let failure = with context { linear.Tracker: memory.New(ada, teams, []linear.Project{}), linear.Reader: memory.NewReadSnapshot(issues), linear.Workflow: memory.NewWorkflowSnapshot([]linear.WorkflowState{started}), linear.Writer: writes, linear.Uploads: NoUploads, io.Stdout: out, io.Stderr: prompts, term.Terminal: terminal, fs.Files: disk, fs.Writes: disk } {
+		attempt(args)
+	}
+	Outcome{Out: out.Text(), Prompts: prompts.Text(), Failure: failure, Modes: len(terminal.Modes()), Writes: len(writes.Events())}
+}
+
+func attempt(args []string) string needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
+	let parsed = invocation(args) catch {
+	case os.Exit as e:
+		return "exit: " + e.Message
+	}
+	match parsed {
+	case None:
+		return "no command"
+	case Some[Invocation] as p:
+		dispatch(p.Value.Command, p.Value.Values) catch {
+		case linear.InvalidInput as e:
+			return "invalid: " + e.Message
+		case linear.NoIssues:
+			return "no issues"
+		case prompt.NotInteractive:
+			return "not interactive"
+		case prompt.Cancelled:
+			return "cancelled"
+		case _:
+			return "other failure"
+		}
+	}
+	""
+}
+
+// Mutants pick-ignores-choice (pickIssue answers the first issue) and
+// pick-offers-every-issue (no 20-issue bound): only this test reads which
+// issue a person picked, and the choices offered.
+test ViewAsksForAnIssue {
+	let mut issues = []linear.Details{}
+	for n in 1..23 { issues = issues.Append(issue("ENG-\(n)", "started")) }
+	let r = ran(issues, []linear.Team{}, []term.Key{term.Down, term.Return}, []string{"issue", "view", "--interactive", "--json"})
+	assert r.Failure == ""
+	assert strings.Contains(r.Out, "\"identifier\":\"ENG-2\"") && !strings.Contains(r.Out, "\"identifier\":\"ENG-1\"")
+	assert strings.Contains(r.Prompts, "Select an issue") && strings.Contains(r.Prompts, "ENG-20: Title of ENG-20 - Name started")
+	assert !strings.Contains(r.Prompts, "ENG-21:")
+	assert r.Modes == 0
+}
+
+// Mutants pick-skips-unstarted (no fallback to unstarted issues) and
+// pick-without-issues-prompts (no NoIssues check): only this test runs the
+// fallback and the empty choice.
+test StartFallsBackToUnstarted {
+	let issues = []linear.Details{issue("ENG-7", "unstarted"), issue("ENG-8", "unstarted")}
+	let r = ran(issues, []linear.Team{}, []term.Key{term.Down, term.Return}, []string{"issue", "start", "--interactive", "--dry-run"})
+	assert r.Failure == ""
+	assert strings.HasPrefix(r.Out, "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-8\"}")
+	assert r.Writes == 0
+	let none = ran([]linear.Details{issue("ENG-9", "completed")}, []linear.Team{}, []term.Key{term.Return}, []string{"issue", "start", "--interactive"})
+	assert none.Failure == "no issues" && none.Prompts == ""
+}
+
+// Mutants create-never-asks-team (asking is false for the team) and
+// create-skips-description (no description prompt): only this test feeds the
+// create machine from a person.
+test CreateAsksInMachineOrder {
+	let teams = []linear.Team{linear.Team{Id: "team-eng", Key: "ENG", Name: "Engineering", Description: None}, linear.Team{Id: "team-ops", Key: "OPS", Name: "Operations", Description: None}}
+	let keys = typed(typed([]term.Key{term.Down, term.Return}, "Route").Append(term.Return), "Pkt").Append(term.Return)
+	let r = ran([]linear.Details{}, teams, keys, []string{"issue", "create", "--interactive", "--dry-run"})
+	assert r.Failure == ""
+	assert r.Out == "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Route\",\"teamId\":\"team-ops\",\"description\":\"Pkt\"}}\n"
+	assert strings.Contains(r.Prompts, "Select a team") && strings.Contains(r.Prompts, "OPS: Operations")
+	assert r.Modes == 0 && r.Writes == 0
+	// A blank title stops before the description is asked.
+	let blank = ran([]linear.Details{}, teams, []term.Key{term.Return, term.Return, term.Return}, []string{"issue", "create", "--interactive", "--dry-run"})
+	assert blank.Failure == "invalid: Issue title cannot be empty" && !strings.Contains(blank.Prompts, "Description")
+}
+
+func signedIn(keys []term.Key, opener exec.Script, disk fstest.Memory) Outcome {
+	let out = io.NewRecorder()
+	let prompts = io.NewRecorder()
+	let reply = "{\"data\":{\"viewer\":{\"id\":\"user-1\",\"name\":\"Ada\",\"email\":\"ada@example.com\",\"admin\":false,\"statusEmoji\":null,\"statusLabel\":null}}}"
+	let net = http.InMemory(func(r http.Request) http.Response needs http.Streaming {
+		for f in r.Header {
+			if f.Name == "Authorization" && f.Value == "lin_good" { return http.Response{Status: 200, Header: []http.Field{}, Body: reply} }
+		}
+		http.Response{Status: 401, Header: []http.Field{}, Body: "{}"}
+	})
+	let credentials = credential.New(disk, disk, "h", None)
+	let sessions = graphqlhttp.New(net, credentials)
+	let failure = with context { io.Stdout: out, io.Stderr: prompts, term.Terminal: term.NewScript(keys, term.Window{Cols: 80, Rows: 24}), exec.Runner: opener, linear.Sessions: sessions, credential.Credentials: credentials } {
+		signIn()
+	}
+	Outcome{Out: out.Text(), Prompts: prompts.Text(), Failure: failure, Modes: 0, Writes: 0}
+}
+
+func signIn() string needs io.Stdout | io.Stderr | term.Terminal | exec.Runner | linear.Sessions | credential.Credentials {
+	authenticate() catch {
+	case linear.AuthError as e:
+		return "auth: " + e.Message
+	case _:
+		return "other failure"
+	}
+	""
+}
+
+// Mutants auth-saves-before-verify (Save before Sessions.Verify) and
+// auth-ignores-open-status (opened is always true): only this test runs auth.
+test AuthChecksBeforeKeeping {
+	let mut results = Map[string, exec.Result]{}
+	results[exec.Key(exec.New("open", []string{keyPage}))] = exec.Result{Status: 0, Stdout: "", Stderr: ""}
+	let disk = fstest.NewMemory()
+	let ok = signedIn(typed([]term.Key{}, " lin_good").Append(term.Return), exec.Script{Results: results}, disk)
+	assert ok.Failure == ""
+	assert ok.Out == "\nTo authenticate, you'll need a Linear API key.\nOpening: "+keyPage+"\n\n\nValidating token...\n\nAuthenticated as Ada (ada@example.com)\n"
+	assert !strings.Contains(ok.Prompts, "lin_good") && strings.Contains(ok.Prompts, "Paste your API key")
+	assert try disk.ReadFile("h/.config/linear/token") == "lin_good"
+
+	let refused = fstest.NewMemory()
+	let mut failing = Map[string, exec.Result]{}
+	failing[exec.Key(exec.New("open", []string{keyPage}))] = exec.Result{Status: 1, Stdout: "", Stderr: ""}
+	let bad = signedIn(typed([]term.Key{}, "lin_bad").Append(term.Return), exec.Script{Results: failing}, refused)
+	assert bad.Failure == "auth: Invalid API token"
+	assert strings.Contains(bad.Out, "Could not open browser. Please visit the URL manually.\n")
+	let absent = signedIn(typed([]term.Key{}, "lin_bad").Append(term.Return), exec.Script{Results: Map[string, exec.Result]{}}, fstest.NewMemory())
+	assert strings.Contains(absent.Out, "Could not open browser. Please visit the URL manually.\n")
+	let kept = refused.ReadFile("h/.config/linear/token") catch {
+	case fs.NotFound:
+		""
+	case _:
+		"unreadable"
+	}
+	assert kept == ""
+}

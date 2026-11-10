@@ -68,7 +68,7 @@ New public seam: execute a copied shim with two inert sibling executables in an
 isolated HOME. It observes selected implementation, exact argv and exit status;
 domain output stays covered by the existing two-program parity corpus.
 
-- `default-routes-interactive-to-ergo`: deleting the flag fallback must fail the interactive route check.
+- `default-routes-interactive-to-ergo`: retired at L5, when `--interactive` reached native parity; replaced by `interactive-routes-to-ts` below.
 - `config-create-routes-to-ergo`: admitting create to the parity table must fail the config route check.
 - `override-ignored`: ignoring explicit ts must fail the override check.
 - `shim-loses-argument`: dropping argv must fail exact argument forwarding.
@@ -77,3 +77,21 @@ domain output stays covered by the existing two-program parity corpus.
 No earlier law, property or example executes a switch. Existing repeated-flag,
 short-name, explicit-priority and download cases guard the CU1 refactor; no new
 domain test is added for already-covered semantics.
+
+# L5 guards (prompts and auth)
+
+New seam: std `term.Script` plays keys to std `prompt` with no terminal; the
+prompts draw on an `io.Recorder`. No earlier law, property, case or test reads a
+prompt, a picked issue, a saved token or the `open` result. The original's
+prompts need a terminal, and its `auth` starts `open`, so the TS record leg
+cannot run them; the scripted-key tests in `ergo/cli` and `ergo/credential` are
+the Ergo-side record.
+
+- `token-saved-elsewhere`: Save writes another file name. Law `Credentials.SavedIsLoaded` (generated secrets and environments).
+- `token-file-not-private`: Save writes the token 0644. Test `SavedTokenIsOwnerOnly`; no law reads a mode.
+- `pick-ignores-choice`, `pick-offers-every-issue`: the picked issue is always the first; more than 20 issues are offered. Test `ViewAsksForAnIssue`.
+- `pick-skips-unstarted`, `pick-without-issues-prompts`: no fallback to unstarted issues; an empty choice is prompted. Test `StartFallsBackToUnstarted`.
+- `create-never-asks-team`, `create-skips-description`: the create machine is not fed from a person. Test `CreateAsksInMachineOrder`.
+- `auth-saves-before-verify`, `auth-ignores-open-status`: a refused key is kept; a failed `open` is not reported. Test `AuthChecksBeforeKeeping`.
+- `no-terminal-reported-as-cancel`, `view-ignores-interactive`: a prompt with no terminal is reported as a cancel; `--interactive` is ignored. Process case `view-interactive-no-terminal`.
+- Switch: `interactive-routes-to-ts` (the flag scan sends `--interactive` to TS again) and `auth-routes-to-ts` (bare `auth` leaves the table).

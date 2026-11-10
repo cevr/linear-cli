@@ -27,7 +27,29 @@ redirect for URL`, where the original reports the redirect's HTTP status.
 - Transport failure and `File Error:` texts are the port's own; the prefix and
   exit status 1 are kept.
 
-Interactive input (L5), TOML config (L6) and performance receipts (L7) are not
-native-parity claims. The local switch and its conservative parity table are
-described in `routing.md`; create and interactive paths remain TypeScript by
-default. No installed command is changed by this branch.
+Prompts and auth (L5):
+
+- Prompts are std `prompt` machines on std `term`. They draw on standard error,
+  so standard output holds only the result; the original draws on standard
+  output. Frames, colors and key handling are std's: Escape, Ctrl-C and Ctrl-D
+  cancel (`Cancelled`, status 1).
+- A prompt needs a terminal on standard input. With none, the port fails with
+  `Invalid input: prompts need a terminal on standard input` and status 1. The
+  original reads keys from the pipe and, at its end, exits 130 with no error line
+  (cases `view-interactive-no-terminal`, `create-interactive-no-terminal`).
+- An issue choice shows `ID: title - state` on every line; the original shows
+  the state only for the highlighted line.
+- Interactive create feeds the create machine in its order (team, title,
+  description). A rejected title stops before the description is asked; the
+  original asks the description and then rejects the title.
+- `auth` trims the pasted key before it checks it (the original checks the
+  untrimmed key and saves it trimmed). An empty key is
+  `Invalid input: API key cannot be empty`. The key is saved only after Linear
+  accepts it, 0600, as the original does. The parity entry never starts `open`.
+- `auth` reads the bare argv `auth` before the command tree: std flag has no
+  command that both runs and has subcommands (neutral gap in the pilot's notes).
+
+TOML config (L6) and performance receipts (L7) are not native-parity claims.
+The local switch and its parity table are described in `routing.md`; create
+remains TypeScript by default until L6. No installed command is changed by this
+branch.

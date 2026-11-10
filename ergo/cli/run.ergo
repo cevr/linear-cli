@@ -1,3 +1,4 @@
+import exec
 import flag
 import fs
 import io
@@ -6,7 +7,9 @@ import linearport/credential
 import linearport/files
 import linearport/linear
 import os
+import prompt
 import strings
+import term
 
 let asJson = flag.Bool("json", false, "Print JSON").Repeated()
 
@@ -34,10 +37,18 @@ func wireViewer(v linear.Viewer) WireViewer {
 	WireViewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
 }
 
-func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | io.Stdout | fs.Files | fs.Writes | go.Foreign {
+func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
 	run(args) catch {
 	case os.Exit as e:
 		return e
+	case linear.NoIssues as e:
+		return os.Exit{Code: 1, Message: e.Message}
+	case prompt.NotInteractive:
+		return os.Exit{Code: 1, Message: "Invalid input: prompts need a terminal on standard input"}
+	case prompt.Cancelled:
+		return os.Exit{Code: 1, Message: "Cancelled"}
+	case io.ReadFailed as e:
+		return os.Exit{Code: 1, Message: "Error: " + e.Reason}
 	case files.WriteFailed as e:
 		return os.Exit{Code: 1, Message: "File Error: " + e.Message}
 	case linear.InvalidInput as e:
@@ -53,15 +64,36 @@ func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | lin
 	}
 }
 
-func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | io.Stdout | fs.Files | fs.Writes | go.Foreign {
+func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
+	// std flag has no command that both runs and holds subcommands, so the
+	// bare group name is the one argv this CLI reads before the tree.
+	if len(args) == 1 && args[0] == "auth" {
+		try authenticate()
+		return
+	}
+	let parsed = match try invocation(args) {
+	case None:
+		return
+	case Some[Invocation] as p:
+		p.Value
+	}
+	if parsed.Command == "api graphql" {
+		try apiGraphQL(parsed.Values)
+		return
+	}
+	try dispatch(parsed.Command, parsed.Values)
+}
+
+// invocation is the parsed command, or None once help or the version is printed.
+func invocation(args []string) Option[Invocation] fails os.Exit needs io.Stdout {
 	let root = commands()
 	let parsed = flag.ParseRoot(root, args) catch {
 	case flag.Help as h:
 		io.Stdout.Print(h.Text)
-		return
+		return None
 	case flag.Version as version:
 		io.Stdout.Println(version.Text)
-		return
+		return None
 	case DuplicateFlag as d:
 		io.Stdout.Print(d.Usage)
 		return os.Exit{Code: 1, Message: "ERROR\n  Invalid value for flag " + d.Name + ": \"\(d.Count) occurrences\". Expected: at most 1 value"}
@@ -69,14 +101,14 @@ func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed 
 		io.Stdout.Print(flag.RootUsage(root))
 		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
 	}
-	let command = parsed.Command
-	let v = parsed.Values
+	Some[Invocation]{Value: parsed}
+}
+
+// dispatch runs every command but api graphql, whose workspace check is the
+// one foreign Go call; tests run dispatch over memory providers.
+func dispatch(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.Uploads | io.Stdout | io.Stderr | term.Terminal | fs.Files | fs.Writes {
 	if command == "file download" {
 		try fileDownload(v)
-		return
-	}
-	if command == "api graphql" {
-		try apiGraphQL(v)
 		return
 	}
 	if command == "issue start" || command == "issue create" || command == "issue comment" {

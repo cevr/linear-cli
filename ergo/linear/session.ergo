@@ -1,0 +1,16 @@
+import linearport/credential
+
+// Sessions checks a token a person gave before anything keeps it.
+type Sessions {
+	Verify(token credential.Token) Viewer fails ApiError | AuthError,
+}
+
+// NoIssues is the failure of an issue choice when the viewer has no started
+// or unstarted issue to choose from.
+type NoIssues { Message string }
+
+// Candidates are the issues a person may pick from: the first 20.
+func Candidates(issues []Summary) []Summary fails NoIssues {
+	if len(issues) == 0 { return NoIssues{Message: "No issues found to select from."} }
+	issues[:if len(issues) < 20 { len(issues) } else { 20 }]
+}

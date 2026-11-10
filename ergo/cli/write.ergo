@@ -4,7 +4,9 @@ import json
 import linearport/credential
 import linearport/linear
 import os
+import prompt
 import strings
+import term
 
 let dryRunFlag = flag.Bool("dry-run", false, "Validate without writing").Repeated()
 let titleFlag = flag.String("title", "", "Issue title").Repeated()
@@ -21,12 +23,13 @@ type CommentDry { DryRun bool, Operation string, Input CommentInput }
 type WireCreate { Title string, TeamId string, Description json.Optional[string], Parent json.Optional[string], ProjectId json.Optional[string], Priority json.Optional[int] }
 type CreateDry { DryRun bool, Operation string, Input WireCreate }
 
-func issueWrite(command string, v flag.Values) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Workflow | linear.Tracker | linear.Writer | io.Stdout {
+func issueWrite(command string, v flag.Values) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Reader | linear.Workflow | linear.Tracker | linear.Writer | io.Stdout | term.Terminal | io.Stderr {
 	if command == "create" {
 		try create(v)
 		return
 	}
-	let ids = flag.Rest(v)
+	let mut ids = flag.Rest(v)
+	if len(ids) == 0 && command == "start" && enabled(interactiveFlag, v) { ids = []string{try pickIssue()} }
 	if len(ids) == 0 { return linear.InvalidInput{Message: "Issue identifier required in non-interactive mode. Usage: linear issue start ISSUE-123 --dry-run"} }
 	if len(ids) != 1 { return linear.InvalidInput{Message: "Expected one issue identifier"} }
 	let id = try linear.ParseSelector(ids[0])
@@ -56,26 +59,34 @@ func issueWrite(command string, v flag.Values) fails os.Exit | linear.InvalidInp
 	io.Stdout.Println("")
 }
 
+// draft feeds the create machine in its order: each input from its flag,
+// else from a person when asking (no --title and --interactive), else the
+// typed failure. A rejected input stops before the next question.
+func draft(v flag.Values, teams []linear.Team, asking bool) linear.Ready fails linear.InvalidInput | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs term.Terminal | io.Stderr {
+	let mut state linear.CreateState = linear.NeedTeam
+	for {
+		match state {
+		case linear.NeedTeam:
+			let selector Option[string] = if present(teamFlag, v) { Some[string]{Value: text(teamFlag, v, "")} } else { None }
+			state = try linear.Feed(state, linear.TeamGiven{Id: try chooseTeam(teams, selector, asking)})
+		case linear.NeedTitle:
+			let title = if present(titleFlag, v) { text(titleFlag, v, "") } else { try prompt.Line("Issue title", "") }
+			state = try linear.Feed(state, linear.TitleGiven{Text: title})
+		case linear.NeedDescription:
+			let description = if present(descriptionFlag, v) { text(descriptionFlag, v, "") } else if asking { try prompt.Line("Description (optional, press Enter to skip)", "") } else { "" }
+			state = try linear.Feed(state, linear.DescriptionGiven{Text: description})
+		case linear.Ready as ready:
+			return ready
+		}
+	}
+}
+
 // Planning is read-only by construction. No Writer capability reaches here.
-func planCreate(v flag.Values) linear.CreateInput fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker {
-	if !present(titleFlag, v) { return linear.InvalidInput{Message: "--title is required in non-interactive mode. Usage: linear issue create --team ENG --title \"Title\" --dry-run"} }
+func planCreate(v flag.Values) linear.CreateInput fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | term.Terminal | io.Stderr {
+	if !present(titleFlag, v) && !enabled(interactiveFlag, v) { return linear.InvalidInput{Message: "--title is required in non-interactive mode. Usage: linear issue create --team ENG --title \"Title\" --dry-run"} }
 	let teams = try linear.Tracker.Teams()
 	if len(teams) == 0 { return linear.InvalidInput{Message: "No teams found; an issue cannot be created"} }
-	let mut teamId = ""
-	if present(teamFlag, v) {
-		let selector = text(teamFlag, v, "")
-		for team in teams {
-			if team.Id == selector || strings.ToLower(team.Key) == strings.ToLower(selector) {
-				teamId = team.Id
-				break
-			}
-		}
-		if teamId == "" { return linear.InvalidInput{Message: "Unknown team: " + selector} }
-	} else {
-		if len(teams) != 1 { return linear.InvalidInput{Message: "--team is required when multiple teams exist"} }
-		teamId = teams[0].Id
-	}
-	let ready = try linear.PrepareCreate(teamId, text(titleFlag, v, ""), text(descriptionFlag, v, ""))
+	let ready = try draft(v, teams, !present(titleFlag, v))
 	let mut priority Option[int] = None
 	if len(priorityFlag.Get(v)) > 0 {
 		let p = integer(priorityFlag, v, 0)
@@ -102,7 +113,7 @@ func planCreate(v flag.Values) linear.CreateInput fails linear.InvalidInput | li
 	linear.CreateInput{Title: ready.Title, TeamId: ready.TeamId, Description: if ready.Description == "" { None } else { Some[string]{Value: ready.Description} }, Parent: parent, ProjectId: projectId, Priority: priority}
 }
 
-func create(v flag.Values) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Writer | io.Stdout {
+func create(v flag.Values) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Tracker | linear.Writer | io.Stdout | term.Terminal | io.Stderr {
 	let input = try planCreate(v)
 	if enabled(dryRunFlag, v) {
 		let parent Option[string] = match input.Parent {

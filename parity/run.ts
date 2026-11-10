@@ -251,8 +251,14 @@ for (const c of selected) {
     "download-exists",
     "config-malformed",
     "config-invalid-type",
+    "view-interactive-no-terminal",
+    "create-interactive-no-terminal",
   ]);
-  const wantedStatus = failures.has(c.name) ? 1 : 0;
+  // The original reads keys from a pipe; at its end the prompt quits as an
+  // interrupt (130) and prints nothing. The port refuses with status 1.
+  const noTerminal = new Set(["view-interactive-no-terminal", "create-interactive-no-terminal"]);
+  let wantedStatus = failures.has(c.name) ? 1 : 0;
+  if (noTerminal.has(c.name) && (record || tsCheck)) wantedStatus = 130;
   if (actual.status !== wantedStatus)
     throw new Error(
       `${c.name}: expected exit ${wantedStatus}, got ${actual.status}: ${actual.err}`,
@@ -329,6 +335,14 @@ for (const c of selected) {
       if (!actual.err.startsWith(prefix) || actual.err.length <= prefix.length + 1)
         throw new Error("graphql-invalid: parser diagnostic prefix or detail is absent");
       expected.err = actual.err;
+    }
+    if (noTerminal.has(c.name) && !tsCheck) {
+      const refusal = "Invalid input: prompts need a terminal on standard input\n";
+      if (expected.status !== 130 || actual.out !== "" || actual.err !== refusal)
+        throw new Error(`${c.name}: no-terminal refusal lost its message or status`);
+      expected.out = actual.out;
+      expected.err = actual.err;
+      expected.status = actual.status;
     }
     if (JSON.stringify(expected) !== JSON.stringify(actual)) {
       console.error(
