@@ -40,7 +40,7 @@ func failure(e Error) string {
 	}
 	let mut parts = []string{}
 	if raw != "" { parts = parts.Append(raw) }
-	if readable != "" && readable != raw { parts = parts.Append(readable) }
+	if readable != raw { parts = parts.Append(readable) }
 	"Error: " + strings.Join(parts, " - ")
 }
 
@@ -68,7 +68,15 @@ func send(c Client, token credential.Token, document string, variables json.Valu
 	}
 	match envelope.Errors {
 	case json.Present[[]Error] as errors:
-		if len(errors.Value) > 0 { return linear.ApiError{Message: failure(errors.Value[0])} }
+		if len(errors.Value) > 0 {
+			let message = failure(errors.Value[0])
+			// The TS service classifies the SDK's rendered text, not only the
+			// HTTP status. Linear can send GraphQL errors with HTTP 200.
+			if strings.Contains(message, "Authentication") || strings.Contains(message, "401") {
+				return linear.AuthError{Message: "Invalid API token"}
+			}
+			return linear.ApiError{Message: message}
+		}
 	case json.Absent:
 	}
 	match envelope.Data {

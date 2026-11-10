@@ -5,6 +5,9 @@ export interface Case {
   args: string[];
   seed?: number;
   failure?: Failure;
+  apiError?: { message: string; extensions?: { userPresentableMessage: string } };
+  // Hex bytes passed to execve at these argv indices, not JS strings.
+  argvBytes?: Record<number, string>;
   noToken?: boolean;
   files?: Record<string, string>;
   // Symbolic links (path -> target) and modes applied after files, restored

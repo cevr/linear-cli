@@ -65,7 +65,12 @@ export const entityNotFound = (type: EntityType) =>
     },
   });
 
-export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs = 0) {
+export function fakeLinear(
+  w: World,
+  failure: Failure = "none",
+  requestDelayMs = 0,
+  apiError?: { message: string; extensions?: { userPresentableMessage: string } },
+) {
   const mutations: unknown[] = [];
   const requests: { operation: string; authenticated: boolean }[] = [];
   const storageHeaders: boolean[] = [];
@@ -267,6 +272,7 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
       });
       if (!requests.at(-1)!.authenticated)
         return Response.json({ errors: [{ message: "Authentication required" }] }, { status: 401 });
+      if (apiError) return Response.json({ data: null, errors: [apiError] });
       const result = await graphql({
         schema,
         source: body.query,
@@ -275,9 +281,9 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
         rootValue: root,
         fieldResolver,
       });
-      // Linear answers a user input error with HTTP 400 (its statusCode extension).
-      const status = result.errors?.some((e) => e.extensions?.statusCode === 400) ? 400 : 200;
-      return Response.json(result, { status });
+      // Linear's GraphQL envelope is HTTP 200 even when the INPUT_ERROR
+      // extension has statusCode: 400 (public cyrus issue 1378).
+      return Response.json(result, { status: 200 });
     },
   });
   return {

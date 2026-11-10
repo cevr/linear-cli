@@ -19,14 +19,21 @@ Downloads (L4):
   host table from the original's parser and checks it), default port with
   leading zeros, dot segments and the path/query/fragment encode sets. The
   printed URL equals the original's `href`.
-- Refused although the original accepts them, pending owner question q101:
+- Refused although the original accepts them, owner-approved q101:
   non-empty user information (`u@`, `u:p@`, `@@`, `::@`) and any port other
   than 443. Neither may widen the origin to which the upload credential
   belongs. The property checks that the port prints exactly the original's
   refusal line for each such input, with status 1 and no file.
-- A `%` that starts no escape stays in the printed URL, as in the original. An
-  HTTP request line cannot carry it, so the request target sends it as `%25`;
-  the fragment is never sent. Only the upload server sees this form.
+- A `%` that starts no escape stays in the printed URL, as in the original.
+  At compiler pin `50facc08`, std http's Go `url.Parse` rejects that request
+  target, so the port sends this `%` as `%25`. This is a std transport limit,
+  not an HTTP request-line restriction: Bun sends the original `%` verbatim.
+  Go's `EscapedPath` also re-escapes the whole decoded path when `|` occurs:
+  `x%2Fy|z.txt` becomes `/x/y%7Cz.txt`, not the original `/x%2Fy|z.txt`.
+  Both differences can change the resource a real server returns. Gap G-L4-3
+  is assigned to the queued S-target std unit (verbatim request targets).
+  Re-pin and remove these differences when that unit lands. The fragment
+  is never sent. This is not a claim of wire-target parity or owner approval.
 - The original follows one redirect and sends no token on it. The port follows one
   redirect through the std http network policy; the token is a credential of the
   upload origin, so a redirect back to that origin carries it and any other origin

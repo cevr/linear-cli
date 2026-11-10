@@ -141,3 +141,27 @@ for default, explicit Ergo and explicit TS; production origins stay fixed.
   missing-native probe must fail nonzero without running TS.
 - `override-ignored`, `shim-loses-argument`: retained, now against the single
   default exec. Retire the old table-entry mutants; no table remains.
+
+# Round 4: API-error text and process argv bytes
+
+Public seams: CLI stdout/stderr/status, saved files and mutation observations,
+with the compiled TS CLI as control and a loopback HTTP fixture. These check
+process decoding and SDK behavior, not a private implementation function.
+
+- `error-authentication-unclassified`: drop Authentication substring recognition;
+  generated HTTP-200 error envelopes (L0) must still report Invalid API token.
+- `error-401-unclassified`: drop 401 substring recognition; same generator.
+- `error-sdk-brace-uncut`: verifier W1, drop the first `": {"` cut; raw query
+  `issue(id: {a: 1})` and generated envelopes must differ from TS.
+- `error-empty-readable-dropped`: drop an explicitly present empty readable
+  message. The SDK filters null/undefined, not empty strings; the generated
+  envelopes caught a real parity gap here in round 4.
+- `argv-keeps-invalid-bytes`: bypass lossy argv decoding; LUTF8 compares raw
+  execve bytes in titles, bodies and upload URLs with the TS process control.
+- `argv-replaces-prefix-bytewise`: replace a truncated valid prefix one byte
+  at a time; LUTF8 includes multi-byte ill-formed subsequences.
+- `fake-not-found-http400`: return 400 on a not-found envelope; the L0
+  membership property checks HTTP 200 separately from extension statusCode 400.
+
+Earlier laws and regressions did not reach HTTP-200 auth substrings, SDK brace
+text or non-UTF-8 execve argv. No production-only test seam is added.

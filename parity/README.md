@@ -87,3 +87,18 @@ no-terminal prompt commands retain the native message and status 1 instead of
 TS's prompt bytes/status 130; TOML failures retain their kind, path and status,
 but use std TOML's suffix. These are owner-approved differences, not equal bytes.
 The TS result is never overwritten by the native result for these exceptions.
+
+# Round 4 error and argv properties
+
+`bun parity/run.ts --regressions=L0 --seed=42 --trace` compares generated
+HTTP-200 GraphQL error envelopes with the compiled TS control: Authentication
+and 401 anywhere in the SDK text, case-sensitive near misses, readable-message
+overrides and the SDK's first `": {"` cut. It also runs the raw-query brace
+repro and the fixture membership property (HTTP 200, error statusCode 400).
+
+`bun parity/run.ts --regressions=LUTF8 --seed=42 --trace` passes exact invalid
+UTF-8 argv bytes via the POSIX `parity/argv.py` execve adapter, then compares
+titles, comment bodies and upload URLs with the TS process. Python is a test
+adapter only; the product decoder is `ergo/cli/argv.ergo`. A failed comparison
+prints the raw hex bytes and replay command. Use `--check-ts --trace` to record
+the TS behavior first without running native. No real network or token is used.

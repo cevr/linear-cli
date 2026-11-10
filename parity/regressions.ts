@@ -78,7 +78,7 @@ export function regressionCases(phase: string, seed: number): Case[] {
     files?: Record<string, string>,
   ): Case => ({
     name: `regression-${phase}-${name}`,
-    phase: { L0: 0, L3: 3, L4: 4 }[phase] ?? 3,
+    phase: { L0: 0, L3: 3, L4: 4, LUTF8: 4 }[phase] ?? 3,
     args,
     seed,
     expectedStatus: status,
@@ -86,6 +86,11 @@ export function regressionCases(phase: string, seed: number): Case[] {
   });
   if (phase === "L0")
     return [
+      ...errorCases(seed).map((apiError, i) => ({
+        ...make(`error-${i}`, ["api", "graphql", "--query", "{ viewer { id } }"], 1),
+        apiError,
+      })),
+      make("error-brace", ["api", "graphql", "--query", "{ issue(id: {a: 1}) { id } }"], 1),
       make("member", ["issue", "view", "ENG-123", "--json"]),
       make("nonmember", ["issue", "view", `ENG-${900000 + seed}`, "--json"], 1),
       // A mutation on a missing entity is Linear's input error, never a created one.
@@ -107,6 +112,7 @@ export function regressionCases(phase: string, seed: number): Case[] {
         1,
       ),
     ];
+  if (phase === "LUTF8") return invalidArgvCases(seed);
   if (phase === "L3") {
     const scalars = [...whitespace, ...nearWhitespace, 0, 0x7f, 0x41, 0x1f680];
     const texts = scalars.map((n) => String.fromCodePoint(n));
@@ -183,4 +189,86 @@ export function regressionCases(phase: string, seed: number): Case[] {
       declared: u.declared ? "q101" : undefined,
     }));
   throw new Error(`Unknown regression phase ${phase}`);
+}
+
+// Every seed reaches the auth substrings (case-sensitive, anywhere), near
+// misses and all SDK join branches. The seed changes surrounding error text.
+function errorCases(seed: number): NonNullable<Case["apiError"]>[] {
+  return ["Authentication", "401", "authentication", "14010", "ordinary"]
+    .flatMap((tag) => {
+      const text = `failure-${seed}-${tag}-tail`;
+      return [text, `${text}: { detail: ${seed} }`].flatMap((message) => [
+        { message },
+        { message, extensions: { userPresentableMessage: message } },
+        { message, extensions: { userPresentableMessage: "" } },
+        { message, extensions: { userPresentableMessage: `readable-${seed}` } },
+      ]);
+    })
+    .concat([
+      {
+        message: `ordinary-${seed}`,
+        extensions: { userPresentableMessage: "Authentication required" },
+      },
+      { message: `ordinary-${seed}`, extensions: { userPresentableMessage: "error 401 here" } },
+    ]);
+}
+
+// Maximal ill-formed subsequences, not just lone 0xff. Every seed visits bad
+// leads, continuations, overlongs, surrogates, >U+10FFFF and truncated prefixes;
+// valid neighbours include encoded U+FFFD, which must not be rewritten.
+function invalidArgvCases(seed: number): Case[] {
+  const invalid = [
+    "ff",
+    "80bf",
+    "c0af",
+    "c1bf",
+    "e08080",
+    "eda080",
+    "f0808080",
+    "f4908080",
+    "f5808080",
+    "e282",
+    "f09f92",
+    "e228a1",
+    "f09f41",
+    "c2",
+    "feff",
+  ];
+  return invalid.flatMap((hex, i): Case[] => {
+    const bytes = Buffer.concat([
+      Buffer.from(`a${seed}-é�`),
+      Buffer.from(hex, "hex"),
+      Buffer.from("😀b"),
+    ]);
+    const text = bytes.toString("utf8");
+    const prefix = "https://uploads.linear.app/";
+    return [
+      {
+        name: `regression-LUTF8-title-${i}`,
+        phase: 3,
+        seed,
+        args: ["issue", "create", "--team", "ENG", "--title", text, "--dry-run"],
+        argvBytes: { 5: bytes.toString("hex") },
+        expectedStatus: 0,
+      },
+      {
+        name: `regression-LUTF8-body-${i}`,
+        phase: 3,
+        seed,
+        args: ["issue", "comment", "ENG-123", "--body", text, "--dry-run"],
+        argvBytes: { 4: bytes.toString("hex") },
+        expectedStatus: 0,
+      },
+      {
+        name: `regression-LUTF8-url-${i}`,
+        phase: 4,
+        seed,
+        args: ["file", "download", `${prefix}${text}.txt`, "--json"],
+        argvBytes: {
+          2: Buffer.concat([Buffer.from(prefix), bytes, Buffer.from(".txt")]).toString("hex"),
+        },
+        expectedStatus: 0,
+      },
+    ];
+  });
 }

@@ -139,7 +139,7 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
   if (c.scenario === "duplicate-names")
     w.issues[0]!.description =
       "[trace.txt](https://uploads.linear.app/a) [trace.txt](https://uploads.linear.app/b) [trace.txt](https://uploads.linear.app/a)";
-  const fake = fakeLinear(w, c.failure);
+  const fake = fakeLinear(w, c.failure, 0, c.apiError);
   const dir = await mkdtemp(`${scratch}/case-${c.name}-`);
   for (const [name, text] of Object.entries(c.files ?? {})) {
     const file = join(dir, name);
@@ -189,12 +189,22 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
       : c.args;
   let out = "",
     err = "";
-  const child = spawn(command, args, {
-    cwd: dir,
-    env,
-    detached: true,
-    stdio: ["pipe", "pipe", "pipe"],
-  });
+  const rawArgs = c.argvBytes
+    ? args.map(
+        (arg, i) =>
+          c.argvBytes![i - (args.length - c.args.length)] ?? Buffer.from(arg).toString("hex"),
+      )
+    : undefined;
+  const child = spawn(
+    rawArgs ? "python3" : command,
+    rawArgs ? [join(root, "parity/argv.py"), command, ...rawArgs] : args,
+    {
+      cwd: dir,
+      env,
+      detached: true,
+      stdio: ["pipe", "pipe", "pipe"],
+    },
+  );
   let active = true;
   const stop = () => {
     if (active && child.pid) {
@@ -328,6 +338,8 @@ for (const c of selected) {
           {
             world: world(c.seed),
             args: c.args,
+            argvBytes: c.argvBytes,
+            apiError: c.apiError,
             reference,
             actual,
             replay: `bun parity/run.ts ${regressions ? `--regressions=${regressions} --seed=${c.seed}` : `--property=${c.seed}`} --phase=${phase} --case=${c.name}${target ? ` --target=${target}` : ""}`,

@@ -38,7 +38,7 @@ func wireViewer(v linear.Viewer) WireViewer {
 }
 
 func Run(args []string) fails os.Exit needs linear.Settings | linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | linear.Sessions | credential.Credentials | io.Stdout | io.Stderr | term.Terminal | exec.Runner | fs.Files | fs.Writes | go.Foreign {
-	run(args) catch {
+	run(decodedArgs(args)) catch {
 	case os.Exit as e:
 		return e
 	case linear.NoIssues as e:

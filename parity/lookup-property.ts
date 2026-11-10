@@ -140,11 +140,12 @@ function answered(
   if (member) return status === 200 && !result.errors && recorded === 1;
   const error = result.errors?.[0];
   return (
-    status === 400 &&
+    status === 200 &&
     result.data === null &&
     error?.message === `Entity not found: ${type}` &&
     error.path?.[0] === mutation &&
     error.extensions?.type === "invalid input" &&
+    error.extensions?.statusCode === 400 &&
     error.extensions?.userPresentableMessage === `Could not find referenced ${type}.` &&
     recorded === 0 &&
     unchanged

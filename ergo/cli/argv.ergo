@@ -1,0 +1,47 @@
+import strings
+import utf8
+
+// Bun decodes OS argv as UTF-8 with replacement of each maximal ill-formed
+// subsequence. Go's os.Args preserves bytes, including invalid UTF-8. Do the
+// decoding once at the process boundary, before parsing any flag or command.
+func decodedArgs(args []string) []string {
+	let mut out = []string{}
+	for arg in args { out = out.Append(argvText(arg)) }
+	out
+}
+
+func argvText(s string) string {
+	if utf8.ValidString(s) { return s }
+	let mut parts = []string{}
+	let mut i = 0
+	for i < len(s) {
+		let decoded = utf8.DecodeRuneInString(s[i:])
+		if decoded.Size > 1 || s[i] < 128 {
+			parts = parts.Append(s[i : i+decoded.Size])
+			i = i + decoded.Size
+		} else {
+			let width = invalidPrefix(s[i:])
+			parts = parts.Append("�")
+			i = i + width
+		}
+	}
+	strings.Join(parts, "")
+}
+
+// An invalid lead consumes one byte. A legal lead consumes its legal prefix
+// up to the first missing/invalid continuation. Bounds on the second byte
+// exclude overlong forms, surrogate code points and values above U+10FFFF.
+func invalidPrefix(s string) int {
+	let lead = s[0]
+	let count = if lead >= 194 && lead <= 223 { 2 } else if lead >= 224 && lead <= 239 { 3 } else if lead >= 240 && lead <= 244 { 4 } else { 1 }
+	let mut width = 1
+	for width < count && width < len(s) {
+		let c = s[width]
+		if c < 128 || c > 191 { break }
+		if width == 1 {
+			if (lead == 224 && c < 160) || (lead == 237 && c > 159) || (lead == 240 && c < 144) || (lead == 244 && c > 143) { break }
+		}
+		width = width + 1
+	}
+	width
+}

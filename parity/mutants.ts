@@ -93,6 +93,64 @@ type Mutant = {
 };
 const mutants: Mutant[] = [
   {
+    name: "error-empty-readable-dropped",
+    file: "graphqlhttp/client.ergo",
+    from: "if readable != raw { parts = parts.Append(readable) }",
+    to: 'if readable != "" && readable != raw { parts = parts.Append(readable) }',
+    pkg: "",
+    guard: "regression-L0-error-18: parity mismatch",
+    args: ["--regressions=L0", "--seed=42"],
+  },
+  ...(
+    [
+      [
+        "error-authentication-unclassified",
+        'strings.Contains(message, "Authentication")',
+        'strings.Contains(message, "never-auth")',
+      ],
+      [
+        "error-401-unclassified",
+        'strings.Contains(message, "401")',
+        'strings.Contains(message, "never-401")',
+      ],
+      [
+        "error-sdk-brace-uncut",
+        "if cut >= 0 { raw = raw[:cut] }",
+        "if cut < -1 { raw = raw[:cut] }",
+      ],
+    ] as const
+  ).map(([name, from, to]) => ({
+    name,
+    file: "graphqlhttp/client.ergo",
+    from,
+    to,
+    pkg: "",
+    guard: ": parity mismatch",
+    args: [
+      "--regressions=L0",
+      "--seed=42",
+      ...(name === "error-sdk-brace-uncut" ? ["--case=regression-L0-error-brace"] : []),
+    ],
+  })),
+  {
+    name: "argv-keeps-invalid-bytes",
+    file: "cli/run.ergo",
+    from: "run(decodedArgs(args)) catch {",
+    to: "run(args) catch {",
+    pkg: "",
+    guard: "regression-LUTF8-title-0: parity mismatch",
+    args: ["--regressions=LUTF8", "--seed=42"],
+  },
+  {
+    name: "argv-replaces-prefix-bytewise",
+    file: "cli/argv.ergo",
+    from: "i = i + width",
+    to: "i = i + 1 + width*0",
+    pkg: "",
+    guard: ": parity mismatch",
+    args: ["--regressions=LUTF8", "--seed=42"],
+  },
+  {
     name: "text-overtrims-next-line",
     file: "linear/write.ergo",
     from: "c == 160 || c == 5760",
@@ -566,6 +624,12 @@ for (const mutant of mutants) {
 }
 // Fixture-fake mutants: each is killed by the L0 membership properties.
 const fakeMutants = [
+  {
+    name: "fake-not-found-http400",
+    from: "return Response.json(result, { status: 200 });",
+    to: "return Response.json(result, { status: result.errors ? 400 : 200 });",
+    guard: "fake-mutates-missing-reference:",
+  },
   {
     name: "fake-invents-missing-root",
     from: 'if (parent === "Query") return null;',
