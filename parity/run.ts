@@ -2,7 +2,16 @@
 // transport behavior cannot be established by an in-process checker.
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, readdir, stat, symlink, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  realpath,
+  stat,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { cases, generatedCases } from "./corpus";
 import type { Case } from "./corpus";
@@ -11,6 +20,9 @@ import { world } from "./world";
 
 const root = resolve(import.meta.dir, "..");
 const scratch = "/tmp/opencode/linear-port";
+const candidate = process.argv.find((x) => x.startsWith("--binary="))?.slice("--binary=".length);
+if (candidate && !(await realpath(candidate)).startsWith(`${scratch}/`))
+  throw new Error("Candidate binary must be under the pilot scratch directory");
 const record = process.argv.includes("--record");
 const tsCheck = process.argv.includes("--check-ts");
 const phaseArg = process.argv.find((x) => x.startsWith("--phase="));
@@ -123,7 +135,10 @@ async function run(c: Case, implementation: "ts" | "ergo"): Promise<Result> {
   };
   if (!c.noToken) env.LINEAR_API_KEY = c.badEnvToken ? "wrong-fixture-token" : "pilot-test-token";
   if (env.HOME !== dir) throw new Error("runner-uses-owner-home survived");
-  const command = implementation === "ts" ? process.execPath : join(root, "bin/linear-ergo-parity");
+  const command =
+    implementation === "ts"
+      ? process.execPath
+      : (candidate ?? join(root, "bin/linear-ergo-parity"));
   const args =
     implementation === "ts"
       ? ["--preload", join(root, "parity/redirect.ts"), join(root, "src/main.ts"), ...c.args]

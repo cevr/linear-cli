@@ -1,0 +1,142 @@
+import flag
+import io
+import json
+import linearport/credential
+import linearport/linear
+import os
+import strings
+
+let asJson = flag.Bool("json", false, "Print JSON")
+
+// Presence is a domain Option. Only this output boundary chooses JSON omission.
+type WireStatus { Emoji json.Optional[string], Label json.Optional[string] }
+type WireViewer { Id string, Name string, Email string, Admin bool, Status json.Optional[WireStatus] }
+type WireTeam { Id string, Key string, Name string, Description json.Optional[string] }
+
+func wireString(s Option[string]) json.Optional[string] {
+	match s {
+	case None:
+		json.Absent
+	case Some[string] as p:
+		json.Present[string]{Value: p.Value}
+	}
+}
+
+func wireViewer(v linear.Viewer) WireViewer {
+	let status json.Optional[WireStatus] = match v.Status {
+	case None:
+		json.Absent
+	case Some[linear.Status] as s:
+		json.Present[WireStatus]{Value: WireStatus{Emoji: wireString(s.Value.Emoji), Label: wireString(s.Value.Label)}}
+	}
+	WireViewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
+}
+
+func Run(args []string) fails os.Exit needs linear.Tracker | io.Stdout {
+	run(args) catch {
+	case os.Exit as e:
+		return e
+	case linear.ApiError as e:
+		return os.Exit{Code: 1, Message: "Linear API Error: " + e.Message}
+	case linear.AuthError as e:
+		return os.Exit{Code: 1, Message: "Authentication Error: " + e.Message}
+	case credential.NoToken:
+		return os.Exit{Code: 1, Message: "Error: No token found. Run 'linear auth' to authenticate."}
+	case credential.ConfigError as e:
+		return os.Exit{Code: 1, Message: "Config Error: " + e.Message}
+	}
+}
+
+func run(args []string) fails os.Exit | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {
+	if len(args) < 2 { return os.Exit{Code: 1, Message: "Usage: linear team list | project list | auth whoami"} }
+	let command = args[0] + " " + args[1]
+	if command != "team list" && command != "project list" && command != "auth whoami" {
+		return os.Exit{Code: 1, Message: "Unknown command: " + command}
+	}
+	let set = flag.Set{Name: "linear " + command, Usage: "", Flags: []flag.Flag{asJson}, Args: []flag.ArgSpec{}}
+	let v = flag.Parse(set, args[2:]) catch {
+	case flag.Help as h:
+		io.Stdout.Print(h.Text)
+		return
+	case err:
+		io.Stdout.Print(flag.Usage(set))
+		return os.Exit{Code: 1, Message: "\nERROR\n  " + flag.Describe(err)}
+	}
+	if command == "team list" {
+		try teams(asJson.Get(v))
+		return
+	}
+	if command == "project list" {
+		try projects(asJson.Get(v))
+		return
+	}
+	try viewer(asJson.Get(v))
+}
+
+func teams(asJson bool) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {
+	let teams = try linear.Tracker.Teams()
+	if asJson {
+		let mut encodedTeams = []WireTeam{}
+		for t in teams { encodedTeams = encodedTeams.Append(WireTeam{Id: t.Id, Key: t.Key, Name: t.Name, Description: wireString(t.Description)}) }
+		io.Stdout.Println(json.Encode(json.Codec[[]WireTeam]{MaxBytes: 0, MaxDepth: 0}, encodedTeams))
+		return
+	}
+	if len(teams) == 0 {
+		io.Stdout.Println("No teams found.")
+		return
+	}
+	io.Stdout.Println("\nTeams:\n")
+	for t in teams {
+		let d = match t.Description {
+		case None:
+			""
+		case Some[string] as p:
+			" - " + p.Value
+		}
+		io.Stdout.Println("  " + strings.PadRight(t.Key, 8, ' ') + " " + t.Name + d)
+	}
+	io.Stdout.Println("")
+}
+
+func projects(asJson bool) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {
+	let projects = try linear.Tracker.Projects()
+	if asJson {
+		io.Stdout.Println(json.Encode(json.Codec[[]linear.Project]{MaxBytes: 0, MaxDepth: 0}, projects))
+		return
+	}
+	if len(projects) == 0 {
+		io.Stdout.Println("No projects found.")
+		return
+	}
+	io.Stdout.Println("\nProjects:\n")
+	for p in projects { io.Stdout.Println("  " + p.Name + "  " + p.State + "  " + p.Id) }
+	io.Stdout.Println("")
+}
+
+func viewer(asJson bool) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {
+	let v = try linear.Tracker.Viewer()
+	if asJson {
+		io.Stdout.Println(json.Encode(json.Codec[WireViewer]{MaxBytes: 0, MaxDepth: 0}, wireViewer(v)))
+		return
+	}
+	io.Stdout.Println("\nLogged in as:")
+	io.Stdout.Println("  Name:  " + v.Name)
+	io.Stdout.Println("  Email: " + v.Email)
+	let admin = if v.Admin { "Yes" } else { "No" }
+	io.Stdout.Println("  Admin: " + admin)
+	match v.Status {
+	case Some[linear.Status] as s:
+		match s.Value.Label {
+		case Some[string] as label:
+			let emoji = match s.Value.Emoji {
+			case None:
+				""
+			case Some[string] as e:
+				e.Value
+			}
+			io.Stdout.Println("  Status: " + emoji + " " + label.Value)
+		case None:
+		}
+	case None:
+	}
+}

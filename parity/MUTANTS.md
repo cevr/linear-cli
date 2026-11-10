@@ -23,6 +23,10 @@ L0 schema validation is a prerequisite, not proof of API parity.
 
 ## L1 guards
 
+- `http-accepts-empty-team-identity`: a schema-valid but empty id/key crosses
+  the wire unchecked. Tracker.IdentityFields over generated in-memory HTTP
+  responses rejects it; the fixed CLI corpus contains only real-shaped ids.
+
 - `memory-keeps-empty-identity`: include a fixture team with an empty id or key.
   `Tracker.IdentityFields` runs on generated constructor inputs, including empty
   strings. The fixed process corpus does not exercise invalid memory fixtures.

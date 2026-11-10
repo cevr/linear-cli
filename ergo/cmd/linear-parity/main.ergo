@@ -1,0 +1,44 @@
+import fs
+import http
+import io
+import linearport/cli
+import linearport/credential
+import linearport/graphqlhttp
+import linearport/linear
+import os
+import strconv
+import strings
+
+// Separate offline entry. Literal loopback only; never a production fallback.
+func main() fails os.Exit needs Ambient {
+	let process = os.NewHost()
+	let disk = fs.NewHost()
+	let out = io.NewHost()
+	let home = match process.Getenv("HOME") {
+	case Some[string] as h:
+		h.Value
+	case None:
+		""
+	}
+	let origin = match process.Getenv("LINEAR_PARITY_ORIGIN") {
+	case Some[string] as o:
+		o.Value
+	case None:
+		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	}
+	let prefix = "http://127.0.0.1:"
+	if !strings.HasPrefix(origin, prefix) { return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"} }
+	let port = strconv.Atoi(origin[len(prefix):]) catch {
+	case _:
+		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	}
+	if port < 1 || port > 65535 || origin != prefix+"\(port)" { return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"} }
+	let credentials = credential.New(disk, home, process.Getenv("LINEAR_API_KEY"))
+	let net = http.NewClient(origin, http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	}
+	with context { linear.Tracker: graphqlhttp.New(net, credentials), io.Stdout: out } {
+		try cli.Run(process.Args())
+	}
+}

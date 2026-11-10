@@ -1,0 +1,30 @@
+import fs
+import http
+import io
+import linearport/cli
+import linearport/credential
+import linearport/graphqlhttp
+import linearport/linear
+import os
+
+// Only this entry chooses the production origins. No environment variable can
+// redirect an API credential. Redirects remain responses, never followed here.
+func main() fails os.Exit needs Ambient {
+	let process = os.NewHost()
+	let disk = fs.NewHost()
+	let out = io.NewHost()
+	let home = match process.Getenv("HOME") {
+	case Some[string] as h:
+		h.Value
+	case None:
+		""
+	}
+	let credentials = credential.New(disk, home, process.Getenv("LINEAR_API_KEY"))
+	let net = http.NewClient("https://api.linear.app", http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
+	}
+	with context { linear.Tracker: graphqlhttp.New(net, credentials), io.Stdout: out } {
+		try cli.Run(process.Args())
+	}
+}
