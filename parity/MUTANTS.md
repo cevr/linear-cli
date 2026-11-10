@@ -1,5 +1,14 @@
 # Parity mutant ledger
 
+## Round 2 regressions (declared before the guards)
+
+- `fake-invents-missing-root`: remove the missing-root boundary and let SDK scalar defaults invent an entity. Generated member/nonmember lookups against fixture membership require GraphQL null propagation and errors. Existing stable records compare two callers of the same broken fake.
+- `fake-forgets-created-comment`: do not retain a successful commentCreate result in the fixture world. Reuse the existing generated `seed-1002-comment` case (an initially empty comment collection); the compiled/source SDK's lazy root lookup must succeed after creation. Root null propagation exposes this older fake defect; no new test is added.
+- `text-overtrims-next-line`: classify U+0085 as blank (the old Go TrimSpace behavior). The Unicode model compares the public validator and strict CLI title/comment results against ECMAScript whitespace, including every whitespace class and mixed strings. Existing CreateReadyTitle accepts any rejection, so it misses over-rejection.
+- `variables-malformed-loses-schema-error`, `variables-kind-loses-schema-error`: drop the exact JSON parse/kind failure detail. Generated malformed JSON and non-object JSON are strict process comparisons to the compiled TS control; earlier raw cases only supply valid objects.
+- `query-file-loses-platform-detail`: replace the workspace-file error with a generic line. Generated missing components, non-directory components and directory reads compare exact bytes/status to the TS binary; the old escape case covers only a successful realpath outside the workspace.
+- `upload-rejects-default-port`: refuse an explicit HTTPS default port. Accepted-origin variants compare canonical URL, files and status to the TS binary, paired with the existing foreign-origin law. Earlier downloads all use an already canonical URL.
+
 ## Seams
 
 - SDK documents → public schema: catches a fake that accepts invalid SDK requests. Does not test real API behavior.

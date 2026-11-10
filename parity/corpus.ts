@@ -11,6 +11,7 @@ export interface Case {
   scenario?: "empty" | "one-team" | "unsafe-names" | "duplicate-names";
   tokenFile?: boolean;
   badEnvToken?: boolean;
+  expectedStatus?: number;
 }
 const c = (name: string, phase: number, args: string[], extra: Partial<Case> = {}): Case => ({
   name,

@@ -47,12 +47,12 @@ func ValidateText(name string, value string, maximum int, allowEmpty bool) strin
 }
 
 func blank(value string) bool {
-	let mut text = value
-	for {
-		let next = strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(text), "\uFEFF"), "\uFEFF")
-		if next == text { return next == "" }
-		text = next
+	// ECMAScript trim's WhiteSpace and LineTerminator set. Go TrimSpace also
+	// removes U+0085, which is valid nonblank input in the original CLI.
+	for c in value {
+		if !(c == 9 || c == 10 || c == 11 || c == 12 || c == 13 || c == 32 || c == 160 || c == 5760 || (c >= 8192 && c <= 8202) || c == 8232 || c == 8233 || c == 8239 || c == 8287 || c == 12288 || c == 65279) { return false }
 	}
+	true
 }
 
 type CreateState = NeedTeam{} | NeedTitle{TeamId string} | NeedDescription{TeamId string, Title string} | Ready{TeamId string, Title string, Description string}

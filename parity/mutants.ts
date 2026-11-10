@@ -12,6 +12,7 @@ const env = {
   PATH: process.env.PATH ?? "/usr/bin:/bin",
   HOME: scratch,
   GOMAXPROCS: "1",
+  GOTOOLCHAIN: process.env.GOTOOLCHAIN ?? "auto",
   GOMEMLIMIT: "6GiB",
   GOFLAGS: "-p=1",
   GOCACHE: join(scratch, "gocache"),
@@ -91,6 +92,51 @@ type Mutant = {
   version?: boolean;
 };
 const mutants: Mutant[] = [
+  {
+    name: "text-overtrims-next-line",
+    file: "linear/write.ergo",
+    from: "c == 160 || c == 5760",
+    to: "c == 133 || c == 160 || c == 5760",
+    pkg: "",
+    guard: "regression-L3-title-25: parity mismatch",
+    args: ["--regressions=L3", "--case=regression-L3-title-25"],
+  },
+  {
+    name: "variables-malformed-loses-schema-error",
+    file: "cli/graphql.ergo",
+    from: "--variables must be a JSON object: SchemaError(Expected a valid JSON string)",
+    to: "--variables must be a JSON object: invalid JSON",
+    pkg: "",
+    guard: "regression-L3-variables-0: parity mismatch",
+    args: ["--regressions=L3", "--case=regression-L3-variables-0"],
+  },
+  {
+    name: "variables-kind-loses-schema-error",
+    file: "cli/graphql.ergo",
+    from: "--variables must be a JSON object: SchemaError(Expected object)",
+    to: "--variables must be a JSON object",
+    pkg: "",
+    guard: "regression-L3-variables-7: parity mismatch",
+    args: ["--regressions=L3", "--case=regression-L3-variables-7"],
+  },
+  {
+    name: "query-file-loses-platform-detail",
+    file: "cli/graphql.ergo",
+    from: 'return fileFailure(path, "realPath", absolute, platformKind(e.Text))',
+    to: 'return linear.InvalidInput{Message: "Could not read GraphQL query file " + path + strings.Repeat(absolute + e.Text, 0)}',
+    pkg: "",
+    guard: "regression-L3-file-0: parity mismatch",
+    args: ["--regressions=L3", "--case=regression-L3-file-0"],
+  },
+  {
+    name: "upload-rejects-default-port",
+    file: "linear/upload.ergo",
+    from: 'if port != "443" && authority[colon+1:] != "" { return invalid }',
+    to: 'if port != "443" || authority[colon+1:] != "" { return invalid }',
+    pkg: "",
+    guard: "regression-L4-upload-0: parity mismatch",
+    args: ["--regressions=L4", "--case=regression-L4-upload-0"],
+  },
   {
     name: "root-version-undeclared",
     file: "cli/arguments.ergo",
@@ -212,8 +258,8 @@ const mutants: Mutant[] = [
   {
     name: "upload-url-host-prefix",
     file: "linear/upload.ergo",
-    from: 'let prefix = UploadOrigin() + "/"',
-    to: "let prefix = UploadOrigin()",
+    from: 'if host != "uploads.linear.app" { return invalid }',
+    to: 'if !strings.HasPrefix(host, "uploads.linear.app") { return invalid }',
     pkg: "linear",
     guard: "law refuted",
   },
@@ -444,30 +490,56 @@ for (const mutant of mutants) {
     throw new Error(`${mutant.name}: survived or failed for the wrong reason: ${result.output}`);
   console.log(`killed ${mutant.name}: ${mutant.guard}`);
 }
-if (only) {
+if (only === "fake-invents-missing-root" || !only) {
+  const dir = await mkdtemp(join(scratch, "missing-root-mutant-"));
+  await cp(join(root, "parity"), join(dir, "parity"), { recursive: true });
+  await symlink(join(root, "node_modules"), join(dir, "node_modules"));
+  const path = join(dir, "parity/fake-linear.ts");
+  const source = await readFile(path, "utf8");
+  const from = 'if (parent === "Query") return null;';
+  if (source.split(from).length !== 2) throw new Error("missing root mutant edit is not unique");
+  await writeFile(path, source.replace(from, "/* let the fallback invent a root */"));
+  const result = await run(process.execPath, [join(dir, "parity/run.ts"), "--regressions=L0"], dir);
+  if (result.code === 0 || !result.output.includes("fake-invents-missing-root:"))
+    throw new Error(
+      `fake-invents-missing-root survived or failed for wrong reason: ${result.output}`,
+    );
+  console.log("killed fake-invents-missing-root: root membership property");
+}
+if (only && !["fake-forgets-created-issue", "fake-forgets-created-comment"].includes(only)) {
   console.log(`EXIT: 0 (mutant ${only} only)`);
   process.exit(0);
 }
-console.log("EXIT: 0 (all phase mutants killed)");
-
-const fakeDir = await mkdtemp(join(scratch, "fake-mutant-"));
-await cp(join(root, "parity"), join(fakeDir, "parity"), { recursive: true });
-await symlink(join(root, "src"), join(fakeDir, "src"));
-await symlink(join(root, "node_modules"), join(fakeDir, "node_modules"));
-const fakePath = join(fakeDir, "parity/fake-linear.ts");
-const fakeSource = await readFile(fakePath, "utf8");
-if (fakeSource.split("w.issues.push(created);").length !== 2)
-  throw new Error("fake mutant edit is not unique");
-await writeFile(
-  fakePath,
-  fakeSource.replace("w.issues.push(created);", "/* forget created issue */"),
-);
-const fakeResult = await run(
-  process.execPath,
-  [join(fakeDir, "parity/run.ts"), "--record", "--phase=3", "--case=create-json"],
-  fakeDir,
-);
-if (fakeResult.code === 0 || !fakeResult.output.includes("fake-forgets-created-issue survived"))
-  throw new Error(`fake mutant survived or failed for the wrong reason: ${fakeResult.output}`);
-console.log("killed fake-forgets-created-issue: record-leg identity guard");
-console.log("EXIT: 0 (harness mutant killed)");
+for (const entity of ["issue", "comment"]) {
+  const name = `fake-forgets-created-${entity}`;
+  if (only && only !== name) continue;
+  const fakeDir = await mkdtemp(join(scratch, "fake-mutant-"));
+  await cp(join(root, "parity"), join(fakeDir, "parity"), { recursive: true });
+  await symlink(join(root, "src"), join(fakeDir, "src"));
+  await symlink(join(root, "node_modules"), join(fakeDir, "node_modules"));
+  const fakePath = join(fakeDir, "parity/fake-linear.ts");
+  const fakeSource = await readFile(fakePath, "utf8");
+  const from = `w.${entity === "issue" ? "issues" : "comments"}.push(created);`;
+  if (fakeSource.split(from).length !== 2) throw new Error(`${name}: edit is not unique`);
+  await writeFile(fakePath, fakeSource.replace(from, `/* forget created ${entity} */`));
+  const fakeResult = await run(
+    process.execPath,
+    [
+      join(fakeDir, "parity/run.ts"),
+      "--record",
+      "--phase=3",
+      ...(entity === "issue"
+        ? ["--case=create-json"]
+        : ["--seed=1002", "--case=seed-1002-comment"]),
+    ],
+    fakeDir,
+  );
+  if (
+    fakeResult.code === 0 ||
+    !fakeResult.output.includes("expected exit 0, got 1") ||
+    !fakeResult.output.includes(`Cannot return null for non-nullable field Query.${entity}.`)
+  )
+    throw new Error(`${name}: survived or failed for the wrong reason: ${fakeResult.output}`);
+  console.log(`killed ${name}: schema refuses missing post-create root`);
+}
+console.log("EXIT: 0 (selected product and harness mutants killed)");

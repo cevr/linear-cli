@@ -50,4 +50,31 @@ cannot be valid HTTP fixture worlds, so this property does not claim those cases
 
 The repeated-flag case uses the approved usage-layout difference only: it checks
 the command name, diagnostic reason and exit 1. Domain failure lines remain byte
-equal. No blanket stderr or JSON normalization is enabled.
+equal except for the explicit q99 owner exceptions below. No blanket stderr or
+JSON normalization is enabled.
+
+## Round 2 strict regressions
+
+Build `bin/linear-ts-parity` with `bun scripts/build.ts --parity` and the native
+offline entry with the pinned compiler, then run:
+
+```sh
+bun parity/run.ts --regressions=L0 --seed=42
+bun parity/run.ts --regressions=L3 --seed=42
+bun parity/run.ts --regressions=L4 --seed=42
+```
+
+These use the compiled TS binary as control, with exact stdout/stderr/status,
+files and mutation logs, without an exception comparator. `--trace` prints both
+results; a failure prints the world, argv and replay command. L0 first checks
+member/nonmember root lookups against fixture membership, independently of CLI
+agreement. L3 checks all ECMAScript whitespace classes, nearby nonblank Unicode
+scalars, seeded mixed strings, malformed/non-object variables and failing file
+states. L4 compares accepted-origin URL canonicalization and downloads; the
+foreign-origin law and every storage request's credential check stay enabled.
+
+The fixed corpus has one explicit q99 allowlist (`owner-exceptions.ts`):
+no-terminal prompt commands retain the native message and status 1 instead of
+TS's prompt bytes/status 130; TOML failures retain their kind, path and status,
+but use std TOML's suffix. These are owner-approved differences, not equal bytes.
+The TS result is never overwritten by the native result for these exceptions.

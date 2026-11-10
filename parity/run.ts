@@ -17,6 +17,9 @@ import { cases, generatedCases } from "./corpus";
 import type { Case } from "./corpus";
 import { fakeLinear } from "./fake-linear";
 import { world } from "./world";
+import { regressionCases } from "./regressions";
+import { checkRootLookups } from "./lookup-property";
+import { q99Equal } from "./owner-exceptions";
 
 const root = resolve(import.meta.dir, "..");
 // One owned scratch per pilot step; the default is the original pilot folder.
@@ -37,6 +40,9 @@ const caseArg = process.argv.find((x) => x.startsWith("--case="))?.split("=")[1]
 const seeds = process.argv.find((x) => x.startsWith("--seed="))?.split("=")[1];
 const property = process.argv.find((x) => x.startsWith("--property="))?.split("=")[1];
 let all = seeds ? generatedCases(Number(seeds)) : cases;
+const regressions = process.argv.find((arg) => arg.startsWith("--regressions="))?.slice(14);
+if (regressions === "L0") await checkRootLookups(Number(seeds ?? 42));
+if (regressions) all = regressionCases(regressions, Number(seeds ?? 42));
 if (property)
   all = Array.from({ length: 12 }, (_, i) => generatedCases(Number(property) + i)).flat();
 const selected = all.filter((c) => c.phase <= phase && (!caseArg || c.name === caseArg));
@@ -156,10 +162,11 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
   if (throughShim && target !== "default") env.LINEAR_IMPL = target!;
   if (env.HOME !== dir) throw new Error("runner-uses-owner-home survived");
   let command = candidate ?? join(root, "bin/linear-ergo-parity");
-  if (implementation === "ts") command = process.execPath;
+  if (implementation === "ts")
+    command = regressions ? join(root, "bin/linear-ts-parity") : process.execPath;
   if (throughShim) command = shim!;
   const args =
-    !throughShim && implementation === "ts"
+    !throughShim && implementation === "ts" && !regressions
       ? ["--preload", join(root, "parity/redirect.ts"), join(root, "src/main.ts"), ...c.args]
       : c.args;
   let out = "",
@@ -272,15 +279,21 @@ for (const c of selected) {
   // The original reads keys from a pipe; at its end the prompt quits as an
   // interrupt (130) and prints nothing. The port refuses with status 1.
   const noTerminal = new Set(["view-interactive-no-terminal", "create-interactive-no-terminal"]);
-  let wantedStatus = failures.has(c.name) ? 1 : 0;
+  let wantedStatus = c.expectedStatus ?? (failures.has(c.name) ? 1 : 0);
   if (noTerminal.has(c.name) && (record || tsCheck)) wantedStatus = 130;
-  if (actual.status !== wantedStatus)
+  if (!regressions && actual.status !== wantedStatus)
     throw new Error(
       `${c.name}: expected exit ${wantedStatus}, got ${actual.status}: ${actual.err}`,
     );
   const path = join(import.meta.dir, "cases", c.name);
-  if (property) {
+  if (property || regressions) {
     const reference = await run(c, "ts");
+    if (process.argv.includes("--trace"))
+      console.log(JSON.stringify({ name: c.name, args: c.args, reference, actual }));
+    if (reference.status !== wantedStatus)
+      throw new Error(
+        `${c.name}: TS control expected ${wantedStatus}, got ${reference.status}: ${reference.err}`,
+      );
     if (JSON.stringify(reference) !== JSON.stringify(actual)) {
       console.error(
         JSON.stringify(
@@ -289,7 +302,7 @@ for (const c of selected) {
             args: c.args,
             reference,
             actual,
-            replay: `bun parity/run.ts --property=${c.seed} --phase=${phase} --case=${c.name}${target ? ` --target=${target}` : ""}`,
+            replay: `bun parity/run.ts ${regressions ? `--regressions=${regressions} --seed=${c.seed}` : `--property=${c.seed}`} --phase=${phase} --case=${c.name}${target ? ` --target=${target}` : ""}`,
           },
           null,
           2,
@@ -351,28 +364,10 @@ for (const c of selected) {
         throw new Error("graphql-invalid: parser diagnostic prefix or detail is absent");
       expected.err = actual.err;
     }
-    // The text after a config failure's path is each TOML parser's own.
-    const configPrefix: Record<string, string> = {
-      "config-malformed": "Config Error: Failed to parse $CASE/.linear.toml: ",
-      "config-invalid-type": "Config Error: Invalid Linear config in $CASE/.linear.toml: ",
-    };
-    const prefix = configPrefix[c.name];
-    if (prefix && !tsCheck) {
-      if (!expected.err.startsWith(prefix) || !actual.err.startsWith(prefix))
-        throw new Error(`${c.name}: config failure lost its kind or path`);
-      if (actual.err.length <= prefix.length + 1)
-        throw new Error(`${c.name}: config failure has no detail`);
-      expected.err = actual.err;
-    }
-    if (noTerminal.has(c.name) && !tsCheck) {
-      const refusal = "Invalid input: prompts need a terminal on standard input\n";
-      if (expected.status !== 130 || actual.out !== "" || actual.err !== refusal)
-        throw new Error(`${c.name}: no-terminal refusal lost its message or status`);
-      expected.out = actual.out;
-      expected.err = actual.err;
-      expected.status = actual.status;
-    }
-    if (JSON.stringify(expected) !== JSON.stringify(actual)) {
+    // q99 does not rewrite a TS result to look equal. It checks the narrowly
+    // approved native contract and preserves file/mutation/status assertions.
+    const exception = tsCheck ? undefined : q99Equal(c.name, expected, actual);
+    if (!(exception ?? JSON.stringify(expected) === JSON.stringify(actual))) {
       console.error(
         JSON.stringify(
           {

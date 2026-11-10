@@ -12,11 +12,12 @@ These are the plan's approved limits, not automatic exclusions of failing cases.
 
 Downloads (L4):
 
-- An upload URL must start with `https://uploads.linear.app/` (scheme and host in
-  any case). The port refuses, instead of normalizing as a WHATWG parser does, a
-  port, user information, a backslash, a `.` or `..` path segment, whitespace,
-  control or non-ASCII characters, and `"'<>{}` and backquote. The printed `url`
-  is then the same text the original prints.
+- Upload URLs normalize the HTTPS default port (including leading zeros),
+  scheme/host casing, slash/backslash separators, dot segments (including
+  escaped dots), outer ASCII whitespace and path/query/fragment encoding before
+  checked origin validation. The old blanket refusal of these inputs is removed.
+  User information and non-default ports are still refused; neither can widen
+  the origin to which the upload credential belongs.
 - The original follows one redirect and sends no token on it. The port follows one
   redirect through the std http network policy; the token is a credential of the
   upload origin, so a redirect back to that origin carries it and any other origin
@@ -37,6 +38,9 @@ Prompts and auth (L5):
   `Invalid input: prompts need a terminal on standard input` and status 1. The
   original reads keys from the pipe and, at its end, exits 130 with no error line
   (cases `view-interactive-no-terminal`, `create-interactive-no-terminal`).
+  **Owner-approved exception to q95: q99** (2026-11-10, pilot decisions.md).
+  Round 2 proceeds on the orchestrator's instruction to retain this exception;
+  this is not byte/status equality with TS.
 - An issue choice shows `ID: title - state` on every line; the original shows
   the state only for the highlighted line.
 - Interactive create feeds the create machine in its order (team, title,
@@ -57,6 +61,9 @@ Config files (L6):
 - After `Failed to parse PATH: ` and `Invalid Linear config in PATH: ` the text
   is the port's (`line 1, key team_id: unclosed string`;
   `expected a string at team_id`); the prefix, the path and status 1 are kept.
+  **Owner-approved suffix exception to q95: q99** (2026-11-10, pilot decisions.md).
+  Round 2 retains only these TOML diagnostic suffix differences, not raw-query
+  variables or workspace-file errors.
 - Unknown keys are skipped, as the original's schema does.
 
 Performance receipts (L7) are not native-parity claims. The local switch and

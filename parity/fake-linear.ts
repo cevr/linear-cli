@@ -70,7 +70,15 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
     },
     commentCreate: ({ input }: { input: Record<string, any> }) => {
       mutations.push({ operation: "comment.create", input });
-      return { success: true, comment: w.comments[0] };
+      const created = {
+        id: "00000000-0000-4000-8000-000000000199",
+        body: String(input.body),
+        createdAt: "2026-01-01T00:00:00.000Z",
+        url: "https://linear.app/comment/created",
+        user: w.user,
+      };
+      w.comments.push(created);
+      return { success: true, comment: created };
     },
     issueArchive: ({ id }: { id: string }) => {
       mutations.push({ operation: "issue.archive", id });
@@ -109,6 +117,9 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
     }
     const value = defaultFieldResolver(source, args, context, info);
     if (value !== undefined) return value;
+    // A lookup is authoritative over the fixture world. Only unused nested SDK
+    // fields get filler defaults; graphql-js owns root null/error propagation.
+    if (parent === "Query") return null;
     if (!isNonNullType(info.returnType)) return null;
     const type = info.returnType.ofType;
     if (isListType(type)) return [];

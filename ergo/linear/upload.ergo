@@ -17,37 +17,90 @@ func dotSegment(segment string) bool {
 	s == "." || s == ".."
 }
 
-// ParseUploadURL accepts https://uploads.linear.app/... with a case-insensitive
-// scheme and host. It refuses, instead of rewriting, what a WHATWG URL parser
-// would normalize: a port, user information, a backslash, a dot segment,
-// whitespace, control and non-ASCII characters, and characters that it would
-// percent-encode. The text is then the URL the original prints.
-func ParseUploadURL(input string) UploadURL fails InvalidInput {
-	let prefix = UploadOrigin() + "/"
-	let invalid = InvalidInput{Message: "Invalid upload URL: " + input + ". Expected https://uploads.linear.app/..."}
-	if len(input) < len(prefix) || strings.ToLower(input[:len(prefix)]) != prefix { return invalid }
-	let rest = input[len(prefix):]
-	for c in rest {
-		if c <= 32 || c >= 127 || c == '\\' || c == '"' || c == '\'' || c == '<' || c == '>' || c == '`' || c == '{' || c == '}' { return invalid }
+// URL encoding keeps existing escapes (including their case), as WHATWG does.
+// A special HTTPS URL uses different encode sets in path, query and fragment.
+func uploadEncode(s string, component string) string {
+	let hex = "0123456789ABCDEF"
+	let mut result = ""
+	for i in 0..len(s) {
+		let c = int(s[i])
+		if c <= 32 || c >= 127 || c == 34 || c == 60 || c == 62 || (component == "path" && (c == 96 || c == 123 || c == 125)) || (component == "query" && c == 39) || (component == "fragment" && c == 96) {
+			result = result + "%" + hex[c/16:c/16+1] + hex[c%16:c%16+1]
+		} else {
+			result = result + s[i:i+1]
+		}
 	}
-	let mut path = rest
-	let query = strings.Index(path, "?")
-	if query >= 0 { path = path[:query] }
-	let fragment = strings.Index(path, "#")
-	if fragment >= 0 { path = path[:fragment] }
-	for segment in strings.Split(path, "/") { if dotSegment(segment) { return invalid } }
-	UploadURL{value: prefix + rest}
+	result
+}
+
+func uploadPath(path string) string {
+	let parts = strings.Split(path, "/")
+	let mut kept = []string{""}
+	for i in 1..len(parts) {
+		let segment = parts[i]
+		let lower = strings.ReplaceAll(strings.ToLower(segment), "%2e", ".")
+		if dotSegment(segment) {
+			if lower == ".." && len(kept) > 1 { kept = kept[:len(kept)-1] }
+			if i == len(parts)-1 { kept = kept.Append("") }
+		} else {
+			kept = kept.Append(segment)
+		}
+	}
+	strings.Join(kept, "/")
+}
+
+// Normalize the special HTTPS URL before checking its authority. A default
+// port is this same origin, not a reason to reject a valid upload. Credentials
+// still bind to UploadOrigin, never to a textual host prefix or another port.
+func ParseUploadURL(input string) UploadURL fails InvalidInput {
+	let invalid = InvalidInput{Message: "Invalid upload URL: " + input + ". Expected https://uploads.linear.app/..."}
+	let mut text = input
+	for len(text) > 0 && int(text[0]) <= 32 { text = text[1:] }
+	for len(text) > 0 && int(text[len(text)-1]) <= 32 { text = text[:len(text)-1] }
+	text = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(text, "\t", ""), "\r", ""), "\n", "")
+	if len(text) < 6 || strings.ToLower(text[:6]) != "https:" { return invalid }
+	let mut rest = text[6:]
+	let mut suffix = ""
+	let end = strings.Index(rest, "#")
+	if end >= 0 {
+		suffix = "#" + uploadEncode(rest[end+1:], "fragment")
+		rest = rest[:end]
+	}
+	let query = strings.Index(rest, "?")
+	if query >= 0 {
+		suffix = "?" + uploadEncode(rest[query+1:], "query") + suffix
+		rest = rest[:query]
+	}
+	rest = strings.ReplaceAll(rest, "\\", "/")
+	for strings.HasPrefix(rest, "/") { rest = rest[1:] }
+	let slash = strings.Index(rest, "/")
+	let authority = strings.ToLower(if slash < 0 { rest } else { rest[:slash] })
+	let colon = strings.Index(authority, ":")
+	let mut host = authority
+	if colon >= 0 {
+		host = authority[:colon]
+		let mut port = authority[colon+1:]
+		for strings.HasPrefix(port, "0") { port = port[1:] }
+		if port != "443" && authority[colon+1:] != "" { return invalid }
+	}
+	if host != "uploads.linear.app" { return invalid }
+	let path = if slash < 0 { "/" } else { rest[slash:] }
+	UploadURL{value: UploadOrigin() + uploadEncode(uploadPath(path), "path") + suffix}
 }
 
 // UploadURLKeepsOrigin: whatever follows the host text, a parsed upload URL
 // names the upload origin itself, never a longer host such as
 // uploads.linear.app.example.
 law UploadURLKeepsOrigin(rest string) {
-	let u = ParseUploadURL(UploadOrigin() + rest) catch {
+	let _ = ParseUploadURL(UploadOrigin() + ".example/" + rest) catch {
 	case InvalidInput:
-		return true
+		let u = ParseUploadURL(UploadOrigin() + rest) catch {
+		case InvalidInput:
+			return true
+		}
+		return strings.HasPrefix(UploadText(u), UploadOrigin()+"/")
 	}
-	strings.HasPrefix(UploadText(u), UploadOrigin()+"/")
+	false
 }
 
 // Downloaded is one upload's bytes and the response fields a name may use.

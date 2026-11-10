@@ -16,14 +16,30 @@ let allowMutationFlag = flag.Bool("allow-mutation", false, "Explicitly authorize
 
 func realPath(path string) string fails go.Error needs go.Foreign { try filepath.EvalSymlinks(try filepath.Abs(path)) }
 
+// Keep the original platform failure's operation and requested absolute path,
+// not Go's failing intermediate symlink component or syscall spelling.
+func fileFailure(path string, operation string, target string, kind string) linear.InvalidInput {
+	linear.InvalidInput{Message: "Could not read GraphQL query file " + path + ": PlatformError: " + kind + ": FileSystem." + operation + " (" + target + ")"}
+}
+func platformKind(reason string) string {
+	if strings.Contains(reason, "no such file or directory") { return "NotFound" }
+	if strings.Contains(reason, "permission denied") { return "PermissionDenied" }
+	if strings.Contains(reason, "not a directory") || strings.Contains(reason, "is a directory") || strings.Contains(reason, "too many links") { return "BadResource" }
+	"Unknown"
+}
+
 func workspaceQuery(path string) string fails linear.InvalidInput needs fs.Files | go.Foreign {
 	let workspace = realPath(".") catch {
-	case _:
-		return linear.InvalidInput{Message: "Could not resolve current workspace"}
+	case go.Error as e:
+		return fileFailure(path, "realPath", ".", platformKind(e.Text))
 	}
-	let target = realPath(path) catch {
-	case _:
-		return linear.InvalidInput{Message: "Could not read GraphQL query file " + path}
+	let absolute = filepath.Abs(path) catch {
+	case go.Error as e:
+		return fileFailure(path, "realPath", path, platformKind(e.Text))
+	}
+	let target = realPath(absolute) catch {
+	case go.Error as e:
+		return fileFailure(path, "realPath", absolute, platformKind(e.Text))
 	}
 	let relative = filepath.Rel(workspace, target) catch {
 	case _:
@@ -31,8 +47,12 @@ func workspaceQuery(path string) string fails linear.InvalidInput needs fs.Files
 	}
 	if relative == ".." || strings.HasPrefix(relative, "../") || filepath.IsAbs(relative) { return linear.InvalidInput{Message: "--query-file must stay within the current workspace: " + path} }
 	let text = fs.Files.ReadFile(target) catch {
-	case _:
-		return linear.InvalidInput{Message: "Could not read GraphQL query file " + path}
+	case fs.NotFound:
+		return fileFailure(path, "readFile", target, "NotFound")
+	case fs.Denied:
+		return fileFailure(path, "readFile", target, "PermissionDenied")
+	case fs.Failed as e:
+		return fileFailure(path, "readFile", target, platformKind(e.Reason))
 	}
 	if linear.TextUnits(text) > 1000000 { return linear.InvalidInput{Message: "GraphQL query files cannot exceed 1000000 characters"} }
 	text
@@ -52,12 +72,12 @@ func apiGraphQL(v flag.Values) fails os.Exit | linear.InvalidInput | linear.ApiE
 	if graphql.IsMutation(document) && !enabled(allowMutationFlag, v) { return linear.InvalidInput{Message: "Raw GraphQL mutations require explicit authorization with --allow-mutation. Preview and inspect the document before retrying."} }
 	let variables = json.Decode(json.Codec[json.Value]{MaxBytes: 4000000, MaxDepth: 128}, variablesText) catch {
 	case _:
-		return linear.InvalidInput{Message: "--variables must be a JSON object: invalid JSON"}
+		return linear.InvalidInput{Message: "--variables must be a JSON object: SchemaError(Expected a valid JSON string)"}
 	}
 	match variables {
 	case json.Object:
 	case _:
-		return linear.InvalidInput{Message: "--variables must be a JSON object"}
+		return linear.InvalidInput{Message: "--variables must be a JSON object: SchemaError(Expected object)"}
 	}
 	let data = try linear.RawGraphQL.Execute(graphql.Text(document), variables)
 	io.Stdout.Println(json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, data))
