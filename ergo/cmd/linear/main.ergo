@@ -5,10 +5,12 @@ import linearport/cli
 import linearport/credential
 import linearport/graphqlhttp
 import linearport/linear
+import linearport/uploadhttp
 import os
 
 // Only this entry chooses the production origins. No environment variable can
-// redirect an API credential. Redirects remain responses, never followed here.
+// redirect an API credential. GraphQL redirects remain responses; only the
+// upload network follows one, without the credential.
 func main() fails os.Exit needs Ambient | go.Foreign {
 	let process = os.NewHost()
 	let disk = fs.NewHost()
@@ -25,7 +27,15 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
 	}
 	let tracker = graphqlhttp.New(net, credentials)
-	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, io.Stdout: out, fs.Files: disk } {
+	// An upload redirects to a storage host named only in the response, so the
+	// upload network admits any origin and follows one redirect, as the original
+	// does. The token is a credential of the upload origin: no other host gets it.
+	let remote = http.NewNet(http.AnyOrigin, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536}, http.Follow{MaxHops: 1}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Linear API Error: invalid upload network"}
+	}
+	let uploads = uploadhttp.New(remote, linear.UploadOrigin(), "", credentials)
+	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, fs.Files: disk, fs.Writes: disk } {
 		try cli.Run(process.Args())
 	}
 }

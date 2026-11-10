@@ -313,6 +313,21 @@ export function generatedCases(seed: number): Case[] {
             { seed },
           ),
           c(`seed-${seed}-files`, 2, ["issue", "files", "ENG-123", "--json"], { seed }),
+          // Text and JSON saved-file output, the short output-dir name, and a
+          // nested output folder that does not exist yet.
+          c(
+            `seed-${seed}-download`,
+            4,
+            [
+              "issue",
+              "files",
+              "ENG-123",
+              "--download",
+              ...(seed & 1 ? ["-o", "files"] : ["--output-dir", "out/nested"]),
+              ...(seed & 2 ? ["--json"] : []),
+            ],
+            { seed },
+          ),
           c(
             `seed-${seed}-start`,
             3,

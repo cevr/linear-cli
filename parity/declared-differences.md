@@ -10,6 +10,23 @@ These are the plan's approved limits, not automatic exclusions of failing cases.
 - The native client sends smaller documents and may make fewer requests; semantic
   mutation inputs, output and token reach must still agree.
 
-Downloads (L4), interactive input (L5), TOML config (L6), installation switch and
-performance receipts (L7) are not native-parity claims of L1–L3. They remain on
-the TypeScript implementation. No installed command is changed by this branch.
+Downloads (L4):
+
+- An upload URL must start with `https://uploads.linear.app/` (scheme and host in
+  any case). The port refuses, instead of normalizing as a WHATWG parser does, a
+  port, user information, a backslash, a `.` or `..` path segment, whitespace,
+  control or non-ASCII characters, and `"'<>{}` and backquote. The printed `url`
+  is then the same text the original prints.
+- The original follows one redirect and sends no token on it. The port follows one
+  redirect through the std http network policy; the token is a credential of the
+  upload origin, so a redirect back to that origin carries it and any other origin
+  does not. A second redirect is `Linear API Error: Download failed: more than 1
+redirect for URL`, where the original reports the redirect's HTTP status.
+- A response body is held in memory up to 64 MiB (67,108,864 bytes); a larger one
+  is a `Download failed` API error. The original has no limit.
+- Transport failure and `File Error:` texts are the port's own; the prefix and
+  exit status 1 are kept.
+
+Interactive input (L5), TOML config (L6), installation switch and performance
+receipts (L7) are not native-parity claims. They remain on the TypeScript
+implementation. No installed command is changed by this branch.

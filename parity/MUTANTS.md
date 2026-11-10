@@ -50,3 +50,14 @@ L0 schema validation is a prerequisite, not proof of API parity.
 - `graphql-rejects-schema-definition`: the same generated property includes type-system syntax and descriptions. Schema fields named mutation are not executable mutation definitions; existing raw CLI cases contain only executable documents.
 - `dry-run-sends-mutation`, `workspace-allows-symlink-escape`: reuse existing process cases; no duplicate unit rows.
 - `fake-forgets-created-issue`: record leg must observe the created issue's identity in the fake world. L0's stable recordings alone allowed the fake's non-null default `fixture` to mask a missing created-issue lookup.
+
+# L4 guards (declared before implementation)
+
+- `upload-url-host-prefix`: the upload prefix check loses its final `/`, so `https://uploads.linear.app.example/...` names another host. Generated UploadURLKeepsOrigin; the fixed foreign-host case uses an unrelated host and cannot catch it.
+- `safe-name-empty-fallback`: a name that cleans to nothing stays empty, so the target is the output folder itself. Generated SafeNameStaysInOutputDir; no fixed case has an all-dot or empty name.
+- `unique-name-no-loop`: the suffix stops at `-2` even when `-2` is taken. Generated UniqueNameIsFresh; the fixed duplicate case has only two equal names.
+- `native-ignores-disposition`: declared at L0; the download-disposition cases kill it.
+- `overwrite-ignored`: an existing file is replaced without `--overwrite`. The download-exists case.
+- `upload-credential-wrong-origin`: the token is bound to an origin that is not the upload origin, so it is never sent. The fake upload origin now answers 401 without the token, as the real one does; the download-redirect case.
+- `saved-text-drops-size`: the text form of saved files. Every fixed download case prints JSON; the generated `seed-N-download` case alternates text and JSON.
+- Token reach: every case fails when the storage listener sees `Authorization`. The token is a CU5 credential of one origin; the port has no public value of it to leak (package `credential` alone reads it), so no port mutant can send it elsewhere. The std http two-peer model owns that guarantee.

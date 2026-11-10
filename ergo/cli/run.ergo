@@ -3,6 +3,7 @@ import fs
 import io
 import json
 import linearport/credential
+import linearport/files
 import linearport/linear
 import os
 import strings
@@ -33,10 +34,12 @@ func wireViewer(v linear.Viewer) WireViewer {
 	WireViewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
 }
 
-func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | io.Stdout | fs.Files | go.Foreign {
+func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | io.Stdout | fs.Files | fs.Writes | go.Foreign {
 	run(args) catch {
 	case os.Exit as e:
 		return e
+	case files.WriteFailed as e:
+		return os.Exit{Code: 1, Message: "File Error: " + e.Message}
 	case linear.InvalidInput as e:
 		return os.Exit{Code: 1, Message: "Invalid input: " + e.Message}
 	case linear.ApiError as e:
@@ -50,9 +53,13 @@ func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | lin
 	}
 }
 
-func run(args []string) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | io.Stdout | fs.Files | go.Foreign {
+func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | io.Stdout | fs.Files | fs.Writes | go.Foreign {
 	if len(args) < 2 { return os.Exit{Code: 1, Message: "Usage: linear team list | project list | auth whoami"} }
 	let command = args[0] + " " + args[1]
+	if command == "file download" {
+		try fileDownload(args[2:])
+		return
+	}
 	if command == "api graphql" {
 		try apiGraphQL(args[2:])
 		return

@@ -147,12 +147,16 @@ export function fakeLinear(w: World, failure: Failure = "none") {
           operation: "upload",
           authenticated: request.headers.get("authorization") === "pilot-test-token",
         });
+        // The upload origin needs the token, as the real one does.
+        if (!requests.at(-1)!.authenticated) return new Response("unauthorized", { status: 401 });
         let disposition = "";
         if (url.pathname.endsWith("/disposition-plain")) disposition = "?name=plain";
         if (url.pathname.endsWith("/disposition-encoded")) disposition = "?name=encoded";
         return new Response(null, {
           status: 302,
-          headers: { location: "https://storage.linear-pilot.invalid/object" + disposition },
+          // A second literal loopback origin: both programs must follow the
+          // redirect across origins without sending the token there.
+          headers: { location: `${storage.url.origin}/object${disposition}` },
         });
       }
       if (url.pathname !== "/graphql" || request.method !== "POST")

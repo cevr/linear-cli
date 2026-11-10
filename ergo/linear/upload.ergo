@@ -1,0 +1,60 @@
+import linearport/credential
+import strings
+
+// UploadOrigin is the one origin an upload URL names. The token may go there.
+func UploadOrigin() string { "https://uploads.linear.app" }
+
+// Only ParseUploadURL constructs an UploadURL, so every value names the
+// upload origin. A provider maps it to a transport target; it cannot forge one.
+type UploadURL { value string }
+func UploadText(u UploadURL) string { u.value }
+
+// UploadPath is the path, query and fragment after the origin; it starts with "/".
+func UploadPath(u UploadURL) string { u.value[len(UploadOrigin()):] }
+
+func dotSegment(segment string) bool {
+	let s = strings.ReplaceAll(strings.ToLower(segment), "%2e", ".")
+	s == "." || s == ".."
+}
+
+// ParseUploadURL accepts https://uploads.linear.app/... with a case-insensitive
+// scheme and host. It refuses, instead of rewriting, what a WHATWG URL parser
+// would normalize: a port, user information, a backslash, a dot segment,
+// whitespace, control and non-ASCII characters, and characters that it would
+// percent-encode. The text is then the URL the original prints.
+func ParseUploadURL(input string) UploadURL fails InvalidInput {
+	let prefix = UploadOrigin() + "/"
+	let invalid = InvalidInput{Message: "Invalid upload URL: " + input + ". Expected https://uploads.linear.app/..."}
+	if len(input) < len(prefix) || strings.ToLower(input[:len(prefix)]) != prefix { return invalid }
+	let rest = input[len(prefix):]
+	for c in rest {
+		if c <= 32 || c >= 127 || c == '\\' || c == '"' || c == '\'' || c == '<' || c == '>' || c == '`' || c == '{' || c == '}' { return invalid }
+	}
+	let mut path = rest
+	let query = strings.Index(path, "?")
+	if query >= 0 { path = path[:query] }
+	let fragment = strings.Index(path, "#")
+	if fragment >= 0 { path = path[:fragment] }
+	for segment in strings.Split(path, "/") { if dotSegment(segment) { return invalid } }
+	UploadURL{value: prefix + rest}
+}
+
+// UploadURLKeepsOrigin: whatever follows the host text, a parsed upload URL
+// names the upload origin itself, never a longer host such as
+// uploads.linear.app.example.
+law UploadURLKeepsOrigin(rest string) {
+	let u = ParseUploadURL(UploadOrigin() + rest) catch {
+	case InvalidInput:
+		return true
+	}
+	strings.HasPrefix(UploadText(u), UploadOrigin()+"/")
+}
+
+// Downloaded is one upload's bytes and the response fields a name may use.
+type Downloaded { Bytes string, ContentType Option[string], Disposition Option[string] }
+
+// Uploads reads a file a user attached to an issue. A provider sends the
+// credential only to the upload origin; a redirect target never receives it.
+type Uploads {
+	Download(u UploadURL) Downloaded fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+}

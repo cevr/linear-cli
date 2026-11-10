@@ -4,7 +4,7 @@ import os
 import strings
 
 func switchFlag(name string) bool {
-	name == "--json" || name == "--dry-run" || name == "--comments" || name == "--children" || name == "--relations" || name == "--allow-mutation" || name == "--help"
+	name == "--json" || name == "--dry-run" || name == "--comments" || name == "--children" || name == "--relations" || name == "--allow-mutation" || name == "--help" || name == "--overwrite" || name == "--download"
 }
 
 // std flag is last-wins, but this CLI refuses repeated singleton flags before

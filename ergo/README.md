@@ -8,8 +8,8 @@ the offline entry accepts only literal IPv4 loopback HTTP origins.
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo check ergo/cmd/linear
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo build ergo/cmd/linear -o bin/linear-ergo
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo build ergo/cmd/linear-parity -o bin/linear-ergo-parity
-bun parity/run.ts --phase=3
-bun parity/run.ts --phase=3 --property=1000
+bun parity/run.ts --phase=4
+bun parity/run.ts --phase=4 --property=1000
 ergo test ergo/linear --seed 42
 ergo test ergo/graphql --seed 42
 ergo test ergo/memory --seed 42
@@ -30,10 +30,18 @@ directory after symlinks; this path check explicitly needs `go.Foreign` at the
 pin, while file reads use the replaceable `fs.Files` capability. Memory writes
 record domain mutations; the native parity gate exercises the HTTP provider.
 
+L4 downloads uploads (`file download`, `issue files --download`). `linear`
+declares the `Uploads` contract and the `UploadURL` brand: only `ParseUploadURL`
+makes one, and each names the upload origin. `uploadhttp` reads an upload over a
+std `http.Remote` that only `main` builds, under its origin and redirect policy
+(production: any origin, one redirect; parity: the two loopback origins). The
+token is an `http.Credential` of the upload origin, so a redirect target never
+gets it. `files` chooses safe, unique names and saves under `--output-dir`.
+
 Use an explicit private GOPATH/GOMODCACHE as well as GOCACHE for isolated HOME
 builds. Clean a private read-only module cache with Go's `clean -modcache`, not
-permission changes. Downloads, prompts, TOML and the installed-command switch
-remain L4–L7. The production binary is not selected or run by the offline gate.
+permission changes. Prompts, TOML and the installed-command switch remain
+L5–L7. The production binary is not selected or run by the offline gate.
 
 Effect service tags and layers are replaced by operation types and contexts;
 runtime schema classes by checked records and derived codecs; tagged errors by

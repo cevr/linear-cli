@@ -1,7 +1,9 @@
 import flag
+import fs
 import io
 import json
 import linearport/credential
+import linearport/files
 import linearport/linear
 import os
 import strings
@@ -57,11 +59,11 @@ func wireDetails(d linear.Details) WireDetails {
 	WireDetails{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State), Description: wireOption(d.Description), Team: wireOption(d.Team), Assignee: wireOption(d.Assignee), Project: wireOption(d.Project), Parent: wireOption(d.Parent), Labels: d.Labels, Children: wireOption(d.Children), Comments: comments, Relations: wireOption(d.Relations)}
 }
 
-func issueRead(command string, args []string) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | io.Stdout {
+func issueRead(command string, args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout {
 	let flags = if command == "list" {
 		[]flag.Flag{asJson, stateFlag, limitFlag}
 	} else {
-		if command == "view" { []flag.Flag{asJson, commentsFlag, childrenFlag, relationsFlag} } else { []flag.Flag{asJson} }
+		if command == "view" { []flag.Flag{asJson, commentsFlag, childrenFlag, relationsFlag} } else { []flag.Flag{asJson, downloadFlag, outputDirFlag, overwriteFlag} }
 	}
 	let set = flag.Set{Name: "linear issue " + command, Usage: "", Flags: flags, Args: if command == "list" { []flag.ArgSpec{} } else { []flag.ArgSpec{idsArg} }}
 	let normalized = aliases(args)
@@ -85,16 +87,20 @@ func issueRead(command string, args []string) fails os.Exit | linear.InvalidInpu
 	if command == "files" {
 		if len(ids) != 1 { return linear.InvalidInput{Message: "Expected one issue identifier"} }
 		let details = try linear.Reader.Issue(selectors[0], linear.DetailsOptions{Comments: true, Children: false, Relations: false})
-		let files = issueFiles(details)
-		if asJson.Get(v) {
-			io.Stdout.Println(json.Encode(json.Codec[[]IssueFile]{MaxBytes: 0, MaxDepth: 0}, files))
+		let listed = issueFiles(details)
+		if downloadFlag.Get(v) {
+			try downloadIssueFiles(listed, v)
 			return
 		}
-		if len(files) == 0 {
+		if asJson.Get(v) {
+			io.Stdout.Println(json.Encode(json.Codec[[]IssueFile]{MaxBytes: 0, MaxDepth: 0}, listed))
+			return
+		}
+		if len(listed) == 0 {
 			io.Stdout.Println("No files found on " + details.Identifier + ".")
 			return
 		}
-		for file in files { io.Stdout.Println(file.Name + "\t" + file.Source + "\t" + file.Url) }
+		for file in listed { io.Stdout.Println(file.Name + "\t" + file.Source + "\t" + file.Url) }
 		return
 	}
 	let options = linear.DetailsOptions{Comments: commentsFlag.Get(v), Children: childrenFlag.Get(v), Relations: relationsFlag.Get(v)}
@@ -260,14 +266,14 @@ func renderDetails(d linear.Details) needs io.Stdout {
 }
 
 func links(markdown string, source string) []IssueFile {
-	let mut files = []IssueFile{}
+	let mut found = []IssueFile{}
 	let mut rest = markdown
 	for {
 		let open = strings.Index(rest, "[")
-		if open < 0 { return files }
+		if open < 0 { return found }
 		rest = rest[open+1:]
 		let close = strings.Index(rest, "]")
-		if close < 0 { return files }
+		if close < 0 { return found }
 		let name = rest[:close]
 		let tail = rest[close+1:]
 		let bracketed = strings.HasPrefix(tail, "(<")
@@ -280,7 +286,7 @@ func links(markdown string, source string) []IssueFile {
 				let url = tail[start:endUrl]
 				let mut valid = len(url) > len("https://uploads.linear.app/")
 				for c in url { if c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '>' { valid = false } }
-				if valid { files = files.Append(IssueFile{Name: name, Url: url, Source: source}) }
+				if valid { found = found.Append(IssueFile{Name: name, Url: url, Source: source}) }
 			}
 		}
 		rest = tail

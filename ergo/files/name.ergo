@@ -1,0 +1,144 @@
+import hex
+import linearport/linear
+import strings
+import utf8
+
+func allowed(c rune) bool {
+	(c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '_' || c == ' ' || c == '(' || c == ')' || c == '-'
+}
+
+// SafeName keeps the last path element of candidate, maps each character
+// outside A-Z a-z 0-9 . _ space ( ) - to "_" (one per UTF-16 unit, as the
+// original's expression does), drops leading dots and spaces, and trims.
+// An empty result is "download".
+func SafeName(candidate string) string {
+	let mut base = candidate
+	let slash = strings.LastIndex(base, "/")
+	if slash >= 0 { base = base[slash+1:] }
+	let back = strings.LastIndex(base, "\\")
+	if back >= 0 { base = base[back+1:] }
+	let mut cleaned = ""
+	for c in base {
+		cleaned = cleaned + if allowed(c) { utf8.RuneText(c) } else { if c > 65535 { "__" } else { "_" } }
+	}
+	for strings.HasPrefix(cleaned, ".") || strings.HasPrefix(cleaned, " ") { cleaned = cleaned[1:] }
+	cleaned = strings.TrimSpace(cleaned)
+	if cleaned == "" { return "download" }
+	cleaned
+}
+
+// SafeNameStaysInOutputDir: a saved name is one visible path element, so the
+// joined path never names the output folder itself or leaves it.
+law SafeNameStaysInOutputDir(candidate string) {
+	let name = SafeName(candidate)
+	name != "" && !strings.Contains(name, "/") && !strings.Contains(name, "\\") && !strings.HasPrefix(name, ".")
+}
+
+func taken(used []string, name string) bool {
+	for u in used { if u == name { return true } }
+	false
+}
+
+// UniqueName is name, or stem-N.ext with the least N >= 2 that used does not hold.
+func UniqueName(name string, used []string) string {
+	if !taken(used, name) { return name }
+	let dot = strings.LastIndex(name, ".")
+	let stem = if dot <= 0 { name } else { name[:dot] }
+	let ext = if dot <= 0 { "" } else { name[dot:] }
+	let mut n = 2
+	for taken(used, stem+"-\(n)"+ext) { n = n + 1 }
+	stem + "-\(n)" + ext
+}
+
+// UniqueNameIsFresh: after any number of uploads with one name, the next
+// choice is still a name no earlier upload took.
+law UniqueNameIsFresh(name string, rounds uint8) {
+	let mut used = []string{}
+	for _ in 0..int(rounds)%6 { used = used.Append(UniqueName(name, used)) }
+	!taken(used, UniqueName(name, used))
+}
+
+// percentDecode is JavaScript's decodeURIComponent: the raw text when an escape is
+// malformed or the bytes are not UTF-8.
+func percentDecode(raw string) string {
+	let mut out = ""
+	let mut i = 0
+	for i < len(raw) {
+		if raw[i] == '%' {
+			if i+3 > len(raw) { return raw }
+			let b = hex.Decode(raw[i+1 : i+3]) catch {
+			case hex.Malformed:
+				return raw
+			}
+			out = out + b
+			i = i + 3
+		} else {
+			out = out + raw[i:i+1]
+			i = i + 1
+		}
+	}
+	if utf8.ValidString(out) { out } else { raw }
+}
+
+// DispositionName is the first filename or filename* parameter of a
+// Content-Disposition value, as the original's expression
+// /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i finds it, then decoded.
+func DispositionName(value string) Option[string] {
+	let mut at = 0
+	for at+8 <= len(value) {
+		let start = at
+		at = at + 1
+		if !strings.EqualFold(value[start:start+8], "filename") { continue }
+		let mut j = start + 8
+		if j < len(value) && value[j] == '*' { j = j + 1 }
+		if j >= len(value) || value[j] != '=' { continue }
+		j = j + 1
+		if j+7 <= len(value) && strings.EqualFold(value[j:j+7], "UTF-8''") { j = j + 7 }
+		if j < len(value) && value[j] == '"' { j = j + 1 }
+		let mut end = j
+		for end < len(value) && value[end] != '"' && value[end] != ';' { end = end + 1 }
+		if end > j { return Some[string]{Value: percentDecode(value[j:end])} }
+	}
+	None
+}
+
+func nonEmpty(value Option[string]) Option[string] {
+	match value {
+	case None:
+		None
+	case Some[string] as v:
+		if strings.TrimSpace(v.Value) == "" { None } else { v }
+	}
+}
+
+// urlName is the last segment of the URL's path, without query or fragment.
+func urlName(u linear.UploadURL) string {
+	let mut path = linear.UploadPath(u)
+	let query = strings.Index(path, "?")
+	if query >= 0 { path = path[:query] }
+	let fragment = strings.Index(path, "#")
+	if fragment >= 0 { path = path[:fragment] }
+	path[strings.LastIndex(path, "/")+1:]
+}
+
+// PreferredName is the Markdown link name, else the response's file name,
+// else the URL's last path segment; SafeName then makes it a file name.
+func PreferredName(link Option[string], disposition Option[string], u linear.UploadURL) string {
+	match nonEmpty(link) {
+	case Some[string] as l:
+		return l.Value
+	case None:
+	}
+	let named = match disposition {
+	case None:
+		None
+	case Some[string] as d:
+		nonEmpty(DispositionName(d.Value))
+	}
+	match named {
+	case Some[string] as n:
+		n.Value
+	case None:
+		urlName(u)
+	}
+}
