@@ -12,12 +12,21 @@ These are the plan's approved limits, not automatic exclusions of failing cases.
 
 Downloads (L4):
 
-- Upload URLs normalize the HTTPS default port (including leading zeros),
-  scheme/host casing, slash/backslash separators, dot segments (including
-  escaped dots), outer ASCII whitespace and path/query/fragment encoding before
-  checked origin validation. The old blanket refusal of these inputs is removed.
-  User information and non-default ports are still refused; neither can widen
-  the origin to which the upload credential belongs.
+- Upload URLs are parsed as WHATWG parses a special HTTPS URL, as the
+  original's `URL.parse` does: outer C0/space and inner tab/CR/LF removed,
+  scheme case, slash/backslash runs, empty user information (`@`, `:@`), host
+  escapes, case and UTS #46 mapping (`parity/upload-host.ts` generates the
+  host table from the original's parser and checks it), default port with
+  leading zeros, dot segments and the path/query/fragment encode sets. The
+  printed URL equals the original's `href`.
+- Refused although the original accepts them, pending owner question q101:
+  non-empty user information (`u@`, `u:p@`, `@@`, `::@`) and any port other
+  than 443. Neither may widen the origin to which the upload credential
+  belongs. The property checks that the port prints exactly the original's
+  refusal line for each such input, with status 1 and no file.
+- A `%` that starts no escape stays in the printed URL, as in the original. An
+  HTTP request line cannot carry it, so the request target sends it as `%25`;
+  the fragment is never sent. Only the upload server sees this form.
 - The original follows one redirect and sends no token on it. The port follows one
   redirect through the std http network policy; the token is a credential of the
   upload origin, so a redirect back to that origin carries it and any other origin

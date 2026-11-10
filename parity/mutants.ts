@@ -129,14 +129,88 @@ const mutants: Mutant[] = [
     args: ["--regressions=L3", "--case=regression-L3-file-0"],
   },
   {
+    name: "query-file-realpath-denied-unknown",
+    file: "cli/graphql.ergo",
+    from: 'if strings.Contains(reason, "permission denied") { return "PermissionDenied" }',
+    to: "",
+    pkg: "",
+    guard: "regression-L3-file-6: parity mismatch",
+    args: ["--regressions=L3", "--seed=1000", "--case=regression-L3-file-6"],
+  },
+  {
+    name: "query-file-denied-unknown",
+    file: "cli/graphql.ergo",
+    from: 'return fileFailure(path, "readFile", target, "PermissionDenied")',
+    to: 'return fileFailure(path, "readFile", target, "Unknown")',
+    pkg: "",
+    guard: "regression-L3-file-7: parity mismatch",
+    args: ["--regressions=L3", "--seed=1000", "--case=regression-L3-file-7"],
+  },
+  {
     name: "upload-rejects-default-port",
     file: "linear/upload.ergo",
     from: 'if port != "443" && authority[colon+1:] != "" { return invalid }',
     to: 'if port != "443" || authority[colon+1:] != "" { return invalid }',
     pkg: "",
-    guard: "regression-L4-upload-0: parity mismatch",
-    args: ["--regressions=L4", "--case=regression-L4-upload-0"],
+    guard: ": parity mismatch",
+    args: ["--regressions=L4", "--seed=42"],
   },
+  // Round 3: the generated WHATWG URL property (parity/upload-property.ts).
+  ...(
+    [
+      [
+        "upload-query-quote-raw",
+        '(component == "query" && c == 39)',
+        '(component == "query" && c == 1000)',
+      ],
+      [
+        "upload-fragment-tick-raw",
+        '(component == "fragment" && c == 96)',
+        '(component == "fragment" && c == 1000)',
+      ],
+      [
+        "upload-path-tick-raw",
+        "(c == 94 || c == 96 || c == 123",
+        "(c == 94 || c == 1000 || c == 123",
+      ],
+      [
+        "upload-path-caret-raw",
+        "(c == 94 || c == 96 || c == 123",
+        "(c == 1000 || c == 96 || c == 123",
+      ],
+      ["upload-inner-tab-kept", 'strings.ReplaceAll(text, "\\t", "")', "text"],
+      [
+        "upload-empty-userinfo-refused",
+        'if userinfo != "" && userinfo != ":" { return invalid }',
+        "if userinfo == userinfo { return invalid }",
+      ],
+      ["upload-host-escape-kept", "if text[i] == '%' && escapeAt(text, i) {", "if false {"],
+      [
+        "upload-host-unmapped",
+        "host = host + m.Value",
+        "host = host + utf8.RuneText(c) + m.Value[:0]",
+      ],
+      ["upload-stray-percent-sent", 'path = path + "%25"', 'path = path + "%"'],
+      [
+        "upload-userinfo-accepted",
+        'if userinfo != "" && userinfo != ":" { return invalid }',
+        'if userinfo == "@never@" { return invalid }',
+      ],
+      [
+        "upload-other-port-accepted",
+        'if port != "443" && authority[colon+1:] != "" { return invalid }',
+        'if port == "x" { return invalid }',
+      ],
+    ] as const
+  ).map(([name, from, to]) => ({
+    name,
+    file: "linear/upload.ergo",
+    from,
+    to,
+    pkg: "",
+    guard: name.endsWith("-accepted") ? ": q101 refusal mismatch" : ": parity mismatch",
+    args: ["--regressions=L4", "--seed=42"],
+  })),
   {
     name: "root-version-undeclared",
     file: "cli/arguments.ergo",
@@ -258,8 +332,8 @@ const mutants: Mutant[] = [
   {
     name: "upload-url-host-prefix",
     file: "linear/upload.ergo",
-    from: 'if host != "uploads.linear.app" { return invalid }',
-    to: 'if !strings.HasPrefix(host, "uploads.linear.app") { return invalid }',
+    from: 'if h.Value != "uploads.linear.app" { return invalid }',
+    to: 'if !strings.HasPrefix(h.Value, "uploads.linear.app") { return invalid }',
     pkg: "linear",
     guard: "law refuted",
   },
@@ -490,21 +564,52 @@ for (const mutant of mutants) {
     throw new Error(`${mutant.name}: survived or failed for the wrong reason: ${result.output}`);
   console.log(`killed ${mutant.name}: ${mutant.guard}`);
 }
-if (only === "fake-invents-missing-root" || !only) {
-  const dir = await mkdtemp(join(scratch, "missing-root-mutant-"));
+// Fixture-fake mutants: each is killed by the L0 membership properties.
+const fakeMutants = [
+  {
+    name: "fake-invents-missing-root",
+    from: 'if (parent === "Query") return null;',
+    to: "/* let the fallback invent a root */",
+    guard: "fake-invents-missing-root:",
+  },
+  {
+    name: "fake-comment-on-missing-issue",
+    from: 'resolveInput("commentCreate", input);',
+    to: "/* accept any comment target */",
+    guard: "fake-mutates-missing-reference: seed=42 field=commentCreate.issueId",
+  },
+  {
+    name: "fake-archives-missing-issue",
+    from: 'referenced("Issue", id);\n      mutations.push({ operation: "issue.archive"',
+    to: 'mutations.push({ operation: "issue.archive"',
+    guard: "field=issueArchive.id",
+  },
+  {
+    name: "fake-creates-under-missing-reference",
+    from: 'resolveInput("issueCreate", input);',
+    to: "/* accept any create references */",
+    guard: "field=issueCreate.teamId",
+  },
+  {
+    name: "fake-records-before-resolving",
+    from: 'resolveInput("issueUpdate", input);\n      mutations.push({ operation: "issue.update", id: target.id, input });',
+    to: 'mutations.push({ operation: "issue.update", id: target.id, input });\n      resolveInput("issueUpdate", input);',
+    guard: "field=issueUpdate.teamId",
+  },
+];
+for (const mutant of fakeMutants) {
+  if (only && only !== mutant.name) continue;
+  const dir = await mkdtemp(join(scratch, "fake-reference-mutant-"));
   await cp(join(root, "parity"), join(dir, "parity"), { recursive: true });
   await symlink(join(root, "node_modules"), join(dir, "node_modules"));
   const path = join(dir, "parity/fake-linear.ts");
   const source = await readFile(path, "utf8");
-  const from = 'if (parent === "Query") return null;';
-  if (source.split(from).length !== 2) throw new Error("missing root mutant edit is not unique");
-  await writeFile(path, source.replace(from, "/* let the fallback invent a root */"));
+  if (source.split(mutant.from).length !== 2) throw new Error(`${mutant.name}: edit is not unique`);
+  await writeFile(path, source.replace(mutant.from, mutant.to));
   const result = await run(process.execPath, [join(dir, "parity/run.ts"), "--regressions=L0"], dir);
-  if (result.code === 0 || !result.output.includes("fake-invents-missing-root:"))
-    throw new Error(
-      `fake-invents-missing-root survived or failed for wrong reason: ${result.output}`,
-    );
-  console.log("killed fake-invents-missing-root: root membership property");
+  if (result.code === 0 || !result.output.includes(mutant.guard))
+    throw new Error(`${mutant.name} survived or failed for wrong reason: ${result.output}`);
+  console.log(`killed ${mutant.name}: L0 membership property`);
 }
 if (only && !["fake-forgets-created-issue", "fake-forgets-created-comment"].includes(only)) {
   console.log(`EXIT: 0 (mutant ${only} only)`);

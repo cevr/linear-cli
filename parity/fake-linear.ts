@@ -1,4 +1,5 @@
 import {
+  GraphQLError,
   buildSchema,
   defaultFieldResolver,
   getNamedType,
@@ -14,6 +15,55 @@ import type { World } from "./world";
 
 const schema = buildSchema(await readFile(new URL("./schema.graphql", import.meta.url), "utf8"));
 export type Failure = "none" | "401" | "500" | "graphql";
+
+export type EntityType =
+  | "Issue"
+  | "Team"
+  | "Project"
+  | "WorkflowState"
+  | "User"
+  | "IssueLabel"
+  | "Comment";
+// The entity references the fixture world models, per mutation input field.
+// Any other *Id/*Ids input field is refused as unmodelled, never accepted.
+export const mutationReferences = {
+  issueCreate: {
+    teamId: "Team",
+    parentId: "Issue",
+    projectId: "Project",
+    stateId: "WorkflowState",
+    assigneeId: "User",
+    subscriberIds: "User",
+    labelIds: "IssueLabel",
+  },
+  issueUpdate: {
+    teamId: "Team",
+    parentId: "Issue",
+    projectId: "Project",
+    stateId: "WorkflowState",
+    assigneeId: "User",
+    subscriberIds: "User",
+    labelIds: "IssueLabel",
+    addedLabelIds: "IssueLabel",
+    removedLabelIds: "IssueLabel",
+  },
+  commentCreate: { issueId: "Issue", parentId: "Comment", subscriberIds: "User" },
+} satisfies Record<string, Record<string, EntityType>> as Record<
+  "issueCreate" | "issueUpdate" | "commentCreate",
+  Record<string, EntityType | undefined>
+>;
+// Linear's answer to an unknown entity id (inferred from public reports of
+// the API: "Entity not found: Issue" / "Could not find referenced Issue.").
+export const entityNotFound = (type: EntityType) =>
+  new GraphQLError(`Entity not found: ${type}`, {
+    extensions: {
+      type: "invalid input",
+      code: "INPUT_ERROR",
+      statusCode: 400,
+      userError: true,
+      userPresentableMessage: `Could not find referenced ${type}.`,
+    },
+  });
 
 export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs = 0) {
   const mutations: unknown[] = [];
@@ -35,6 +85,31 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
       },
     };
   };
+  // A mutation resolves every entity id it names before it records anything,
+  // as Linear does: an unknown id is an input error, never a created entity.
+  const entities: Record<EntityType, (id: string) => { id: string } | undefined> = {
+    Issue: (id) => issue(id),
+    Team: (id) => find(w.teams, id),
+    Project: (id) => find(w.projects, id),
+    WorkflowState: (id) => find(w.states, id),
+    User: (id) => find([w.user], id),
+    IssueLabel: (id) => find(w.labels, id),
+    Comment: (id) => find(w.comments, id),
+  };
+  const referenced = (type: EntityType, id: string) => {
+    const found = entities[type](id);
+    if (!found) throw entityNotFound(type);
+    return found as any;
+  };
+  const resolveInput = (mutation: keyof typeof mutationReferences, input: Record<string, any>) => {
+    for (const [field, value] of Object.entries(input)) {
+      if (value === null || value === undefined || !/Ids?$/.test(field)) continue;
+      const type = mutationReferences[mutation][field];
+      // A reference the fixture world does not model must fail loudly, not pass.
+      if (!type) throw new Error(`Fixture does not model ${mutation}.${field}`);
+      for (const id of Array.isArray(value) ? value : [value]) referenced(type, String(id));
+    }
+  };
   const root = {
     viewer: () => w.user,
     user: ({ id }: { id: string }) => find([w.user], id),
@@ -48,15 +123,14 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
     comment: ({ id }: { id: string }) => find(w.comments, id),
     issueRelation: ({ id }: { id: string }) => find(w.relations, id),
     issueUpdate: ({ id, input }: { id: string; input: { stateId: string } }) => {
-      const target = issue(id);
-      if (!target) throw new Error("Issue not found");
+      const target = referenced("Issue", id);
+      resolveInput("issueUpdate", input);
       mutations.push({ operation: "issue.update", id: target.id, input });
-      const next = find(w.states, input.stateId);
-      if (!next) throw new Error("State not found");
-      target.state = next;
+      if (input.stateId) target.state = find(w.states, input.stateId)!;
       return { success: true, issue: target };
     },
     issueCreate: ({ input }: { input: Record<string, any> }) => {
+      resolveInput("issueCreate", input);
       mutations.push({ operation: "issue.create", input });
       const created = {
         ...w.issues[0]!,
@@ -69,6 +143,7 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
       return { success: true, issue: created };
     },
     commentCreate: ({ input }: { input: Record<string, any> }) => {
+      resolveInput("commentCreate", input);
       mutations.push({ operation: "comment.create", input });
       const created = {
         id: "00000000-0000-4000-8000-000000000199",
@@ -81,6 +156,7 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
       return { success: true, comment: created };
     },
     issueArchive: ({ id }: { id: string }) => {
+      referenced("Issue", id);
       mutations.push({ operation: "issue.archive", id });
       return { success: true, entityId: id };
     },
@@ -199,7 +275,9 @@ export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs =
         rootValue: root,
         fieldResolver,
       });
-      return Response.json(result);
+      // Linear answers a user input error with HTTP 400 (its statusCode extension).
+      const status = result.errors?.some((e) => e.extensions?.statusCode === 400) ? 400 : 200;
+      return Response.json(result, { status });
     },
   });
   return {

@@ -7,7 +7,14 @@ export interface Case {
   failure?: Failure;
   noToken?: boolean;
   files?: Record<string, string>;
+  // Symbolic links (path -> target) and modes applied after files, restored
+  // before the case directory is inspected.
+  links?: Record<string, string>;
+  modes?: Record<string, number>;
   symlink?: boolean;
+  // An owner-approved refusal (q101): compared with the exact refusal line,
+  // not with the TS control, which cannot reach the input offline.
+  declared?: "q101";
   scenario?: "empty" | "one-team" | "unsafe-names" | "duplicate-names";
   tokenFile?: boolean;
   badEnvToken?: boolean;

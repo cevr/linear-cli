@@ -1,5 +1,15 @@
 # Parity mutant ledger
 
+## Round 3 (declared before the guards)
+
+- `fake-comment-on-missing-issue`: commentCreate records and returns a comment for an issue id the world does not hold. The L0 mutation-reference property (every id-taking mutation input, generated member and nonmember ids) requires Linear's input error and no recorded mutation; the lookup-root property never sends a mutation. Siblings on the same rule: `fake-archives-missing-issue`, `fake-creates-under-missing-reference`, `fake-records-before-resolving` (issueUpdate records before it resolves its references).
+- `query-file-realpath-denied-unknown`: drop the `permission denied` arm of `platformKind`. The generated L3 file state "path through a mode-000 directory" compares realPath bytes with the TS control; no earlier state was permission-denied.
+- `query-file-denied-unknown`: the readFile `fs.Denied` arm prints `Unknown`. The generated L3 state "mode-000 file" compares readFile bytes.
+- `upload-query-quote-raw`, `upload-fragment-tick-raw`, `upload-path-tick-raw`, `upload-path-caret-raw`, `upload-inner-tab-kept`: drop one member of a WHATWG encode set, or keep an inner tab. The generated L4 URL grammar puts every byte class in path, query and fragment of an accepted URL for every seed; the old 13-URL list reached none of them.
+- `upload-empty-userinfo-refused`, `upload-host-escape-kept`, `upload-host-unmapped`: refuse `@`/`:@`, skip host percent-decoding, or skip UTS #46 mapping. The grammar's host and user-information variants are accepted by the original.
+- `upload-stray-percent-sent`: send a stray `%` unescaped; the transport cannot build the request and the download fails where the original succeeds.
+- `upload-userinfo-accepted`, `upload-other-port-accepted`: accept a q101 input. Each seed has one non-empty user information and one non-443 port on an accepted host; the run requires exactly the refusal line.
+
 ## Round 2 regressions (declared before the guards)
 
 - `fake-invents-missing-root`: remove the missing-root boundary and let SDK scalar defaults invent an entity. Generated member/nonmember lookups against fixture membership require GraphQL null propagation and errors. Existing stable records compare two callers of the same broken fake.

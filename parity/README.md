@@ -67,11 +67,20 @@ bun parity/run.ts --regressions=L4 --seed=42
 These use the compiled TS binary as control, with exact stdout/stderr/status,
 files and mutation logs, without an exception comparator. `--trace` prints both
 results; a failure prints the world, argv and replay command. L0 first checks
-member/nonmember root lookups against fixture membership, independently of CLI
-agreement. L3 checks all ECMAScript whitespace classes, nearby nonblank Unicode
-scalars, seeded mixed strings, malformed/non-object variables and failing file
-states. L4 compares accepted-origin URL canonicalization and downloads; the
-foreign-origin law and every storage request's credential check stay enabled.
+member/nonmember root lookups and every entity id a mutation input names
+(`issueCreate`, `issueUpdate`, `commentCreate`, `issueArchive`) against
+fixture membership, independently of CLI agreement: a missing id is Linear's
+input error (`Entity not found: <Type>`, HTTP 400) and records no mutation.
+L3 checks all ECMAScript whitespace classes, nearby nonblank Unicode scalars,
+seeded mixed strings, malformed/non-object variables and failing file states
+for each errno class the port maps (missing, not a directory, is a directory,
+symlink loop, permission denied) at realPath and at readFile. L4 runs a seeded
+grammar over WHATWG URL components (`upload-property.ts`): the original's
+`URL.parse` decides each status, and the compiled TS control's bytes, files
+and status are compared; q101 refusals are compared with the exact refusal
+line. `bun parity/upload-host.ts --check` proves the generated host table
+still matches the original's parser. The foreign-origin law and every storage
+request's credential check stay enabled.
 
 The fixed corpus has one explicit q99 allowlist (`owner-exceptions.ts`):
 no-terminal prompt commands retain the native message and status 1 instead of

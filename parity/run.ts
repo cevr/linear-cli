@@ -3,12 +3,14 @@
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
+  chmod,
+  lstat,
   mkdir,
   mkdtemp,
   readFile,
   readdir,
+  readlink,
   realpath,
-  stat,
   symlink,
   writeFile,
 } from "node:fs/promises";
@@ -20,6 +22,7 @@ import { world } from "./world";
 import { regressionCases } from "./regressions";
 import { checkRootLookups } from "./lookup-property";
 import { q99Equal } from "./owner-exceptions";
+import { refusal } from "./upload-property";
 
 const root = resolve(import.meta.dir, "..");
 // One owned scratch per pilot step; the default is the original pilot folder.
@@ -65,6 +68,10 @@ function setup(c: Case): string {
   for (const [path, text] of Object.entries(c.files ?? {})) {
     lines.push(`mkdir -p ${quote(dirname(path))}`, `printf %s ${quote(text)} > ${quote(path)}`);
   }
+  for (const [path, to] of Object.entries(c.links ?? {}))
+    lines.push(`mkdir -p ${quote(dirname(path))}`, `ln -s ${quote(to)} ${quote(path)}`);
+  for (const [path, mode] of Object.entries(c.modes ?? {}))
+    lines.push(`chmod ${mode.toString(8).padStart(3, "0")} ${quote(path)}`);
   if (c.tokenFile)
     lines.push(
       "mkdir -p .config/linear",
@@ -103,8 +110,9 @@ async function snapshot(folder: string, prefix = ""): Promise<unknown[]> {
   for (const name of (await readdir(join(folder, prefix))).sort()) {
     const path = join(prefix, name);
     if (path === "escape.graphql") continue;
-    const info = await stat(join(folder, path));
-    if (info.isDirectory()) entries.push(...(await snapshot(folder, path)));
+    const info = await lstat(join(folder, path));
+    if (info.isSymbolicLink()) entries.push({ path, link: await readlink(join(folder, path)) });
+    else if (info.isDirectory()) entries.push(...(await snapshot(folder, path)));
     else
       entries.push({
         path,
@@ -147,6 +155,16 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
     await writeFile(outside, "query { viewer { id } }\n");
     await symlink(outside, join(dir, "escape.graphql"));
   }
+  for (const [name, to] of Object.entries(c.links ?? {})) {
+    await mkdir(dirname(join(dir, name)), { recursive: true });
+    await symlink(to, join(dir, name));
+  }
+  // Restore readable modes before the snapshot and on every exit path.
+  const unlock = async () => {
+    for (const name of Object.keys(c.modes ?? {}))
+      await chmod(join(dir, name), (await lstat(join(dir, name))).isDirectory() ? 0o755 : 0o644);
+  };
+  for (const [name, mode] of Object.entries(c.modes ?? {})) await chmod(join(dir, name), mode);
   const env: Record<string, string> = {
     BUN_RUNTIME_TRANSPILER_CACHE_PATH: join(scratch, "transpiler-cache"),
     BUN_INSTALL_CACHE_DIR: join(scratch, "install-cache"),
@@ -229,6 +247,7 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
         throw new Error(`${c.name}: fake-forgets-created-issue survived`);
     }
     const normalize = (s: string) => s.replaceAll(dir, "$CASE");
+    await unlock();
     return {
       out: normalize(out),
       err: normalize(err),
@@ -241,6 +260,7 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
     active = false;
     clearTimeout(timer);
     for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"] as const) process.off(signal, stopSignal);
+    await unlock();
     await fake.close();
     confirmNoOwnedProcesses(child.pid, c.name);
   }
@@ -286,7 +306,15 @@ for (const c of selected) {
       `${c.name}: expected exit ${wantedStatus}, got ${actual.status}: ${actual.err}`,
     );
   const path = join(import.meta.dir, "cases", c.name);
-  if (property || regressions) {
+  if (regressions && c.declared === "q101") {
+    // q101: the port refuses non-empty user information and non-443 ports
+    // that the original's parser accepts. Exactly the refusal, nothing else.
+    const refused = { out: "", err: refusal(c.args[2]!), status: 1, files: [], mutations: [] };
+    if (JSON.stringify(actual) !== JSON.stringify(refused)) {
+      console.error(JSON.stringify({ args: c.args, refused, actual }, null, 2));
+      throw new Error(`${c.name}: q101 refusal mismatch`);
+    }
+  } else if (property || regressions) {
     const reference = await run(c, "ts");
     if (process.argv.includes("--trace"))
       console.log(JSON.stringify({ name: c.name, args: c.args, reference, actual }));

@@ -2,6 +2,8 @@ import http
 import json
 import linearport/credential
 import linearport/linear
+import strings
+import utf8
 
 type Client { net http.Net, credentials credential.Credentials }
 
@@ -10,8 +12,37 @@ func New(net http.Net, credentials credential.Credentials) Client {
 }
 
 type Ask { Query string, Variables json.Value }
-type Error { Message string }
+type Extensions { UserPresentableMessage json.Optional[string] }
+type Error { Message string, Extensions json.Optional[Extensions] }
 type Envelope { Data json.Optional[json.Value], Errors json.Optional[[]Error] }
+
+// failure is the original SDK's LinearError text for a GraphQL error: the raw
+// message (capitalized, cut at its first ": {") and the most readable message
+// (userPresentableMessage, else the raw message), each once, joined by " - ".
+func failure(e Error) string {
+	let mut raw = e.Message
+	let cut = strings.Index(raw, ": {")
+	if cut >= 0 { raw = raw[:cut] }
+	if raw != "" {
+		let first = utf8.DecodeRuneInString(raw)
+		raw = strings.ToUpper(raw[:first.Size]) + raw[first.Size:]
+	}
+	let readable = match e.Extensions {
+	case json.Present[Extensions] as x:
+		match x.Value.UserPresentableMessage {
+		case json.Present[string] as m:
+			m.Value
+		case json.Absent:
+			e.Message
+		}
+	case json.Absent:
+		e.Message
+	}
+	let mut parts = []string{}
+	if raw != "" { parts = parts.Append(raw) }
+	if readable != "" && readable != raw { parts = parts.Append(readable) }
+	"Error: " + strings.Join(parts, " - ")
+}
 
 func query(c Client, document string) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
 	try queryVariables(c, document, json.Object{Members: []json.Member{}})
@@ -37,7 +68,7 @@ func send(c Client, token credential.Token, document string, variables json.Valu
 	}
 	match envelope.Errors {
 	case json.Present[[]Error] as errors:
-		if len(errors.Value) > 0 { return linear.ApiError{Message: "Error: " + errors.Value[0].Message} }
+		if len(errors.Value) > 0 { return linear.ApiError{Message: failure(errors.Value[0])} }
 	case json.Absent:
 	}
 	match envelope.Data {

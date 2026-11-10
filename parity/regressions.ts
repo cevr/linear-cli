@@ -1,4 +1,5 @@
 import type { Case } from "./corpus";
+import { uploadCases } from "./upload-property";
 
 // ECMAScript WhiteSpace + LineTerminator, independent of Go's Unicode table.
 // Control validation runs first; vertical tab/form feed therefore still fail.
@@ -25,6 +26,50 @@ const control = (s: string) =>
     const n = c.codePointAt(0)!;
     return n === 0x7f || (n < 0x20 && ![9, 10, 13].includes(n));
   });
+type FileState = {
+  path: string;
+  files: Record<string, string>;
+  modes?: Record<string, number>;
+  links?: Record<string, string>;
+};
+// One failing workspace-file state per errno class the port maps (ENOENT,
+// ENOTDIR, EISDIR, ELOOP, EACCES), at the step that meets it: realPath (path
+// resolution) or readFile. The seed varies names and nesting depth.
+function fileStates(seed: number): FileState[] {
+  const dir = Array.from({ length: seed % 3 }, (_, i) => `d${seed}-${i}/`).join("");
+  const query = "query { viewer { id } }";
+  const keep = { [`${dir}keep.graphql`]: query };
+  return [
+    { path: `${dir}missing-${seed}.graphql`, files: keep },
+    { path: `${dir}absent-${seed}/query.graphql`, files: keep },
+    {
+      path: `${dir}dangling-${seed}.graphql`,
+      files: keep,
+      links: { [`${dir}dangling-${seed}.graphql`]: `nowhere-${seed}.graphql` },
+    },
+    {
+      path: `${dir}blocked-${seed}/query.graphql`,
+      files: { ...keep, [`${dir}blocked-${seed}`]: "not a directory" },
+    },
+    { path: `${dir}folder-${seed}`, files: { ...keep, [`${dir}folder-${seed}/child`]: query } },
+    {
+      path: `${dir}loop-${seed}.graphql`,
+      files: keep,
+      links: { [`${dir}loop-${seed}.graphql`]: `loop-${seed}.graphql` },
+    },
+    {
+      path: `${dir}locked-${seed}/query.graphql`,
+      files: { ...keep, [`${dir}locked-${seed}/query.graphql`]: query },
+      modes: { [`${dir}locked-${seed}`]: 0o000 },
+    },
+    {
+      path: `${dir}unreadable-${seed}.graphql`,
+      files: { ...keep, [`${dir}unreadable-${seed}.graphql`]: query },
+      modes: { [`${dir}unreadable-${seed}.graphql`]: 0o000 },
+    },
+  ];
+}
+
 export function regressionCases(phase: string, seed: number): Case[] {
   const make = (
     name: string,
@@ -43,6 +88,24 @@ export function regressionCases(phase: string, seed: number): Case[] {
     return [
       make("member", ["issue", "view", "ENG-123", "--json"]),
       make("nonmember", ["issue", "view", `ENG-${900000 + seed}`, "--json"], 1),
+      // A mutation on a missing entity is Linear's input error, never a created one.
+      make(
+        "comment-nonmember",
+        ["issue", "comment", `ENG-${900000 + seed}`, "--body", "Ready", "--json"],
+        1,
+      ),
+      make(
+        "comment-nonmember-uuid",
+        [
+          "issue",
+          "comment",
+          `00000000-0000-4000-8000-${String(900000 + seed).padStart(12, "0")}`,
+          "--body",
+          "Ready",
+          "--json",
+        ],
+        1,
+      ),
     ];
   if (phase === "L3") {
     const scalars = [...whitespace, ...nearWhitespace, 0, 0x7f, 0x41, 0x1f680];
@@ -107,30 +170,17 @@ export function regressionCases(phase: string, seed: number): Case[] {
           1,
         ),
       ),
-      ...["missing.graphql", `absent-${seed}/query.graphql`, "blocked/query.graphql", "folder"].map(
-        (path, i) =>
-          make(`file-${i}`, ["api", "graphql", "--query-file", path], 1, {
-            blocked: "not a directory",
-            "folder/child": "query { viewer { id } }",
-          }),
-      ),
+      ...fileStates(seed).map((file, i) => ({
+        ...make(`file-${i}`, ["api", "graphql", "--query-file", file.path], 1, file.files),
+        modes: file.modes,
+        links: file.links,
+      })),
     ];
   }
   if (phase === "L4")
-    return [
-      "https://uploads.linear.app:443/trace.txt",
-      "HTTPS://UPLOADS.LINEAR.APP:443/trace.txt",
-      "https://uploads.linear.app:0443/trace.txt",
-      "https://uploads.linear.app/a/../trace.txt",
-      "https://uploads.linear.app/a/%2e%2E/trace.txt",
-      "https://uploads.linear.app/a/./trace.txt",
-      "https://uploads.linear.app/trac%65.txt",
-      `https://uploads.linear.app/trace-${seed}.txt?x=%2F#part`,
-      "https://uploads.linear.app/space name.txt",
-      "https://uploads.linear.app/café.txt",
-      " https://uploads.linear.app/trace.txt\n",
-      "https:\\uploads.linear.app\\trace.txt",
-      "https://uploads.linear.app",
-    ].map((url, i) => make(`upload-${i}`, ["file", "download", url, "--json"]));
+    return uploadCases(seed).map((u, i) => ({
+      ...make(`upload-${i}`, ["file", "download", u.url, "--json"], u.status),
+      declared: u.declared ? "q101" : undefined,
+    }));
   throw new Error(`Unknown regression phase ${phase}`);
 }

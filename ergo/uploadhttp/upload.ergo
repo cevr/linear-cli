@@ -39,7 +39,7 @@ func Download(r Remote, u linear.UploadURL) linear.Downloaded fails linear.ApiEr
 	case http.InvalidClient as e:
 		return linear.ApiError{Message: "Download failed: " + e.Reason}
 	}
-	let request = http.URLRequest{URL: r.origin + r.prefix + linear.UploadPath(u), Method: "GET", Header: []http.Field{}, Credentials: []http.Credential{secret}, Body: ""}
+	let request = http.URLRequest{URL: r.origin + r.prefix + linear.UploadTarget(u), Method: "GET", Header: []http.Field{}, Credentials: []http.Credential{secret}, Body: ""}
 	let response = r.net.SendURL(request) catch {
 	case http.OriginRefused as o:
 		return linear.ApiError{Message: "Download failed: redirect to a refused origin " + o.Origin + " for " + public}
