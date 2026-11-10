@@ -45,12 +45,12 @@ type TeamNode { Id string, Key string, Name string, Description json.Nullable[st
 type TeamsConnection { Nodes []TeamNode, PageInfo PageInfo }
 type TeamsData { Teams TeamsConnection }
 
-func optional(s json.Nullable[string]) Option[string] {
+func optional[T](s json.Nullable[T]) Option[T] {
 	match s {
 	case json.Null:
 		None
-	case json.NonNull[string] as n:
-		Some[string]{Value: n.Value}
+	case json.NonNull[T] as n:
+		Some[T]{Value: n.Value}
 	}
 }
 

@@ -1,0 +1,107 @@
+import json
+import linearport/credential
+import linearport/linear
+
+let referenceFields = "id identifier title url"
+let summaryFields = "id identifier title url branchName priority priorityLabel state { id name type }"
+let detailFields = summaryFields + " description team { id key name } assignee { id name email } project { id name url } parent { " + referenceFields + " }"
+type IssueNode {
+	Id            string,
+	Identifier    string,
+	Title         string,
+	Url           string,
+	BranchName    string,
+	Priority      int,
+	PriorityLabel string,
+	State         json.Nullable[linear.WorkflowState],
+	Description   json.Nullable[string],
+	Team          json.Nullable[linear.IssueTeam],
+	Assignee      json.Nullable[linear.Assignee],
+	Project       json.Nullable[linear.IssueProject],
+	Parent        json.Nullable[linear.Reference],
+}
+type SummaryNode { Id string, Identifier string, Title string, Url string, BranchName string, Priority int, PriorityLabel string, State json.Nullable[linear.WorkflowState] }
+type IssueData { Issue IssueNode }
+type Connection[T] { Nodes []T, PageInfo PageInfo }
+type Assigned { AssignedIssues Connection[SummaryNode] }
+type AssignedData { Viewer Assigned }
+type Items[T] { Items Connection[T] }
+type ItemsData[T] { Issue Items[T] }
+type CommentNode { Id string, Body string, CreatedAt string, Url string, User json.Nullable[linear.Author] }
+type RelationNode { Id string, Type string, Related json.Nullable[linear.Reference] }
+
+func decodeValue[T wire](value json.Value) T fails linear.ApiError {
+	json.Decode(json.Codec[T]{MaxBytes: 8000000, MaxDepth: 64}, json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, value)) catch {
+	case _:
+		return linear.ApiError{Message: "unexpected issue response"}
+	}
+}
+
+func quoted(text string) string { json.Encode(json.Codec[string]{MaxBytes: 0, MaxDepth: 0}, text) }
+
+func MyIssues(c Client, state Option[string], limit int) []linear.Summary fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let filter = match state {
+	case None:
+		""
+	case Some[string] as s:
+		", filter: { state: { type: { eq: " + quoted(s.Value) + " } } }"
+	}
+	// Match the SDK's deliberate first-page behavior for assigned issues.
+	let value = try c.query("query { viewer { assignedIssues(first: \(limit)" + filter + ") { nodes { " + summaryFields + " } pageInfo { hasNextPage endCursor } } } }")
+	let data = try decodeValue[AssignedData](value)
+	let mut result = []linear.Summary{}
+	for n in data.Viewer.AssignedIssues.Nodes {
+		result = result.Append(linear.Summary{Id: n.Id, Identifier: n.Identifier, Title: n.Title, Url: n.Url, BranchName: n.BranchName, Priority: linear.Priority{Value: n.Priority, Label: n.PriorityLabel}, State: optional(n.State)})
+	}
+	result
+}
+
+// All detail connections share one advancing-cursor traversal. Aliasing keeps
+// the decoder typed without duplicating a traversal for each GraphQL field.
+func items[T wire](c Client, id linear.Selector, field string, fields string) []T fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut cursor = ""
+	let mut result = []T{}
+	for {
+		let value = try c.query("query { issue(id: " + quoted(linear.Text(id)) + ") { items: " + field + "(first: 50" + cursor + ") { nodes { " + fields + " } pageInfo { hasNextPage endCursor } } } }")
+		let data = try decodeValue[ItemsData[T]](value)
+		for n in data.Issue.Items.Nodes { result = result.Append(n) }
+		if !data.Issue.Items.PageInfo.HasNextPage { return result }
+		let next = try after(data.Issue.Items.PageInfo)
+		if next == cursor { return linear.ApiError{Message: "pagination did not advance"} }
+		cursor = next
+	}
+}
+
+func Issue(c Client, id linear.Selector, options linear.DetailsOptions) linear.Details fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let value = try c.query("query { issue(id: " + quoted(linear.Text(id)) + ") { " + detailFields + " } }")
+	let data = try decodeValue[IssueData](value)
+	let n = data.Issue
+	let labels = try items[linear.Label](c, id, "labels", "id name")
+	let mut children Option[[]linear.Reference] = None
+	if options.Children { children = Some[[]linear.Reference]{Value: try items[linear.Reference](c, id, "children", referenceFields)} }
+	let mut comments Option[[]linear.Comment] = None
+	if options.Comments {
+		let nodes = try items[CommentNode](c, id, "comments", "id body createdAt url user { id name }")
+		let mut rows = []linear.Comment{}
+		for row in nodes { rows = rows.Append(linear.Comment{Id: row.Id, Body: row.Body, CreatedAt: row.CreatedAt, Url: row.Url, Author: optional(row.User)}) }
+		comments = Some[[]linear.Comment]{Value: rows}
+	}
+	let mut relations Option[[]linear.Relation] = None
+	if options.Relations {
+		let mut rows = []linear.Relation{}
+		for direction in []string{"outbound", "inbound"} {
+			let field = if direction == "outbound" { "relations" } else { "inverseRelations" }
+			let related = if direction == "outbound" { "relatedIssue" } else { "issue" }
+			let nodes = try items[RelationNode](c, id, field, "id type related: "+related+" { "+referenceFields+" }")
+			for row in nodes {
+				match row.Related {
+				case json.Null:
+				case json.NonNull[linear.Reference] as r:
+					rows = rows.Append(linear.Relation{Id: row.Id, Type: row.Type, Direction: direction, Issue: r.Value})
+				}
+			}
+		}
+		relations = Some[[]linear.Relation]{Value: rows}
+	}
+	linear.Details{Id: n.Id, Identifier: n.Identifier, Title: n.Title, Url: n.Url, BranchName: n.BranchName, Priority: linear.Priority{Value: n.Priority, Label: n.PriorityLabel}, State: optional(n.State), Description: optional(n.Description), Team: optional(n.Team), Assignee: optional(n.Assignee), Project: optional(n.Project), Parent: optional(n.Parent), Labels: labels, Children: children, Comments: comments, Relations: relations}
+}

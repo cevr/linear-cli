@@ -82,7 +82,7 @@ export function fakeLinear(w: World, failure: Failure = "none") {
     if (parent === "User" && name === "assignedIssues") {
       const type = args.filter?.state?.type?.eq;
       return connection(
-        w.issues.filter((x) => !type || x.state.type === type),
+        w.issues.filter((x) => !type || x.state?.type === type),
         args,
       );
     }

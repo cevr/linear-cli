@@ -14,6 +14,8 @@ const env = {
   GOMEMLIMIT: "6GiB",
   GOFLAGS: "-p=1",
   GOCACHE: join(scratch, "gocache"),
+  GOPATH: join(scratch, "go"),
+  GOMODCACHE: join(scratch, "go/pkg/mod"),
 };
 
 async function run(command: string, args: string[], cwd: string) {
@@ -76,7 +78,16 @@ async function run(command: string, args: string[], cwd: string) {
   }
 }
 
-const mutants = [
+type Mutant = {
+  name: string;
+  file: string;
+  from: string;
+  to: string;
+  pkg: string;
+  guard: string;
+  args?: string[];
+};
+const mutants: Mutant[] = [
   {
     name: "memory-keeps-empty-identity",
     file: "memory/tracker.ergo",
@@ -100,6 +111,41 @@ const mutants = [
     to: "if true {",
     pkg: "",
     guard: "parity mismatch",
+  },
+  {
+    name: "selector-url-loses-key",
+    file: "linear/selector.ergo",
+    from: "return Selector{value: parts[2]}",
+    to: 'return Selector{value: "WRONG-1"}',
+    pkg: "linear",
+    guard: "law refuted",
+  },
+  {
+    name: "issue-connection-first-page",
+    file: "graphqlhttp/issue.ergo",
+    from: "if !data.Issue.Items.PageInfo.HasNextPage {",
+    to: "if true {",
+    pkg: "",
+    guard: "parity mismatch",
+    args: ["--phase=2", "--property=1000", "--case=seed-1000-view"],
+  },
+  {
+    name: "read-flags-load-every-relation",
+    file: "graphqlhttp/issue.ergo",
+    from: "if options.Relations {",
+    to: "if true {",
+    pkg: "",
+    guard: "parity mismatch",
+    args: ["--phase=2", "--case=view-json"],
+  },
+  {
+    name: "bulk-view-keeps-last",
+    file: "cli/issue.ergo",
+    from: "selectors = selectors.Append(try linear.ParseSelector(id))",
+    to: "selectors = []linear.Selector{try linear.ParseSelector(id)}",
+    pkg: "",
+    guard: "parity mismatch",
+    args: ["--phase=2", "--case=view-bulk-three"],
   },
 ];
 for (const mutant of mutants) {
@@ -125,9 +171,7 @@ for (const mutant of mutants) {
       process.execPath,
       [
         join(root, "parity/run.ts"),
-        "--phase=1",
-        "--seed=42",
-        "--case=seed-42-team",
+        ...(mutant.args ?? ["--phase=1", "--seed=42", "--case=seed-42-team"]),
         `--binary=${binary}`,
       ],
       root,
@@ -137,4 +181,4 @@ for (const mutant of mutants) {
     throw new Error(`${mutant.name}: survived or failed for the wrong reason: ${result.output}`);
   console.log(`killed ${mutant.name}: ${mutant.guard}`);
 }
-console.log("EXIT: 0 (all L1 mutants killed)");
+console.log("EXIT: 0 (all phase mutants killed)");

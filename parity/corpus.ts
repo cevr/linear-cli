@@ -283,5 +283,36 @@ export function generatedCases(seed: number): Case[] {
       ["issue", "view", "ENG-123", "ENG-124", "--comments", "--children", "--relations", "--json"],
       { seed },
     ),
+    ...(seed < 1000
+      ? []
+      : [
+          c(
+            `seed-${seed}-list-text`,
+            2,
+            [
+              "issue",
+              "list",
+              "--limit",
+              String(1 + (seed % 5)),
+              ...(seed % 2 ? ["--state", "started"] : []),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-view-flags`,
+            2,
+            [
+              "issue",
+              "view",
+              "ENG-123",
+              ...(seed & 1 ? ["--comments"] : []),
+              ...(seed & 2 ? ["--children"] : []),
+              ...(seed & 4 ? ["--relations"] : []),
+              ...(seed & 8 ? ["--json"] : []),
+            ],
+            { seed },
+          ),
+          c(`seed-${seed}-files`, 2, ["issue", "files", "ENG-123", "--json"], { seed }),
+        ]),
   ];
 }

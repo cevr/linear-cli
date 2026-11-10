@@ -57,26 +57,58 @@ export function world(seed = 1) {
     priority: random() % 5,
     priorityLabel: "",
     description: i % 2 ? null : "[trace.txt](https://uploads.linear.app/trace.txt)",
-    state: states[i % 2],
+    state: states[i % 2]!,
     team: teams[0],
     assignee: i % 2 ? null : user,
     project: i % 3 ? null : projects[0],
     parent: null as Record<string, unknown> | null,
   }));
-  const labels = [{ id: uuid(30), name: "tooling" }];
+  const labels = Array.from({ length: seed >= 1000 ? seed % 7 : 1 }, (_, i) => ({
+    id: uuid(30 + i),
+    name: `tooling${i || ""}`,
+  }));
   const comments = [
     {
       id: uuid(31),
       body: "[log.txt](https://uploads.linear.app/log.txt)",
       createdAt: "2026-01-01T00:00:00.000Z",
       url: "https://linear.app/comment/pilot",
-      user,
+      user: user as typeof user | null,
     },
   ];
+  if (seed >= 1000) {
+    comments.length = 0;
+    for (let i = 0; i < seed % 6; i++)
+      comments.push({
+        id: uuid(100 + i),
+        body: `[trace-${i}.txt](https://uploads.linear.app/trace-${i}.txt)`,
+        createdAt: "2026-01-01T00:00:00.000Z",
+        url: `https://linear.app/comment/${i}`,
+        user: i % 2 ? null : user,
+      });
+    for (let i = 1; i < issues.length; i++) if (i % 2) issues[i]!.parent = issues[0]!;
+  }
   for (const issue of issues)
     issue.priorityLabel = ["No priority", "Urgent", "High", "Medium", "Low"][issue.priority]!;
   if (seed % 2 === 0) issues[1]!.parent = issues[0]!;
   const relations = [{ id: uuid(32), type: "blocks", issue: issues[0], relatedIssue: issues[1] }];
+  if (seed >= 1000) {
+    relations.length = 0;
+    for (let i = 1; i < issues.length; i++) {
+      relations.push({
+        id: uuid(200 + i),
+        type: "blocks",
+        issue: issues[0],
+        relatedIssue: issues[i],
+      });
+      relations.push({
+        id: uuid(300 + i),
+        type: "related",
+        issue: issues[i],
+        relatedIssue: issues[0],
+      });
+    }
+  }
   return {
     seed,
     user,

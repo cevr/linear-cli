@@ -1,0 +1,39 @@
+import linearport/credential
+
+type Priority { Value int, Label string }
+type WorkflowState { Id string, Name string, Type string }
+type Reference { Id string, Identifier string, Title string, Url string }
+type IssueTeam { Id string, Key string, Name string }
+type Assignee { Id string, Name string, Email string }
+type IssueProject { Id string, Name string, Url string }
+type Label { Id string, Name string }
+type Author { Id string, Name string }
+type Comment { Id string, Body string, CreatedAt string, Url string, Author Option[Author] }
+type Relation { Id string, Type string, Direction string, Issue Reference }
+type Summary { Id string, Identifier string, Title string, Url string, BranchName string, Priority Priority, State Option[WorkflowState] }
+type Details {
+	Id          string,
+	Identifier  string,
+	Title       string,
+	Url         string,
+	BranchName  string,
+	Priority    Priority,
+	State       Option[WorkflowState],
+	Description Option[string],
+	Team        Option[IssueTeam],
+	Assignee    Option[Assignee],
+	Project     Option[IssueProject],
+	Parent      Option[Reference],
+	Labels      []Label,
+	Children    Option[[]Reference],
+	Comments    Option[[]Comment],
+	Relations   Option[[]Relation],
+}
+type DetailsOptions { Comments bool, Children bool, Relations bool }
+
+// Reader has no mutation operation. Dry-run planning can use this capability
+// without being able to send a write.
+type Reader {
+	MyIssues(state Option[string], limit int) []Summary fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+	Issue(id Selector, options DetailsOptions) Details fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+}

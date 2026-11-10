@@ -37,3 +37,17 @@ functions, not the application's Effect service graph. Its lint override is
 limited to `parity/`: Effect-specific architecture rules do not apply. Dynamic
 GraphQL resolver inputs and caught OS errors are the two explicit `any`
 boundaries. The fake's public schema validates incoming GraphQL documents.
+
+# Native read property (L2)
+
+`bun parity/run.ts --phase=2 --property=1000` runs twelve deterministic worlds
+through both programs. It compares process bytes, exits, files and mutation logs,
+not a mapper shared with the port. A mismatch prints the world, arguments, both
+outputs and a replay command. Worlds vary pagination, optional assignees/projects/
+parents/authors, label/comment/child/relation counts, titles, limits and read flags.
+The pinned public schema makes issue state and team non-null; absent state/team
+cannot be valid HTTP fixture worlds, so this property does not claim those cases.
+
+The repeated-flag case uses the approved usage-layout difference only: it checks
+the command name, diagnostic reason and exit 1. Domain failure lines remain byte
+equal. No blanket stderr or JSON normalization is enabled.

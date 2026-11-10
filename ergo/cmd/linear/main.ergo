@@ -24,7 +24,8 @@ func main() fails os.Exit needs Ambient {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
 	}
-	with context { linear.Tracker: graphqlhttp.New(net, credentials), io.Stdout: out } {
+	let tracker = graphqlhttp.New(net, credentials)
+	with context { linear.Tracker: tracker, linear.Reader: tracker, io.Stdout: out } {
 		try cli.Run(process.Args())
 	}
 }

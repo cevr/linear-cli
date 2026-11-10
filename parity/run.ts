@@ -29,7 +29,10 @@ const phaseArg = process.argv.find((x) => x.startsWith("--phase="));
 const phase = phaseArg ? Number(phaseArg.split("=")[1]) : 6;
 const caseArg = process.argv.find((x) => x.startsWith("--case="))?.split("=")[1];
 const seeds = process.argv.find((x) => x.startsWith("--seed="))?.split("=")[1];
-const all = seeds ? generatedCases(Number(seeds)) : cases;
+const property = process.argv.find((x) => x.startsWith("--property="))?.split("=")[1];
+let all = seeds ? generatedCases(Number(seeds)) : cases;
+if (property)
+  all = Array.from({ length: 12 }, (_, i) => generatedCases(Number(property) + i)).flat();
 const selected = all.filter((c) => c.phase <= phase && (!caseArg || c.name === caseArg));
 if (!selected.length) throw new Error("No parity cases selected");
 await mkdir(scratch, { recursive: true });
@@ -244,7 +247,25 @@ for (const c of selected) {
       `${c.name}: expected exit ${wantedStatus}, got ${actual.status}: ${actual.err}`,
     );
   const path = join(import.meta.dir, "cases", c.name);
-  if (record) {
+  if (property) {
+    const reference = await run(c, "ts");
+    if (JSON.stringify(reference) !== JSON.stringify(actual)) {
+      console.error(
+        JSON.stringify(
+          {
+            world: world(c.seed),
+            args: c.args,
+            reference,
+            actual,
+            replay: `bun parity/run.ts --property=${c.seed} --phase=${phase} --case=${c.name}`,
+          },
+          null,
+          2,
+        ),
+      );
+      throw new Error(`${c.name}: parity mismatch`);
+    }
+  } else if (record) {
     // Two fresh processes and worlds: this acceptance must not bless unstable output.
     const again = await run(c, "ts");
     if (JSON.stringify(actual) !== JSON.stringify(again))
@@ -279,6 +300,19 @@ for (const c of selected) {
       files: JSON.parse(await readFile(join(path, "expected.files"), "utf8")),
       mutations: JSON.parse(await readFile(join(path, "expected.mutations"), "utf8")),
     };
+    // Only the one declared usage-layout case compares its semantic diagnostic
+    // instead of Effect CLI's help bytes. Domain failure lines stay byte exact.
+    if (c.name === "repeated-flag" && !tsCheck) {
+      const reason = 'Invalid value for flag --limit: "2 occurrences". Expected: at most 1 value';
+      if (
+        actual.status !== 1 ||
+        !actual.err.includes(reason) ||
+        !actual.out.includes("linear issue list")
+      )
+        throw new Error("repeated-flag: usage error lost its command, reason or exit status");
+      expected.out = actual.out;
+      expected.err = actual.err;
+    }
     if (JSON.stringify(expected) !== JSON.stringify(actual)) {
       console.error(
         JSON.stringify(

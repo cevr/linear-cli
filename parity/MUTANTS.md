@@ -34,3 +34,10 @@ L0 schema validation is a prerequisite, not proof of API parity.
   and project cases plus generated page sizes lose data.
 - `ship-origin-override`: read a transport-origin environment variable in the
   production entry. The fixed-origin source/build review must reject it.
+
+# L2 guards (declared before implementation)
+
+- `selector-url-loses-key`: URLAndIdentifierAgree at the pure checked-construction seam. Existing L1 laws cover no selectors.
+- `issue-connection-first-page`: native-vs-TypeScript generated read comparison with multi-page labels, comments, children and both relation directions. Existing L1 pagination guard covers teams only.
+- `read-flags-load-every-relation`: existing fixed single-flag read cases check omission independently; generated all-flags cases alone cannot catch this.
+- `bulk-view-keeps-last`: existing multi-id native comparison checks retention and input order, independent of completion order.

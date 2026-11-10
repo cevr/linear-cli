@@ -32,10 +32,12 @@ func wireViewer(v linear.Viewer) WireViewer {
 	WireViewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
 }
 
-func Run(args []string) fails os.Exit needs linear.Tracker | io.Stdout {
+func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | io.Stdout {
 	run(args) catch {
 	case os.Exit as e:
 		return e
+	case linear.InvalidInput as e:
+		return os.Exit{Code: 1, Message: "Invalid input: " + e.Message}
 	case linear.ApiError as e:
 		return os.Exit{Code: 1, Message: "Linear API Error: " + e.Message}
 	case linear.AuthError as e:
@@ -47,9 +49,13 @@ func Run(args []string) fails os.Exit needs linear.Tracker | io.Stdout {
 	}
 }
 
-func run(args []string) fails os.Exit | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {
+func run(args []string) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Reader | io.Stdout {
 	if len(args) < 2 { return os.Exit{Code: 1, Message: "Usage: linear team list | project list | auth whoami"} }
 	let command = args[0] + " " + args[1]
+	if args[0] == "issue" && (args[1] == "list" || args[1] == "view" || args[1] == "files") {
+		try issueRead(args[1], args[2:])
+		return
+	}
 	if command != "team list" && command != "project list" && command != "auth whoami" {
 		return os.Exit{Code: 1, Message: "Unknown command: " + command}
 	}
