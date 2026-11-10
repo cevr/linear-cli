@@ -1,6 +1,7 @@
 #!/bin/sh
 # Local pilot switch. Never rewrite argv or change the installed owner's link.
-bindir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
+self=$(readlink -f -- "$0" 2>/dev/null || printf '%s' "$0")
+bindir=$(CDPATH= cd -- "$(dirname -- "$self")" && pwd) || exit 1
 case ${LINEAR_IMPL-} in
   ts) exec "$bindir/linear-ts" "$@" ;;
   ergo) exec "$bindir/linear-ergo" "$@" ;;
