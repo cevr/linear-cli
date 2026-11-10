@@ -5,8 +5,8 @@ A command-line interface for [Linear](https://linear.app) built with Bun and Eff
 The unshipped `ergo-port` pilot also has a native implementation. Its local
 `bin/linear` shim now defaults to Ergo for all commands; `LINEAR_IMPL=ts` selects
 the retained TypeScript binary. Build both binaries before using the shim (see
-[native port](ergo/README.md)). The old TS-only postinstall is not a native
-installation. This branch does not change the owner's installed link or publish
+[native port](ergo/README.md)). The npm package ships the native binaries
+for darwin and linux (arm64, x64) and a sh launcher; it has no postinstall. This branch does not change the owner's installed link or publish
 a package.
 
 ## Installation

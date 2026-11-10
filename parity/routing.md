@@ -7,13 +7,23 @@ there is no parity table, flag scan or missing-binary fallback. This also applie
 to groups, help, unknown commands and unsupported Effect flags. The native CLI
 reports its own help/usage; use `LINEAR_IMPL=ts` to request the original behavior.
 An absent native executable is a build error, not an implicit backend change.
-TS source and tests remain. This is a local pilot, not a distribution change.
+TS source and tests remain in the repository; the npm package ships neither.
 
 Build `bun run build` for `bin/linear-ts`; build the pinned compiler, then
 `ERGO=/path/to/ergo bun run build:ergo` for `bin/linear-ergo`. The compiler pin
 is in `ergo-toolchain.json`. Both binaries are needed for the local pilot.
-The TS-only postinstall is not a complete native installation; publication and
-prebuilt installation wait for T2 and owner approval.
+
+The package (DIST2): `bun scripts/release.ts` builds `npm/<os>-<arch>/linear`
+for darwin-arm64, darwin-x64, linux-arm64 and linux-x64 with the pinned
+compiler, and checks each header and version line. With no `bin/linear-ergo`
+beside it (the package never ships one), `bin/linear` resolves itself through
+symlinks, picks `npm/<os>-<arch>/linear` by `uname -s`/`uname -m`, and refuses
+any other platform by name. No postinstall step builds anything. In the
+package, `LINEAR_IMPL=ts` is refused: there is no TS binary. `bun
+parity/launcher.ts --mutants` checks the package layout; `bun scripts/smoke.ts`
+packs, installs with bun and npm into clean homes and runs the result.
+`.github/workflows/release.yml` builds on Linux and macOS runners from the pin.
+Publication waits for owner approval (DIST4).
 
 `bun scripts/build.ts --parity` builds a separate offline TS control. It bundles
 the same refusing preload used by the source reference, before importing the

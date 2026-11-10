@@ -1,7 +1,7 @@
 # Native port
 
-Compiler: `ergo-toolchain.json`. No installed command, publishing metadata or
-TypeScript source is changed. The production entry has a fixed API origin;
+Compiler: `ergo-toolchain.json`. Packaging: `parity/routing.md` (DIST2). No
+installed command or TypeScript source is changed. The production entry has a fixed API origin;
 the offline entry accepts only literal IPv4 loopback HTTP origins.
 
 ```sh
