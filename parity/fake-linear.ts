@@ -65,6 +65,7 @@ export function fakeLinear(w: World, failure: Failure = "none") {
         title: input.title,
         url: "https://linear.app/issue/ENG-999",
       };
+      w.issues.push(created);
       return { success: true, issue: created };
     },
     commentCreate: ({ input }: { input: Record<string, any> }) => {

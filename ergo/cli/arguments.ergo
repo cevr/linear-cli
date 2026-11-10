@@ -1,0 +1,34 @@
+import flag
+import io
+import os
+import strings
+
+func switchFlag(name string) bool {
+	name == "--json" || name == "--dry-run" || name == "--comments" || name == "--children" || name == "--relations" || name == "--allow-mutation" || name == "--help"
+}
+
+// std flag is last-wins, but this CLI refuses repeated singleton flags before
+// executing a command, especially before a write. The existing repeated-flag
+// case guards this adapter; C1 will replace the port-local declaration adapter.
+func rejectRepeated(set flag.Set, args []string) fails os.Exit needs io.Stdout {
+	let mut seen = []string{}
+	let mut takesValue = false
+	for arg in args {
+		if takesValue {
+			takesValue = false
+			continue
+		}
+		if arg == "--" { return }
+		if strings.HasPrefix(arg, "--") {
+			let name = strings.Split(arg, "=")[0]
+			for prior in seen {
+				if prior == name {
+					io.Stdout.Print(flag.Usage(set))
+					return os.Exit{Code: 1, Message: "ERROR\n  Invalid value for flag " + name + ": \"2 occurrences\". Expected: at most 1 value"}
+				}
+			}
+			seen = seen.Append(name)
+			takesValue = !switchFlag(name) && !strings.Contains(arg, "=")
+		}
+	}
+}

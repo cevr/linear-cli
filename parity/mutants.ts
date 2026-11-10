@@ -1,6 +1,6 @@
 // Mutants run only in generated copies under the pilot's own scratch folder.
 import { spawn, spawnSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
@@ -88,6 +88,56 @@ type Mutant = {
   args?: string[];
 };
 const mutants: Mutant[] = [
+  {
+    name: "graphql-rejects-schema-definition",
+    file: "graphql/schema.ergo",
+    from: 'if token.Text == "schema" {',
+    to: "if false {",
+    pkg: "graphql",
+    guard: "FAIL law MutationIsAnOperation",
+  },
+  {
+    name: "create-machine-accepts-blank-title",
+    file: "linear/write.ergo",
+    from: 'let text = try ValidateText("Issue title", title.Text, 255, false)',
+    to: "let text = title.Text",
+    pkg: "linear",
+    guard: "law refuted",
+  },
+  {
+    name: "graphql-string-is-mutation",
+    file: "graphql/document.ergo",
+    from: "let mut mutation = false",
+    to: 'let mut mutation = strings.Contains(text, "mutation")',
+    pkg: "graphql",
+    guard: "law refuted",
+  },
+  {
+    name: "graphql-skips-later-operation",
+    file: "graphql/document.ergo",
+    from: 'mutation = mutation || token.Text == "mutation"',
+    to: 'mutation = mutation || (count == 0 && token.Text == "mutation")',
+    pkg: "graphql",
+    guard: "law refuted",
+  },
+  {
+    name: "dry-run-sends-mutation",
+    file: "cli/write.ergo",
+    from: "let started = try linear.PlanStart(id)",
+    to: "let started = try linear.PlanStart(id)\n\ttry linear.Writer.Start(started.Issue.Id, started.State.Id)",
+    pkg: "",
+    guard: "dry-run-sends-mutation survived",
+    args: ["--phase=3", "--case=start-dry"],
+  },
+  {
+    name: "workspace-allows-symlink-escape",
+    file: "cli/graphql.ergo",
+    from: 'if relative == ".." || strings.HasPrefix(relative, "../") || filepath.IsAbs(relative) {',
+    to: 'if (relative == ".." || strings.HasPrefix(relative, "../") || filepath.IsAbs(relative)) && false {',
+    pkg: "",
+    guard: "expected exit 1, got 0",
+    args: ["--phase=3", "--case=graphql-file-escape"],
+  },
   {
     name: "memory-keeps-empty-identity",
     file: "memory/tracker.ergo",
@@ -182,3 +232,25 @@ for (const mutant of mutants) {
   console.log(`killed ${mutant.name}: ${mutant.guard}`);
 }
 console.log("EXIT: 0 (all phase mutants killed)");
+
+const fakeDir = await mkdtemp(join(scratch, "fake-mutant-"));
+await cp(join(root, "parity"), join(fakeDir, "parity"), { recursive: true });
+await symlink(join(root, "src"), join(fakeDir, "src"));
+await symlink(join(root, "node_modules"), join(fakeDir, "node_modules"));
+const fakePath = join(fakeDir, "parity/fake-linear.ts");
+const fakeSource = await readFile(fakePath, "utf8");
+if (fakeSource.split("w.issues.push(created);").length !== 2)
+  throw new Error("fake mutant edit is not unique");
+await writeFile(
+  fakePath,
+  fakeSource.replace("w.issues.push(created);", "/* forget created issue */"),
+);
+const fakeResult = await run(
+  process.execPath,
+  [join(fakeDir, "parity/run.ts"), "--record", "--phase=3", "--case=create-json"],
+  fakeDir,
+);
+if (fakeResult.code === 0 || !fakeResult.output.includes("fake-forgets-created-issue survived"))
+  throw new Error(`fake mutant survived or failed for the wrong reason: ${fakeResult.output}`);
+console.log("killed fake-forgets-created-issue: record-leg identity guard");
+console.log("EXIT: 0 (harness mutant killed)");

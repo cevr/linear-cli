@@ -313,6 +313,59 @@ export function generatedCases(seed: number): Case[] {
             { seed },
           ),
           c(`seed-${seed}-files`, 2, ["issue", "files", "ENG-123", "--json"], { seed }),
+          c(
+            `seed-${seed}-start`,
+            3,
+            ["issue", "start", "ENG-123", ...(seed % 2 ? ["--dry-run"] : ["--json"])],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-create`,
+            3,
+            [
+              "issue",
+              "create",
+              "--team",
+              "eng",
+              "--title",
+              `Café 🚀 ${seed}`,
+              "--priority",
+              String(seed % 5),
+              ...(seed & 1 ? ["--description", "Packet"] : []),
+              ...(seed & 2 ? ["--parent", "ENG-123"] : []),
+              ...(seed & 4 ? ["--project", "router"] : []),
+              ...(seed & 8 ? ["--dry-run"] : ["--json"]),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-comment`,
+            3,
+            [
+              "issue",
+              "comment",
+              "ENG-123",
+              "--body",
+              `Ready ${seed}`,
+              ...(seed & 1 ? ["--dry-run"] : ["--json"]),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-graphql`,
+            3,
+            [
+              "api",
+              "graphql",
+              "--query",
+              seed % 2
+                ? "query mutation($yes: Boolean! = true) { viewer @include(if: $yes) { mutation: id ...F } } fragment F on User { name } # mutation"
+                : 'query($id: String! = "ENG-123") { issue(id: $id) { identifier } }',
+              "--variables",
+              seed % 2 ? "{}" : '{"id":"ENG-124"}',
+            ],
+            { seed },
+          ),
         ]),
   ];
 }

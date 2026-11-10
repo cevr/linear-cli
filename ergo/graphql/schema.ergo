@@ -1,0 +1,94 @@
+// GraphQL's parser accepts type-system definitions too. They are not mutation
+// operations; the service will reject a non-executable document on its own.
+
+func description(p Parser) Parser { if peek(p).Kind == "string" { bump(p) } else { p } }
+
+func inputDefinition(p Parser) Parser fails InvalidDocument {
+	let mut next = try typeRef(try expect(try name(description(p)), ":"), 0)
+	if peek(next).Text == "=" { next = try value(bump(next), true, 0) }
+	try directives(next, true)
+}
+func argumentDefinitions(p Parser) Parser fails InvalidDocument {
+	if peek(p).Text != "(" { return p }
+	let mut next = try inputDefinition(bump(p))
+	for peek(next).Text != ")" { next = try inputDefinition(next) }
+	bump(next)
+}
+func fieldDefinitions(p Parser, input bool) Parser fails InvalidDocument {
+	if peek(p).Text != "{" { return p }
+	let mut next = bump(p)
+	let mut count = 0
+	for peek(next).Text != "}" {
+		if input {
+			next = try inputDefinition(next)
+		} else {
+			next = try directives(try typeRef(try expect(try argumentDefinitions(try name(description(next))), ":"), 0), true)
+		}
+		count = count + 1
+	}
+	if count == 0 { return InvalidDocument{Message: "empty field definitions"} }
+	bump(next)
+}
+func implements(p Parser) Parser fails InvalidDocument {
+	if peek(p).Text != "implements" { return p }
+	let next = bump(p)
+	let mut result = try name(if peek(next).Text == "&" { bump(next) } else { next })
+	for peek(result).Text == "&" { result = try name(bump(result)) }
+	result
+}
+
+func schemaDefinition(p Parser, extension bool) Parser fails InvalidDocument {
+	let token = peek(p)
+	let mut next = bump(p)
+	if token.Text == "schema" {
+		next = try directives(next, true)
+		if !extension || peek(next).Text == "{" {
+			next = try expect(next, "{")
+			let mut count = 0
+			for peek(next).Text != "}" {
+				if peek(next).Text != "query" && peek(next).Text != "mutation" && peek(next).Text != "subscription" { return InvalidDocument{Message: "expected an operation type"} }
+				next = try name(try expect(bump(next), ":"))
+				count = count + 1
+			}
+			if count == 0 { return InvalidDocument{Message: "empty schema definition"} }
+			next = bump(next)
+		}
+	} else {
+		if token.Text == "directive" && !extension {
+			next = try argumentDefinitions(try name(try expect(next, "@")))
+			if peek(next).Text == "repeatable" { next = bump(next) }
+			next = try expect(next, "on")
+			if peek(next).Text == "|" { next = bump(next) }
+			next = try name(next)
+			for peek(next).Text == "|" { next = try name(bump(next)) }
+			return next
+		}
+		if token.Text != "scalar" && token.Text != "type" && token.Text != "interface" && token.Text != "union" && token.Text != "enum" && token.Text != "input" { return InvalidDocument{Message: "expected a definition"} }
+		next = try name(next)
+		let afterName = next.at
+		if token.Text == "type" || token.Text == "interface" { next = try implements(next) }
+		next = try directives(next, true)
+		if token.Text == "type" || token.Text == "interface" || token.Text == "input" { next = try fieldDefinitions(next, token.Text == "input") }
+		if token.Text == "union" && peek(next).Text == "=" {
+			next = bump(next)
+			if peek(next).Text == "|" { next = bump(next) }
+			next = try name(next)
+			for peek(next).Text == "|" { next = try name(bump(next)) }
+		}
+		if token.Text == "enum" && peek(next).Text == "{" {
+			next = bump(next)
+			let mut count = 0
+			for peek(next).Text != "}" {
+				next = description(next)
+				if peek(next).Text == "true" || peek(next).Text == "false" || peek(next).Text == "null" { return InvalidDocument{Message: "reserved enum value"} }
+				next = try directives(try name(next), true)
+				count = count + 1
+			}
+			if count == 0 { return InvalidDocument{Message: "empty enum"} }
+			next = bump(next)
+		}
+		if extension && next.at == afterName { return InvalidDocument{Message: "empty type extension"} }
+	}
+	if extension && next.at == p.at+1 { return InvalidDocument{Message: "empty schema extension"} }
+	next
+}

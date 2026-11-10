@@ -9,15 +9,19 @@ func New(net http.Net, credentials credential.Credentials) Client {
 	Client{net: net, credentials: credentials}
 }
 
-type Ask { Query string }
+type Ask { Query string, Variables json.Value }
 type Error { Message string }
 type Envelope { Data json.Optional[json.Value], Errors json.Optional[[]Error] }
 
 func query(c Client, document string) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	try queryVariables(c, document, json.Object{Members: []json.Member{}})
+}
+
+func queryVariables(c Client, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
 	let token = try c.credentials.Load()
 	let request = credential.Authorize(token, http.Request{Method: "POST", Path: "/graphql", Query: []http.Field{},
 		Header: []http.Field{http.Field{Name: "Content-Type", Value: "application/json"}},
-		Body:   http.Buffered{Text: json.Encode(json.Codec[Ask]{MaxBytes: 0, MaxDepth: 0}, Ask{Query: document})}})
+		Body:   http.Buffered{Text: json.Encode(json.Codec[Ask]{MaxBytes: 0, MaxDepth: 0}, Ask{Query: document, Variables: variables})}})
 	let response = c.net.Send(request) catch {
 	case http.RequestFailed:
 		return linear.ApiError{Message: "request failed"}

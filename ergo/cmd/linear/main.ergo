@@ -9,7 +9,7 @@ import os
 
 // Only this entry chooses the production origins. No environment variable can
 // redirect an API credential. Redirects remain responses, never followed here.
-func main() fails os.Exit needs Ambient {
+func main() fails os.Exit needs Ambient | go.Foreign {
 	let process = os.NewHost()
 	let disk = fs.NewHost()
 	let out = io.NewHost()
@@ -25,7 +25,7 @@ func main() fails os.Exit needs Ambient {
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
 	}
 	let tracker = graphqlhttp.New(net, credentials)
-	with context { linear.Tracker: tracker, linear.Reader: tracker, io.Stdout: out } {
+	with context { linear.Tracker: tracker, linear.Reader: tracker, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, io.Stdout: out, fs.Files: disk } {
 		try cli.Run(process.Args())
 	}
 }

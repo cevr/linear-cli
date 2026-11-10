@@ -65,28 +65,7 @@ func issueRead(command string, args []string) fails os.Exit | linear.InvalidInpu
 	}
 	let set = flag.Set{Name: "linear issue " + command, Usage: "", Flags: flags, Args: if command == "list" { []flag.ArgSpec{} } else { []flag.ArgSpec{idsArg} }}
 	let normalized = aliases(args)
-	// std flag deliberately uses last-wins; this CLI retains its refusal rule.
-	let mut seen = []string{}
-	let mut takesValue = false
-	let mut ended = false
-	for arg in normalized {
-		if takesValue {
-			takesValue = false
-			continue
-		}
-		if arg == "--" { ended = true }
-		if !ended && strings.HasPrefix(arg, "--") {
-			let name = strings.Split(arg, "=")[0]
-			for prior in seen {
-				if name == prior {
-					io.Stdout.Print(flag.Usage(set))
-					return os.Exit{Code: 1, Message: "ERROR\n  Invalid value for flag " + name + ": \"2 occurrences\". Expected: at most 1 value"}
-				}
-			}
-			seen = seen.Append(name)
-			takesValue = !strings.Contains(arg, "=") && (name == "--state" || name == "--limit")
-		}
-	}
+	try rejectRepeated(set, normalized)
 	let v = flag.Parse(set, normalized) catch {
 	case flag.Help as h:
 		io.Stdout.Print(h.Text)

@@ -195,6 +195,16 @@ async function run(c: Case, implementation: "ts" | "ergo"): Promise<Result> {
     if (fake.storageHeaders.some(Boolean)) throw new Error(`${c.name}: credential reached storage`);
     if (c.args.includes("--dry-run") && fake.mutations.length)
       throw new Error(`${c.name}: dry-run-sends-mutation survived`);
+    if (
+      status === 0 &&
+      c.args[0] === "issue" &&
+      c.args[1] === "create" &&
+      !c.args.includes("--dry-run")
+    ) {
+      const created = w.issues.find((issue) => issue.identifier === "ENG-999");
+      if (!created || !out.includes(created.identifier))
+        throw new Error(`${c.name}: fake-forgets-created-issue survived`);
+    }
     const normalize = (s: string) => s.replaceAll(dir, "$CASE");
     return {
       out: normalize(out),
@@ -311,6 +321,12 @@ for (const c of selected) {
       )
         throw new Error("repeated-flag: usage error lost its command, reason or exit status");
       expected.out = actual.out;
+      expected.err = actual.err;
+    }
+    if (c.name === "graphql-invalid" && !tsCheck) {
+      const prefix = "Invalid input: Invalid GraphQL document: ";
+      if (!actual.err.startsWith(prefix) || actual.err.length <= prefix.length + 1)
+        throw new Error("graphql-invalid: parser diagnostic prefix or detail is absent");
       expected.err = actual.err;
     }
     if (JSON.stringify(expected) !== JSON.stringify(actual)) {

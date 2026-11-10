@@ -41,3 +41,12 @@ L0 schema validation is a prerequisite, not proof of API parity.
 - `issue-connection-first-page`: native-vs-TypeScript generated read comparison with multi-page labels, comments, children and both relation directions. Existing L1 pagination guard covers teams only.
 - `read-flags-load-every-relation`: existing fixed single-flag read cases check omission independently; generated all-flags cases alone cannot catch this.
 - `bulk-view-keeps-last`: existing multi-id native comparison checks retention and input order, independent of completion order.
+
+# L3 guards (declared before implementation)
+
+- `create-machine-accepts-blank-title`: generated CreateReadyTitle law; existing creation cases use nonblank titles and cannot catch it.
+- `graphql-string-is-mutation`: generated query/parser property keeps mutation text inside a string or comment inert; existing raw-query cases contain no such text.
+- `graphql-skips-later-operation`: generated multi-operation parser property detects a mutation after a query/fragment; existing corpus uses one operation per document.
+- `graphql-rejects-schema-definition`: the same generated property includes type-system syntax and descriptions. Schema fields named mutation are not executable mutation definitions; existing raw CLI cases contain only executable documents.
+- `dry-run-sends-mutation`, `workspace-allows-symlink-escape`: reuse existing process cases; no duplicate unit rows.
+- `fake-forgets-created-issue`: record leg must observe the created issue's identity in the fake world. L0's stable recordings alone allowed the fake's non-null default `fixture` to mask a missing created-issue lookup.
