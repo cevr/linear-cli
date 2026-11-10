@@ -141,7 +141,8 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Build output
-bin/
+bin/*
+!bin/linear
 
 # OS
 .DS_Store

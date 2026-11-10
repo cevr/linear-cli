@@ -27,6 +27,7 @@ redirect for URL`, where the original reports the redirect's HTTP status.
 - Transport failure and `File Error:` texts are the port's own; the prefix and
   exit status 1 are kept.
 
-Interactive input (L5), TOML config (L6), installation switch and performance
-receipts (L7) are not native-parity claims. They remain on the TypeScript
-implementation. No installed command is changed by this branch.
+Interactive input (L5), TOML config (L6) and performance receipts (L7) are not
+native-parity claims. The local switch and its conservative parity table are
+described in `routing.md`; create and interactive paths remain TypeScript by
+default. No installed command is changed by this branch.

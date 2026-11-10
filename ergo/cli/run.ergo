@@ -8,7 +8,7 @@ import linearport/linear
 import os
 import strings
 
-let asJson = flag.Bool("json", false, "Print JSON")
+let asJson = flag.Bool("json", false, "Print JSON").Repeated()
 
 // Presence is a domain Option. Only this output boundary chooses JSON omission.
 type WireStatus { Emoji json.Optional[string], Label json.Optional[string] }
@@ -54,46 +54,51 @@ func Run(args []string) fails os.Exit needs linear.Tracker | linear.Reader | lin
 }
 
 func run(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Reader | linear.Workflow | linear.Writer | linear.RawGraphQL | linear.Uploads | io.Stdout | fs.Files | fs.Writes | go.Foreign {
-	if len(args) < 2 { return os.Exit{Code: 1, Message: "Usage: linear team list | project list | auth whoami"} }
-	let command = args[0] + " " + args[1]
+	let root = commands()
+	let parsed = flag.ParseRoot(root, args) catch {
+	case flag.Help as h:
+		io.Stdout.Print(h.Text)
+		return
+	case flag.Version as version:
+		io.Stdout.Println(version.Text)
+		return
+	case DuplicateFlag as d:
+		io.Stdout.Print(d.Usage)
+		return os.Exit{Code: 1, Message: "ERROR\n  Invalid value for flag " + d.Name + ": \"\(d.Count) occurrences\". Expected: at most 1 value"}
+	case err:
+		io.Stdout.Print(flag.RootUsage(root))
+		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
+	}
+	let command = parsed.Command
+	let v = parsed.Values
 	if command == "file download" {
-		try fileDownload(args[2:])
+		try fileDownload(v)
 		return
 	}
 	if command == "api graphql" {
-		try apiGraphQL(args[2:])
+		try apiGraphQL(v)
 		return
 	}
-	if args[0] == "issue" && (args[1] == "start" || args[1] == "create" || args[1] == "comment") {
-		try issueWrite(args[1], args[2:])
+	if command == "issue start" || command == "issue create" || command == "issue comment" {
+		try issueWrite(strings.Split(command, " ")[1], v)
 		return
 	}
-	if args[0] == "issue" && (args[1] == "list" || args[1] == "view" || args[1] == "files") {
-		try issueRead(args[1], args[2:])
+	if command == "issue list" || command == "issue view" || command == "issue files" {
+		try issueRead(strings.Split(command, " ")[1], v)
 		return
 	}
 	if command != "team list" && command != "project list" && command != "auth whoami" {
 		return os.Exit{Code: 1, Message: "Unknown command: " + command}
 	}
-	let set = flag.Set{Name: "linear " + command, Usage: "", Flags: []flag.Flag{asJson}, Args: []flag.ArgSpec{}}
-	try rejectRepeated(set, args[2:])
-	let v = flag.Parse(set, args[2:]) catch {
-	case flag.Help as h:
-		io.Stdout.Print(h.Text)
-		return
-	case err:
-		io.Stdout.Print(flag.Usage(set))
-		return os.Exit{Code: 1, Message: "\nERROR\n  " + flag.Describe(err)}
-	}
 	if command == "team list" {
-		try teams(asJson.Get(v))
+		try teams(enabled(asJson, v))
 		return
 	}
 	if command == "project list" {
-		try projects(asJson.Get(v))
+		try projects(enabled(asJson, v))
 		return
 	}
-	try viewer(asJson.Get(v))
+	try viewer(enabled(asJson, v))
 }
 
 func teams(asJson bool) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | io.Stdout {

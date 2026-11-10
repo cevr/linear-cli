@@ -86,8 +86,18 @@ type Mutant = {
   pkg: string;
   guard: string;
   args?: string[];
+  version?: boolean;
 };
 const mutants: Mutant[] = [
+  {
+    name: "root-version-undeclared",
+    file: "cli/arguments.ergo",
+    from: 'Version: Some[string]{Value: "linear v0.6.0"}',
+    to: "Version: None",
+    pkg: "",
+    guard: "root-version-undeclared: version differs",
+    version: true,
+  },
   {
     name: "graphql-rejects-schema-definition",
     file: "graphql/schema.ergo",
@@ -273,16 +283,20 @@ for (const mutant of mutants) {
     const binary = join(dir, "linear-mutant");
     const built = await run(
       compiler,
-      ["build", join(module, "cmd/linear-parity"), "-o", binary],
+      ["build", join(module, mutant.version ? "cmd/linear" : "cmd/linear-parity"), "-o", binary],
       root,
     );
     if (built.code !== 0) throw new Error(`${mutant.name}: invalid mutant build: ${built.output}`);
     result = await run(
       process.execPath,
       [
-        join(root, "parity/run.ts"),
-        ...(mutant.args ?? ["--phase=1", "--seed=42", "--case=seed-42-team"]),
-        `--binary=${binary}`,
+        join(root, mutant.version ? "parity/switch.ts" : "parity/run.ts"),
+        ...(mutant.version
+          ? [`--native=${binary}`]
+          : [
+              ...(mutant.args ?? ["--phase=1", "--seed=42", "--case=seed-42-team"]),
+              `--binary=${binary}`,
+            ]),
       ],
       root,
     );

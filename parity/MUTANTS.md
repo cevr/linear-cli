@@ -61,3 +61,19 @@ L0 schema validation is a prerequisite, not proof of API parity.
 - `upload-credential-wrong-origin`: the token is bound to an origin that is not the upload origin, so it is never sent. The fake upload origin now answers 401 without the token, as the real one does; the download-redirect case.
 - `saved-text-drops-size`: the text form of saved files. Every fixed download case prints JSON; the generated `seed-N-download` case alternates text and JSON.
 - Token reach: every case fails when the storage listener sees `Authorization`. The token is a CU5 credential of one origin; the port has no public value of it to leak (package `credential` alone reads it), so no port mutant can send it elsewhere. The std http two-peer model owns that guarantee.
+
+# L4b switch mutants
+
+New public seam: execute a copied shim with two inert sibling executables in an
+isolated HOME. It observes selected implementation, exact argv and exit status;
+domain output stays covered by the existing two-program parity corpus.
+
+- `default-routes-interactive-to-ergo`: deleting the flag fallback must fail the interactive route check.
+- `config-create-routes-to-ergo`: admitting create to the parity table must fail the config route check.
+- `override-ignored`: ignoring explicit ts must fail the override check.
+- `shim-loses-argument`: dropping argv must fail exact argument forwarding.
+- `root-version-undeclared`: removing the native root version must fail the isolated `--version` smoke check (no previous native case invokes the root).
+
+No earlier law, property or example executes a switch. Existing repeated-flag,
+short-name, explicit-priority and download cases guard the CU1 refactor; no new
+domain test is added for already-covered semantics.

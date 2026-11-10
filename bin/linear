@@ -1,0 +1,27 @@
+#!/bin/sh
+# Local pilot switch. Never rewrite argv or change the installed owner's link.
+bindir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
+case ${LINEAR_IMPL-} in
+  ts) exec "$bindir/linear-ts" "$@" ;;
+  ergo) exec "$bindir/linear-ergo" "$@" ;;
+  '') ;;
+  *) printf '%s\n' 'LINEAR_IMPL must be ts or ergo' >&2; exit 1 ;;
+esac
+
+# Prompt/config and Effect-only flags have not reached parity. Conservative
+# fallback is safe even when such a word occurs as a flag value or positional.
+for arg do
+  case $arg in
+    --interactive|--interactive=*|--wizard|--wizard=*|--completions|--completions=*|--log-level|--log-level=*) exec "$bindir/linear-ts" "$@" ;;
+  esac
+done
+
+# Parity table: L1-L4 leaves only. Create stays TS until TOML config parity.
+impl=ts
+case ${1-}:${2-} in
+  auth:whoami|team:list|project:list|issue:list|issue:view|issue:files|issue:start|issue:comment|file:download|api:graphql) impl=ergo ;;
+  --version:|--help:|-h:) impl=ergo ;;
+esac
+# A TS-only build remains usable. Explicit ergo never silently falls back.
+if [ "$impl" = ergo ] && [ ! -x "$bindir/linear-ergo" ]; then impl=ts; fi
+exec "$bindir/linear-$impl" "$@"

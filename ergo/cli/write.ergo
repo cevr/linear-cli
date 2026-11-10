@@ -6,14 +6,14 @@ import linearport/linear
 import os
 import strings
 
-let dryRunFlag = flag.Bool("dry-run", false, "Validate without writing")
-let titleFlag = flag.String("title", "", "Issue title")
-let descriptionFlag = flag.String("description", "", "Markdown description")
-let teamFlag = flag.String("team", "", "Team key or UUID")
-let parentFlag = flag.String("parent", "", "Parent selector")
-let projectFlag = flag.String("project", "", "Project selector")
-let priorityFlag = flag.Int("priority", -1, "Priority 0 to 4")
-let bodyFlag = flag.RequiredString("body", "Comment body")
+let dryRunFlag = flag.Bool("dry-run", false, "Validate without writing").Repeated()
+let titleFlag = flag.String("title", "", "Issue title").Repeated()
+let descriptionFlag = flag.String("description", "", "Markdown description").Repeated()
+let teamFlag = flag.String("team", "", "Team key or UUID").Repeated()
+let parentFlag = flag.String("parent", "", "Parent selector").Repeated()
+let projectFlag = flag.String("project", "", "Project selector").Repeated()
+let priorityFlag = flag.Int("priority", 0, "Priority 0 to 4").Repeated()
+let bodyFlag = flag.RequiredString("body", "Comment body").Repeated()
 type IdInput { Id string }
 type StartDry { DryRun bool, Operation string, Input IdInput, Result linear.Started }
 type CommentInput { Id string, Body string }
@@ -21,38 +21,9 @@ type CommentDry { DryRun bool, Operation string, Input CommentInput }
 type WireCreate { Title string, TeamId string, Description json.Optional[string], Parent json.Optional[string], ProjectId json.Optional[string], Priority json.Optional[int] }
 type CreateDry { DryRun bool, Operation string, Input WireCreate }
 
-// Presence is read independently of the sentinel/default, including an explicit
-// empty string and an explicitly supplied -1. C1 replaces this local adapter.
-func supplied(args []string, name string) bool {
-	let mut value = false
-	for arg in args {
-		if value {
-			value = false
-			continue
-		}
-		if arg == "--" { return false }
-		if arg == "--"+name || strings.HasPrefix(arg, "--"+name+"=") { return true }
-		if strings.HasPrefix(arg, "--") && !strings.Contains(arg, "=") && arg != "--json" && arg != "--dry-run" && arg != "--allow-mutation" { value = true }
-	}
-	false
-}
-
-func issueWrite(command string, args []string) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Workflow | linear.Tracker | linear.Writer | io.Stdout {
-	let mut flags = []flag.Flag{asJson, dryRunFlag}
-	if command == "create" { flags = []flag.Flag{asJson, dryRunFlag, titleFlag, descriptionFlag, teamFlag, parentFlag, projectFlag, priorityFlag} }
-	if command == "comment" { flags = []flag.Flag{asJson, dryRunFlag, bodyFlag} }
-	let set = flag.Set{Name: "linear issue " + command, Usage: "", Flags: flags, Args: if command == "create" { []flag.ArgSpec{} } else { []flag.ArgSpec{idsArg} }}
-	try rejectRepeated(set, args)
-	let v = flag.Parse(set, args) catch {
-	case flag.Help as h:
-		io.Stdout.Print(h.Text)
-		return
-	case err:
-		io.Stdout.Print(flag.Usage(set))
-		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
-	}
+func issueWrite(command string, v flag.Values) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Workflow | linear.Tracker | linear.Writer | io.Stdout {
 	if command == "create" {
-		try create(v, args)
+		try create(v)
 		return
 	}
 	let ids = flag.Rest(v)
@@ -60,22 +31,22 @@ func issueWrite(command string, args []string) fails os.Exit | linear.InvalidInp
 	if len(ids) != 1 { return linear.InvalidInput{Message: "Expected one issue identifier"} }
 	let id = try linear.ParseSelector(ids[0])
 	if command == "comment" {
-		let body = try linear.ValidateText("Comment body", bodyFlag.Get(v), 100000, false)
-		if dryRunFlag.Get(v) {
+		let body = try linear.ValidateText("Comment body", text(bodyFlag, v, ""), 100000, false)
+		if enabled(dryRunFlag, v) {
 			io.Stdout.Println(json.Encode(json.Codec[CommentDry]{MaxBytes: 0, MaxDepth: 0}, CommentDry{DryRun: true, Operation: "issue.comment", Input: CommentInput{Id: linear.Text(id), Body: body}}))
 			return
 		}
 		let comment = try linear.Writer.Comment(id, body)
-		if asJson.Get(v) { io.Stdout.Println(json.Encode(json.Codec[linear.CommentCreated]{MaxBytes: 0, MaxDepth: 0}, comment)) } else { io.Stdout.Println("Comment created: " + comment.Url) }
+		if enabled(asJson, v) { io.Stdout.Println(json.Encode(json.Codec[linear.CommentCreated]{MaxBytes: 0, MaxDepth: 0}, comment)) } else { io.Stdout.Println("Comment created: " + comment.Url) }
 		return
 	}
 	let started = try linear.PlanStart(id)
-	if dryRunFlag.Get(v) {
+	if enabled(dryRunFlag, v) {
 		io.Stdout.Println(json.Encode(json.Codec[StartDry]{MaxBytes: 0, MaxDepth: 0}, StartDry{DryRun: true, Operation: "issue.start", Input: IdInput{Id: linear.Text(id)}, Result: started}))
 		return
 	}
 	try linear.Writer.Start(started.Issue.Id, started.State.Id)
-	if asJson.Get(v) {
+	if enabled(asJson, v) {
 		io.Stdout.Println(json.Encode(json.Codec[linear.Started]{MaxBytes: 0, MaxDepth: 0}, started))
 		return
 	}
@@ -86,13 +57,13 @@ func issueWrite(command string, args []string) fails os.Exit | linear.InvalidInp
 }
 
 // Planning is read-only by construction. No Writer capability reaches here.
-func planCreate(v flag.Values, args []string) linear.CreateInput fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker {
-	if !supplied(args, "title") { return linear.InvalidInput{Message: "--title is required in non-interactive mode. Usage: linear issue create --team ENG --title \"Title\" --dry-run"} }
+func planCreate(v flag.Values) linear.CreateInput fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker {
+	if !present(titleFlag, v) { return linear.InvalidInput{Message: "--title is required in non-interactive mode. Usage: linear issue create --team ENG --title \"Title\" --dry-run"} }
 	let teams = try linear.Tracker.Teams()
 	if len(teams) == 0 { return linear.InvalidInput{Message: "No teams found; an issue cannot be created"} }
 	let mut teamId = ""
-	if supplied(args, "team") {
-		let selector = teamFlag.Get(v)
+	if present(teamFlag, v) {
+		let selector = text(teamFlag, v, "")
 		for team in teams {
 			if team.Id == selector || strings.ToLower(team.Key) == strings.ToLower(selector) {
 				teamId = team.Id
@@ -104,16 +75,16 @@ func planCreate(v flag.Values, args []string) linear.CreateInput fails linear.In
 		if len(teams) != 1 { return linear.InvalidInput{Message: "--team is required when multiple teams exist"} }
 		teamId = teams[0].Id
 	}
-	let ready = try linear.PrepareCreate(teamId, titleFlag.Get(v), descriptionFlag.Get(v))
+	let ready = try linear.PrepareCreate(teamId, text(titleFlag, v, ""), text(descriptionFlag, v, ""))
 	let mut priority Option[int] = None
-	if supplied(args, "priority") {
-		let p = priorityFlag.Get(v)
+	if len(priorityFlag.Get(v)) > 0 {
+		let p = integer(priorityFlag, v, 0)
 		if p < 0 || p > 4 { return linear.InvalidInput{Message: "--priority must be between 0 and 4"} }
 		priority = Some[int]{Value: p}
 	}
 	let mut projectId Option[string] = None
-	if supplied(args, "project") {
-		let selector = projectFlag.Get(v)
+	if present(projectFlag, v) {
+		let selector = text(projectFlag, v, "")
 		let projects = try linear.Tracker.Projects()
 		for p in projects {
 			if p.Id == selector || strings.ToLower(p.Name) == strings.ToLower(selector) || strings.ToLower(p.Slug) == strings.ToLower(selector) {
@@ -127,13 +98,13 @@ func planCreate(v flag.Values, args []string) linear.CreateInput fails linear.In
 		case Some[string]:
 		}
 	}
-	let parent Option[linear.Selector] = if supplied(args, "parent") { Some[linear.Selector]{Value: try linear.ParseSelector(parentFlag.Get(v))} } else { None }
+	let parent Option[linear.Selector] = if present(parentFlag, v) { Some[linear.Selector]{Value: try linear.ParseSelector(text(parentFlag, v, ""))} } else { None }
 	linear.CreateInput{Title: ready.Title, TeamId: ready.TeamId, Description: if ready.Description == "" { None } else { Some[string]{Value: ready.Description} }, Parent: parent, ProjectId: projectId, Priority: priority}
 }
 
-func create(v flag.Values, args []string) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Writer | io.Stdout {
-	let input = try planCreate(v, args)
-	if dryRunFlag.Get(v) {
+func create(v flag.Values) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Tracker | linear.Writer | io.Stdout {
+	let input = try planCreate(v)
+	if enabled(dryRunFlag, v) {
 		let parent Option[string] = match input.Parent {
 		case None:
 			None
@@ -145,7 +116,7 @@ func create(v flag.Values, args []string) fails linear.InvalidInput | linear.Api
 		return
 	}
 	let created = try linear.Writer.Create(input)
-	if asJson.Get(v) {
+	if enabled(asJson, v) {
 		io.Stdout.Println(json.Encode(json.Codec[linear.Reference]{MaxBytes: 0, MaxDepth: 0}, created))
 		return
 	}

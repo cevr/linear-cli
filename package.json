@@ -18,7 +18,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "bun build ./src/main.ts --compile --outfile bin/linear",
+    "build": "bun scripts/build.ts",
+    "build:ergo": "bun scripts/build.ts --ergo",
     "postinstall": "bun run build",
     "test": "vitest run",
     "test:watch": "vitest",

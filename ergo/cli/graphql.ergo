@@ -9,10 +9,10 @@ import os
 import strings
 import go path/filepath
 
-let queryFlag = flag.String("query", "", "GraphQL document")
-let queryFileFlag = flag.String("query-file", "", "Workspace query file")
-let variablesFlag = flag.String("variables", "{}", "Variables JSON object")
-let allowMutationFlag = flag.Bool("allow-mutation", false, "Explicitly authorize mutations")
+let queryFlag = flag.String("query", "", "GraphQL document").Repeated()
+let queryFileFlag = flag.String("query-file", "", "Workspace query file").Repeated()
+let variablesFlag = flag.String("variables", "{}", "Variables JSON object").Repeated()
+let allowMutationFlag = flag.Bool("allow-mutation", false, "Explicitly authorize mutations").Repeated()
 
 func realPath(path string) string fails go.Error needs go.Foreign { try filepath.EvalSymlinks(try filepath.Abs(path)) }
 
@@ -38,28 +38,18 @@ func workspaceQuery(path string) string fails linear.InvalidInput needs fs.Files
 	text
 }
 
-func apiGraphQL(args []string) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.RawGraphQL | io.Stdout | fs.Files | go.Foreign {
-	let set = flag.Set{Name: "linear api graphql", Usage: "", Flags: []flag.Flag{queryFlag, queryFileFlag, variablesFlag, allowMutationFlag}, Args: []flag.ArgSpec{}}
-	try rejectRepeated(set, args)
-	let v = flag.Parse(set, args) catch {
-	case flag.Help as h:
-		io.Stdout.Print(h.Text)
-		return
-	case err:
-		io.Stdout.Print(flag.Usage(set))
-		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
-	}
-	if supplied(args, "query") && supplied(args, "query-file") { return linear.InvalidInput{Message: "Use exactly one of --query or --query-file"} }
-	if !supplied(args, "query") && !supplied(args, "query-file") { return linear.InvalidInput{Message: "--query or --query-file is required"} }
-	let text = if supplied(args, "query") { queryFlag.Get(v) } else { try workspaceQuery(queryFileFlag.Get(v)) }
-	if linear.TextUnits(text) > 1000000 { return linear.InvalidInput{Message: "GraphQL documents cannot exceed 1000000 characters"} }
-	let variablesText = variablesFlag.Get(v)
+func apiGraphQL(v flag.Values) fails os.Exit | linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.RawGraphQL | io.Stdout | fs.Files | go.Foreign {
+	if present(queryFlag, v) && present(queryFileFlag, v) { return linear.InvalidInput{Message: "Use exactly one of --query or --query-file"} }
+	if !present(queryFlag, v) && !present(queryFileFlag, v) { return linear.InvalidInput{Message: "--query or --query-file is required"} }
+	let documentText = if present(queryFlag, v) { text(queryFlag, v, "") } else { try workspaceQuery(text(queryFileFlag, v, "")) }
+	if linear.TextUnits(documentText) > 1000000 { return linear.InvalidInput{Message: "GraphQL documents cannot exceed 1000000 characters"} }
+	let variablesText = text(variablesFlag, v, "{}")
 	if linear.TextUnits(variablesText) > 1000000 { return linear.InvalidInput{Message: "--variables cannot exceed 1000000 characters"} }
-	let document = graphql.Parse(text) catch {
+	let document = graphql.Parse(documentText) catch {
 	case graphql.InvalidDocument as e:
 		return linear.InvalidInput{Message: "Invalid GraphQL document: " + e.Message}
 	}
-	if graphql.IsMutation(document) && !allowMutationFlag.Get(v) { return linear.InvalidInput{Message: "Raw GraphQL mutations require explicit authorization with --allow-mutation. Preview and inspect the document before retrying."} }
+	if graphql.IsMutation(document) && !enabled(allowMutationFlag, v) { return linear.InvalidInput{Message: "Raw GraphQL mutations require explicit authorization with --allow-mutation. Preview and inspect the document before retrying."} }
 	let variables = json.Decode(json.Codec[json.Value]{MaxBytes: 4000000, MaxDepth: 128}, variablesText) catch {
 	case _:
 		return linear.InvalidInput{Message: "--variables must be a JSON object: invalid JSON"}

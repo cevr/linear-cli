@@ -40,8 +40,18 @@ gets it. `files` chooses safe, unique names and saves under `--output-dir`.
 
 Use an explicit private GOPATH/GOMODCACHE as well as GOCACHE for isolated HOME
 builds. Clean a private read-only module cache with Go's `clean -modcache`, not
-permission changes. Prompts, TOML and the installed-command switch remain
-L5–L7. The production binary is not selected or run by the offline gate.
+permission changes. Prompts, TOML and installed-command linking remain L5–L7.
+The local switch in `bin/linear` uses the parity table in `parity/routing.md`.
+`bun run build` builds `linear-ts`, never replaces the shim; `build:ergo` builds
+`linear-ergo` with the compiler from `ERGO` (or PATH). The offline gate runs the
+production binary only for the origin-free `--version` smoke check.
+
+`cli/arguments.ergo` declares one std flag command tree. Aliases are declarations
+(`WithAlias`), not argv rewrites. Repeated handles preserve all occurrences and
+presence; the leaf's Build refuses more than one occurrence before a service can
+run. This retains singleton semantics rather than accepting std scalar last-wins.
+Absent priority is an empty occurrence list, not an integer sentinel. Std help
+labels these handles repeated; the CLI's singleton check remains stricter.
 
 Effect service tags and layers are replaced by operation types and contexts;
 runtime schema classes by checked records and derived codecs; tagged errors by

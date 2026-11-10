@@ -7,9 +7,9 @@ import linearport/files
 import linearport/linear
 import os
 
-let outputDirFlag = flag.String("output-dir", ".", "Directory to save files in; created when missing")
-let overwriteFlag = flag.Bool("overwrite", false, "Replace files that already exist in the output directory")
-let downloadFlag = flag.Bool("download", false, "Save every listed file into --output-dir")
+let outputDirFlag = flag.String("output-dir", ".", "Directory to save files in; created when missing").Repeated().WithAlias("o")
+let overwriteFlag = flag.Bool("overwrite", false, "Replace files that already exist in the output directory").Repeated()
+let downloadFlag = flag.Bool("download", false, "Save every listed file into --output-dir").Repeated()
 let urlsArg = flag.Remaining("url", "https://uploads.linear.app/... URL (repeat for several files)")
 
 type WireSaved { Url string, Path string, Bytes int, ContentType json.Optional[string] }
@@ -24,28 +24,17 @@ func printSaved(saved []files.Saved, asJson bool) needs io.Stdout {
 	for s in saved { io.Stdout.Println("Saved " + s.Path + " (\(s.Bytes) bytes)") }
 }
 
-func fileDownload(args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Uploads | fs.Files | fs.Writes | io.Stdout {
-	let set = flag.Set{Name: "linear file download", Usage: "", Flags: []flag.Flag{asJson, outputDirFlag, overwriteFlag}, Args: []flag.ArgSpec{urlsArg}}
-	let normalized = aliases(args)
-	try rejectRepeated(set, normalized)
-	let v = flag.Parse(set, normalized) catch {
-	case flag.Help as h:
-		io.Stdout.Print(h.Text)
-		return
-	case err:
-		io.Stdout.Print(flag.Usage(set))
-		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
-	}
+func fileDownload(v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Uploads | fs.Files | fs.Writes | io.Stdout {
 	let urls = flag.Rest(v)
 	if len(urls) == 0 { return linear.InvalidInput{Message: "Upload URL required. Usage: linear file download https://uploads.linear.app/... --json"} }
 	let mut requests = []files.Request{}
 	for url in urls { requests = requests.Append(files.Request{Url: try linear.ParseUploadURL(url), LinkName: None}) }
-	printSaved(try files.Save(requests, outputDirFlag.Get(v), overwriteFlag.Get(v)), asJson.Get(v))
+	printSaved(try files.Save(requests, text(outputDirFlag, v, "."), enabled(overwriteFlag, v)), enabled(asJson, v))
 }
 
 // downloadIssueFiles saves the files issue files lists, each under its link name.
 func downloadIssueFiles(listed []IssueFile, v flag.Values) fails linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Uploads | fs.Files | fs.Writes | io.Stdout {
 	let mut requests = []files.Request{}
 	for file in listed { requests = requests.Append(files.Request{Url: try linear.ParseUploadURL(file.Url), LinkName: Some[string]{Value: file.Name}}) }
-	printSaved(try files.Save(requests, outputDirFlag.Get(v), overwriteFlag.Get(v)), asJson.Get(v))
+	printSaved(try files.Save(requests, text(outputDirFlag, v, "."), enabled(overwriteFlag, v)), enabled(asJson, v))
 }

@@ -9,11 +9,11 @@ import os
 import strings
 import tasks
 
-let stateFlag = flag.String("state", "", "Filter by state type")
-let limitFlag = flag.Int("limit", 20, "Number of issues")
-let commentsFlag = flag.Bool("comments", false, "Include comments")
-let childrenFlag = flag.Bool("children", false, "Include sub-issues")
-let relationsFlag = flag.Bool("relations", false, "Include relations")
+let stateFlag = flag.String("state", "", "Filter by state type").Repeated().WithAlias("s")
+let limitFlag = flag.Int("limit", 20, "Number of issues").Repeated().WithAlias("n")
+let commentsFlag = flag.Bool("comments", false, "Include comments").Repeated()
+let childrenFlag = flag.Bool("children", false, "Include sub-issues").Repeated()
+let relationsFlag = flag.Bool("relations", false, "Include relations").Repeated()
 let idsArg = flag.Remaining("id", "Issue identifiers or URLs")
 
 type WireSummary { Id string, Identifier string, Title string, Url string, BranchName string, Priority linear.Priority, State json.Optional[linear.WorkflowState] }
@@ -59,23 +59,7 @@ func wireDetails(d linear.Details) WireDetails {
 	WireDetails{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State), Description: wireOption(d.Description), Team: wireOption(d.Team), Assignee: wireOption(d.Assignee), Project: wireOption(d.Project), Parent: wireOption(d.Parent), Labels: d.Labels, Children: wireOption(d.Children), Comments: comments, Relations: wireOption(d.Relations)}
 }
 
-func issueRead(command string, args []string) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout {
-	let flags = if command == "list" {
-		[]flag.Flag{asJson, stateFlag, limitFlag}
-	} else {
-		if command == "view" { []flag.Flag{asJson, commentsFlag, childrenFlag, relationsFlag} } else { []flag.Flag{asJson, downloadFlag, outputDirFlag, overwriteFlag} }
-	}
-	let set = flag.Set{Name: "linear issue " + command, Usage: "", Flags: flags, Args: if command == "list" { []flag.ArgSpec{} } else { []flag.ArgSpec{idsArg} }}
-	let normalized = aliases(args)
-	try rejectRepeated(set, normalized)
-	let v = flag.Parse(set, normalized) catch {
-	case flag.Help as h:
-		io.Stdout.Print(h.Text)
-		return
-	case err:
-		io.Stdout.Print(flag.Usage(set))
-		return os.Exit{Code: 1, Message: "ERROR\n  " + flag.Describe(err)}
-	}
+func issueRead(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout {
 	if command == "list" {
 		try issueList(v)
 		return
@@ -88,11 +72,11 @@ func issueRead(command string, args []string) fails os.Exit | linear.InvalidInpu
 		if len(ids) != 1 { return linear.InvalidInput{Message: "Expected one issue identifier"} }
 		let details = try linear.Reader.Issue(selectors[0], linear.DetailsOptions{Comments: true, Children: false, Relations: false})
 		let listed = issueFiles(details)
-		if downloadFlag.Get(v) {
+		if enabled(downloadFlag, v) {
 			try downloadIssueFiles(listed, v)
 			return
 		}
-		if asJson.Get(v) {
+		if enabled(asJson, v) {
 			io.Stdout.Println(json.Encode(json.Codec[[]IssueFile]{MaxBytes: 0, MaxDepth: 0}, listed))
 			return
 		}
@@ -103,11 +87,11 @@ func issueRead(command string, args []string) fails os.Exit | linear.InvalidInpu
 		for file in listed { io.Stdout.Println(file.Name + "\t" + file.Source + "\t" + file.Url) }
 		return
 	}
-	let options = linear.DetailsOptions{Comments: commentsFlag.Get(v), Children: childrenFlag.Get(v), Relations: relationsFlag.Get(v)}
+	let options = linear.DetailsOptions{Comments: enabled(commentsFlag, v), Children: enabled(childrenFlag, v), Relations: enabled(relationsFlag, v)}
 	let details = try tasks.Transform(selectors, 4, func(id linear.Selector) linear.Details fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader {
 		linear.Reader.Issue(id, options)
 	})
-	if asJson.Get(v) {
+	if enabled(asJson, v) {
 		let mut rows = []WireDetails{}
 		for d in details { rows = rows.Append(wireDetails(d)) }
 		io.Stdout.Println(json.Encode(json.Codec[[]WireDetails]{MaxBytes: 0, MaxDepth: 0}, rows))
@@ -116,39 +100,14 @@ func issueRead(command string, args []string) fails os.Exit | linear.InvalidInpu
 	for d in details { renderDetails(d) }
 }
 
-// Rewrite only flag positions, never a value or a token after --.
-func aliases(args []string) []string {
-	let mut result = []string{}
-	let mut value = false
-	let mut ended = false
-	for arg in args {
-		if value || ended {
-			result = result.Append(arg)
-			value = false
-			continue
-		}
-		if arg == "--" {
-			ended = true
-			result = result.Append(arg)
-			continue
-		}
-		let parts = strings.SplitN(arg, "=", 2)
-		let name = if parts[0] == "-s" { "--state" } else { if parts[0] == "-n" { "--limit" } else { if parts[0] == "-o" { "--output-dir" } else { parts[0] } } }
-		let suffix = if len(parts) == 2 { "=" + parts[1] } else { "" }
-		result = result.Append(name + suffix)
-		value = len(parts) == 1 && (name == "--state" || name == "--limit" || name == "--output-dir")
-	}
-	result
-}
-
 func issueList(v flag.Values) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | io.Stdout {
-	let limit = limitFlag.Get(v)
+	let limit = integer(limitFlag, v, 20)
 	if limit < 1 || limit > 250 { return linear.InvalidInput{Message: "--limit must be between 1 and 250. Example: linear issue list --limit 20"} }
-	let state Option[string] = if stateFlag.Get(v) == "" { None } else { Some[string]{Value: stateFlag.Get(v)} }
+	let state Option[string] = if text(stateFlag, v, "") == "" { None } else { Some[string]{Value: text(stateFlag, v, "")} }
 	let issues = try linear.Reader.MyIssues(state, limit)
 	let end = if len(issues) < limit { len(issues) } else { limit }
 	let displayed = issues[:end]
-	if asJson.Get(v) {
+	if enabled(asJson, v) {
 		let mut rows = []WireSummary{}
 		for d in displayed { rows = rows.Append(WireSummary{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State)}) }
 		io.Stdout.Println(json.Encode(json.Codec[[]WireSummary]{MaxBytes: 0, MaxDepth: 0}, rows))

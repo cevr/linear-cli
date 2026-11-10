@@ -1,34 +1,63 @@
 import flag
-import io
-import os
 import strings
 
-func switchFlag(name string) bool {
-	name == "--json" || name == "--dry-run" || name == "--comments" || name == "--children" || name == "--relations" || name == "--allow-mutation" || name == "--help" || name == "--overwrite" || name == "--download"
-}
+type Invocation { Command string, Values flag.Values }
+type DuplicateFlag { Name string, Count int, Usage string }
 
-// std flag is last-wins, but this CLI refuses repeated singleton flags before
-// executing a command, especially before a write. The existing repeated-flag
-// case guards this adapter; C1 will replace the port-local declaration adapter.
-func rejectRepeated(set flag.Set, args []string) fails os.Exit needs io.Stdout {
-	let mut seen = []string{}
-	let mut takesValue = false
-	for arg in args {
-		if takesValue {
-			takesValue = false
-			continue
+// Repeated handles preserve every occurrence, including aliases. The CLI's
+// singleton policy is checked after std flag parses, never by scanning argv.
+func singletonValues(v flag.Values, set flag.Set) fails DuplicateFlag {
+	let mut seen = Map[string, int]{}
+	for arg in flag.Render(v) {
+		if arg == "--" { break }
+		let name = strings.SplitN(arg, "=", 2)[0]
+		let count = match seen.Get(name) {
+		case None:
+			1
+		case Some[int] as n:
+			n.Value + 1
 		}
-		if arg == "--" { return }
-		if strings.HasPrefix(arg, "--") {
-			let name = strings.Split(arg, "=")[0]
-			for prior in seen {
-				if prior == name {
-					io.Stdout.Print(flag.Usage(set))
-					return os.Exit{Code: 1, Message: "ERROR\n  Invalid value for flag " + name + ": \"2 occurrences\". Expected: at most 1 value"}
-				}
-			}
-			seen = seen.Append(name)
-			takesValue = !switchFlag(name) && !strings.Contains(arg, "=")
-		}
+		seen[name] = count
+		if count > 1 { return DuplicateFlag{Name: "-" + name, Count: count, Usage: flag.Usage(set)} }
 	}
 }
+
+func leaf(name string, path string, flags []flag.Flag, args []flag.ArgSpec) flag.Command[Invocation, DuplicateFlag] {
+	let set = flag.Set{Name: "linear " + path, Usage: "", Flags: flags, Args: args}
+	flag.Command[Invocation, DuplicateFlag]{Name: name, Usage: "", Set: set, Commands: []flag.Command[Invocation, DuplicateFlag]{}, Build: func(v flag.Values) Invocation fails DuplicateFlag {
+		try singletonValues(v, set)
+		Invocation{Command: path, Values: v}
+	}}
+}
+
+func commands() flag.Root[Invocation, DuplicateFlag] {
+	flag.Root[Invocation, DuplicateFlag]{Name: "linear", Usage: "", Version: Some[string]{Value: "linear v0.6.0"}, Commands: []flag.Command[Invocation, DuplicateFlag]{
+		flag.Group("auth", "Authentication", []flag.Command[Invocation, DuplicateFlag]{leaf("whoami", "auth whoami", []flag.Flag{asJson}, []flag.ArgSpec{})}),
+		flag.Group("team", "Teams", []flag.Command[Invocation, DuplicateFlag]{leaf("list", "team list", []flag.Flag{asJson}, []flag.ArgSpec{})}),
+		flag.Group("project", "Projects", []flag.Command[Invocation, DuplicateFlag]{leaf("list", "project list", []flag.Flag{asJson}, []flag.ArgSpec{})}),
+		flag.Group("issue", "Issues", []flag.Command[Invocation, DuplicateFlag]{
+			leaf("list", "issue list", []flag.Flag{asJson, stateFlag, limitFlag}, []flag.ArgSpec{}),
+			leaf("view", "issue view", []flag.Flag{asJson, commentsFlag, childrenFlag, relationsFlag}, []flag.ArgSpec{idsArg}),
+			leaf("files", "issue files", []flag.Flag{asJson, downloadFlag, outputDirFlag, overwriteFlag}, []flag.ArgSpec{idsArg}),
+			leaf("start", "issue start", []flag.Flag{asJson, dryRunFlag}, []flag.ArgSpec{idsArg}),
+			leaf("create", "issue create", []flag.Flag{asJson, dryRunFlag, titleFlag, descriptionFlag, teamFlag, parentFlag, projectFlag, priorityFlag}, []flag.ArgSpec{}),
+			leaf("comment", "issue comment", []flag.Flag{asJson, dryRunFlag, bodyFlag}, []flag.ArgSpec{idsArg}),
+		}),
+		flag.Group("file", "Files", []flag.Command[Invocation, DuplicateFlag]{leaf("download", "file download", []flag.Flag{asJson, outputDirFlag, overwriteFlag}, []flag.ArgSpec{urlsArg})}),
+		flag.Group("api", "Raw API", []flag.Command[Invocation, DuplicateFlag]{leaf("graphql", "api graphql", []flag.Flag{queryFlag, queryFileFlag, variablesFlag, allowMutationFlag}, []flag.ArgSpec{})}),
+	}}
+}
+
+func enabled(f flag.RepeatedBoolFlag, v flag.Values) bool {
+	let items = f.Get(v)
+	len(items) > 0 && items[0]
+}
+func text(f flag.RepeatedStringFlag, v flag.Values, fallback string) string {
+	let items = f.Get(v)
+	if len(items) == 0 { fallback } else { items[0] }
+}
+func integer(f flag.RepeatedIntFlag, v flag.Values, fallback int) int {
+	let items = f.Get(v)
+	if len(items) == 0 { fallback } else { items[0] }
+}
+func present(f flag.RepeatedStringFlag, v flag.Values) bool { len(f.Get(v)) > 0 }
