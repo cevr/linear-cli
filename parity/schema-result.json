@@ -1,0 +1,12 @@
+{
+  "schema": {
+    "sdk": "88.2.0",
+    "repository": "https://github.com/linear/linear",
+    "commit": "addf9aeaec0af1323ad48dc192999afd5255e67d",
+    "path": "packages/sdk/src/schema.graphql"
+  },
+  "sha256": "984a5254fdac5f662f711a90cd0d4e2f3cc001017990d1c4b57dc2f94efc965b",
+  "checkedDocuments": 663,
+  "failures": [],
+  "negativeControl": "schema-accepts-unknown-field killed"
+}
