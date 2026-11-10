@@ -4,6 +4,9 @@ import { chmod, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
+const packageVersion: string = JSON.parse(
+  await readFile(join(root, "package.json"), "utf8"),
+).version;
 // One owned scratch per pilot step; the default is the original pilot folder.
 const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port";
 await mkdir(scratch, { recursive: true });
@@ -143,7 +146,7 @@ const native = process.argv.find((arg) => arg.startsWith("--native="))?.slice(9)
 if (native) {
   const home = await mkdtemp(join(scratch, "version-"));
   const version = await run(native, ["--version"], home);
-  if (version.code !== 0 || version.err !== "" || version.out !== "linear v0.6.0\n")
+  if (version.code !== 0 || version.err !== "" || version.out !== `linear v${packageVersion}\n`)
     throw new Error("root-version-undeclared: version differs");
   console.log("native declared root version passed");
 }
@@ -160,11 +163,7 @@ if (process.argv.includes("--mutants")) {
       'exec "$bindir/linear-ergo" "$@"\n',
       '[ -x "$bindir/linear-ergo" ] || exec "$bindir/linear-ts" "$@"\nexec "$bindir/linear-ergo" "$@"\n',
     ],
-    [
-      "override-ignored",
-      'ts) exec "$bindir/linear-ts" "$@"',
-      'ts) exec "$bindir/linear-ergo" "$@"',
-    ],
+    ["override-ignored", 'exec "$bindir/linear-ts" "$@"', 'exec "$bindir/linear-ergo" "$@"'],
     ["shim-loses-argument", 'exec "$bindir/linear-ergo" "$@"\n', 'exec "$bindir/linear-ergo"\n'],
   ];
   for (const [name, from, to] of mutants) {

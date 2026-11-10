@@ -165,3 +165,21 @@ process decoding and SDK behavior, not a private implementation function.
 
 Earlier laws and regressions did not reach HTTP-200 auth substrings, SDK brace
 text or non-UTF-8 execve argv. No production-only test seam is added.
+
+# DIST2 launcher (declared before the guards)
+
+Public seam: the package launcher's chosen file, argv, status and refusal line,
+in the installed layout (`npm/<os>-<arch>/linear`), reached directly, through
+npm's relative link and through bun's absolute link behind a second link, under
+dash and bash, with a fake `uname` (`bun parity/launcher.ts --mutants`). No
+earlier probe ran the package layout: `switch.ts` covers the source checkout.
+
+- `arch-x64-as-arm64`: x86_64 maps to arm64; the route check runs the wrong file.
+- `arch-aarch64-unmapped`: Linux's `aarch64` spelling falls out of the map; it is refused.
+- `os-darwin-as-linux`: Darwin maps to linux.
+- `link-unresolved`: the launcher looks beside the link, not the package; both links fail.
+- `relative-link-from-cwd`: a relative link target is read from the working directory, not the link's folder; npm's link fails.
+- `unsupported-arch-as-x64`, `unsupported-os-as-linux`: an unknown platform runs some binary instead of the exact refusal line.
+
+`switch.ts`'s `override-ignored` now edits `exec "$bindir/linear-ts" "$@"`: the ts
+arm first refuses a missing TS binary (the package ships none).

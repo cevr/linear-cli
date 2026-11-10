@@ -1,14 +1,56 @@
 #!/bin/sh
-# Local pilot switch. Never rewrite argv or change the installed owner's link.
-self=$(readlink -f -- "$0" 2>/dev/null || printf '%s' "$0")
-bindir=$(CDPATH= cd -- "$(dirname -- "$self")" && pwd) || exit 1
+# linear launcher: exec the native Ergo binary for this platform. POSIX sh, so a
+# call costs no Node or Bun start. Never rewrites argv.
+
+# Resolve this file through symlinks (npm and bun link bin/linear into PATH).
+# `readlink` without -f exists on Linux and every macOS.
+self=$0
+while [ -L "$self" ]; do
+  link=$(readlink -- "$self") || exit 1
+  case $link in
+    /*) self=$link ;;
+    *) self=$(dirname -- "$self")/$link ;;
+  esac
+done
+bindir=$(CDPATH= cd -- "$(dirname -- "$self")" && pwd -P) || exit 1
+
+fail() {
+  printf 'linear: %s\n' "$1" >&2
+  exit 1
+}
+
+# LINEAR_IMPL=ts is the way back (q96) while a source checkout ships the TS
+# source; the npm package ships only native binaries.
 case ${LINEAR_IMPL-} in
-  ts) exec "$bindir/linear-ts" "$@" ;;
-  ergo) exec "$bindir/linear-ergo" "$@" ;;
-  '') ;;
+  ts)
+    [ -e "$bindir/linear-ts" ] || fail "LINEAR_IMPL=ts needs bin/linear-ts, which only a source checkout builds (bun run build)"
+    exec "$bindir/linear-ts" "$@" ;;
+  ergo | '') ;;
   *) printf '%s\n' 'LINEAR_IMPL must be ts or ergo' >&2; exit 1 ;;
 esac
 
-# L7: one default for all argv. A missing native binary is a build error;
-# LINEAR_IMPL=ts is the explicit way back, not an implicit fallback.
-exec "$bindir/linear-ergo" "$@"
+# A source checkout: `bun run build:ergo` builds this host's binary here. The
+# package never ships it. A missing native binary is an error, never TS.
+if [ -e "$bindir/linear-ergo" ]; then
+  exec "$bindir/linear-ergo" "$@"
+fi
+
+# The package: npm/<os>-<arch>/linear, names as Node's process.platform/arch.
+system=$(uname -s)
+machine=$(uname -m)
+case $system in
+  Linux) os=linux ;;
+  Darwin) os=darwin ;;
+  *) os= ;;
+esac
+case $machine in
+  x86_64 | amd64) arch=x64 ;;
+  arm64 | aarch64) arch=arm64 ;;
+  *) arch= ;;
+esac
+if [ -z "$os" ] || [ -z "$arch" ]; then
+  fail "no native binary for $system $machine; the platforms are darwin-arm64, darwin-x64, linux-arm64 and linux-x64"
+fi
+exe=$(dirname -- "$bindir")/npm/$os-$arch/linear
+[ -e "$exe" ] || fail "$exe is missing; reinstall the package, or run bun scripts/release.ts in a source checkout"
+exec "$exe" "$@"
