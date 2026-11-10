@@ -105,3 +105,20 @@ law reads the file order.
 - `config-ignored-by-create`: create does not use the configured team. Case `config-global`.
 - `config-error-swallowed`: a malformed file reads as no defaults. Case `config-malformed`.
 - Switch: `create-routes-to-ts` (create leaves the table; replaces L4b's `config-create-routes-to-ergo`, whose rule is gone).
+
+# L7 guards (declared before the switch change)
+
+The shim process seam now covers every argv, including groups, unknown commands
+and unsupported Effect flags. Existing domain cases never select a sibling
+binary; the switch probe observes selection, argv and status without network.
+The existing corpus also runs through a copied real shim with offline siblings
+for default, explicit Ergo and explicit TS; production origins stay fixed.
+
+- `default-still-ts`: unset LINEAR_IMPL selects TS. The all-argv default probe
+  fails; earlier routing checks expected TS for groups and unknown commands.
+- `effect-flag-still-ts`: the old Effect-only flag scan remains. The default
+  opaque-argv probe must select Ergo even for these flags (which Ergo rejects).
+- `missing-native-falls-back`: default uses TS when native is absent. The
+  missing-native probe must fail nonzero without running TS.
+- `override-ignored`, `shim-loses-argument`: retained, now against the single
+  default exec. Retire the old table-entry mutants; no table remains.

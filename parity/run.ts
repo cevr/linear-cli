@@ -25,7 +25,12 @@ const candidate = process.argv.find((x) => x.startsWith("--binary="))?.slice("--
 if (candidate && !(await realpath(candidate)).startsWith(`${scratch}/`))
   throw new Error("Candidate binary must be under the pilot scratch directory");
 const record = process.argv.includes("--record");
-const tsCheck = process.argv.includes("--check-ts");
+const target = process.argv.find((arg) => arg.startsWith("--target="))?.slice(9);
+if (target && !["default", "ergo", "ts"].includes(target))
+  throw new Error("Target must be default, ergo or ts");
+if (target && (candidate || record || process.argv.includes("--check-ts")))
+  throw new Error("Target cannot be combined with binary, record or check-ts");
+const tsCheck = process.argv.includes("--check-ts") || target === "ts";
 const phaseArg = process.argv.find((x) => x.startsWith("--phase="));
 const phase = phaseArg ? Number(phaseArg.split("=")[1]) : 6;
 const caseArg = process.argv.find((x) => x.startsWith("--case="))?.split("=")[1];
@@ -39,6 +44,16 @@ if (!selected.length) throw new Error("No parity cases selected");
 await mkdir(scratch, { recursive: true });
 
 const quote = (s: string) => `'${s.replaceAll("'", "'\\''")}'`;
+// Exercise the real shim, but bind only offline siblings. The shipped native
+// entry must never accept the fake-origin environment variables.
+let shim: string | undefined;
+if (target) {
+  const siblings = await mkdtemp(join(scratch, "targets-"));
+  shim = join(siblings, "linear");
+  await writeFile(shim, await readFile(join(root, "bin/linear")), { mode: 0o755 });
+  await symlink(join(root, "bin/linear-ergo-parity"), join(siblings, "linear-ergo"));
+  await symlink(join(root, "bin/linear-ts-parity"), join(siblings, "linear-ts"));
+}
 function setup(c: Case): string {
   const lines = ["set -eu", "umask 022"];
   for (const [path, text] of Object.entries(c.files ?? {})) {
@@ -96,7 +111,7 @@ async function snapshot(folder: string, prefix = ""): Promise<unknown[]> {
   return entries;
 }
 
-async function run(c: Case, implementation: "ts" | "ergo"): Promise<Result> {
+async function run(c: Case, implementation: "ts" | "ergo", throughShim = false): Promise<Result> {
   const w = world(c.seed ?? 1);
   if (c.scenario === "empty") {
     w.teams.length = 0;
@@ -138,13 +153,13 @@ async function run(c: Case, implementation: "ts" | "ergo"): Promise<Result> {
     TZ: "UTC",
   };
   if (!c.noToken) env.LINEAR_API_KEY = c.badEnvToken ? "wrong-fixture-token" : "pilot-test-token";
+  if (throughShim && target !== "default") env.LINEAR_IMPL = target!;
   if (env.HOME !== dir) throw new Error("runner-uses-owner-home survived");
-  const command =
-    implementation === "ts"
-      ? process.execPath
-      : (candidate ?? join(root, "bin/linear-ergo-parity"));
+  let command = candidate ?? join(root, "bin/linear-ergo-parity");
+  if (implementation === "ts") command = process.execPath;
+  if (throughShim) command = shim!;
   const args =
-    implementation === "ts"
+    !throughShim && implementation === "ts"
       ? ["--preload", join(root, "parity/redirect.ts"), join(root, "src/main.ts"), ...c.args]
       : c.args;
   let out = "",
@@ -225,7 +240,7 @@ async function run(c: Case, implementation: "ts" | "ergo"): Promise<Result> {
 }
 
 for (const c of selected) {
-  const actual = await run(c, record || tsCheck ? "ts" : "ergo");
+  const actual = await run(c, record || tsCheck ? "ts" : "ergo", Boolean(target));
   // A broken fake must not silently become an all-failure golden corpus.
   const failures = new Set([
     "download-notfound",
@@ -274,7 +289,7 @@ for (const c of selected) {
             args: c.args,
             reference,
             actual,
-            replay: `bun parity/run.ts --property=${c.seed} --phase=${phase} --case=${c.name}`,
+            replay: `bun parity/run.ts --property=${c.seed} --phase=${phase} --case=${c.name}${target ? ` --target=${target}` : ""}`,
           },
           null,
           2,

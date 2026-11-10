@@ -8,20 +8,6 @@ case ${LINEAR_IMPL-} in
   *) printf '%s\n' 'LINEAR_IMPL must be ts or ergo' >&2; exit 1 ;;
 esac
 
-# Effect-only flags are not ported. Conservative
-# fallback is safe even when such a word occurs as a flag value or positional.
-for arg do
-  case $arg in
-    --wizard|--wizard=*|--completions|--completions=*|--log-level|--log-level=*) exec "$bindir/linear-ts" "$@" ;;
-  esac
-done
-
-# Parity table: every ported leaf (L1-L6) and bare auth.
-impl=ts
-case ${1-}:${2-} in
-  auth:|auth:whoami|team:list|project:list|issue:list|issue:view|issue:files|issue:start|issue:create|issue:comment|file:download|api:graphql) impl=ergo ;;
-  --version:|--help:|-h:) impl=ergo ;;
-esac
-# A TS-only build remains usable. Explicit ergo never silently falls back.
-if [ "$impl" = ergo ] && [ ! -x "$bindir/linear-ergo" ]; then impl=ts; fi
-exec "$bindir/linear-$impl" "$@"
+# L7: one default for all argv. A missing native binary is a build error;
+# LINEAR_IMPL=ts is the explicit way back, not an implicit fallback.
+exec "$bindir/linear-ergo" "$@"

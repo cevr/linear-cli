@@ -60,5 +60,5 @@ Config files (L6):
 - Unknown keys are skipped, as the original's schema does.
 
 Performance receipts (L7) are not native-parity claims. The local switch and
-its parity table are described in `routing.md`. No installed command is changed
+its unconditional native default are described in `routing.md`. No installed command is changed
 by this branch.

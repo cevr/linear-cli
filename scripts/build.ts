@@ -36,9 +36,9 @@ if (process.argv.includes("--ergo")) {
 } else {
   await run(process.execPath, [
     "build",
-    "./src/main.ts",
+    process.argv.includes("--parity") ? "./parity/ts-main.ts" : "./src/main.ts",
     "--compile",
     "--outfile",
-    "bin/linear-ts",
+    process.argv.includes("--parity") ? "bin/linear-ts-parity" : "bin/linear-ts",
   ]);
 }

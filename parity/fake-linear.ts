@@ -15,7 +15,7 @@ import type { World } from "./world";
 const schema = buildSchema(await readFile(new URL("./schema.graphql", import.meta.url), "utf8"));
 export type Failure = "none" | "401" | "500" | "graphql";
 
-export function fakeLinear(w: World, failure: Failure = "none") {
+export function fakeLinear(w: World, failure: Failure = "none", requestDelayMs = 0) {
   const mutations: unknown[] = [];
   const requests: { operation: string; authenticated: boolean }[] = [];
   const storageHeaders: boolean[] = [];
@@ -161,6 +161,8 @@ export function fakeLinear(w: World, failure: Failure = "none") {
       }
       if (url.pathname !== "/graphql" || request.method !== "POST")
         return new Response("refused", { status: 403 });
+      // A deliberate benchmark fixture, never a wait in an acceptance test.
+      if (requestDelayMs) await Bun.sleep(requestDelayMs);
       if (failure === "401")
         return Response.json({ errors: [{ message: "Authentication required" }] }, { status: 401 });
       if (failure === "500")

@@ -100,12 +100,14 @@ async function verify(script: string) {
     const args = command.split(" ");
     await expect(args, "ergo");
     await expect([...args, "--interactive"], "ergo");
-    await expect([...args, "--log-level=debug"], "ts");
+    await expect([...args, "--log-level=debug"], "ergo");
   }
-  for (const args of [[], ["issue"], ["unknown", "list"]]) await expect(args, "ts");
+  for (const args of [[], ["issue"], ["unknown", "list"]]) await expect(args, "ergo");
   for (const arg of ["--help", "-h", "--version"]) await expect([arg], "ergo");
   await expect(["auth"], "ergo");
-  await expect(["auth", "--help"], "ts");
+  await expect(["auth", "--help"], "ergo");
+  for (const arg of ["--wizard", "--completions=bash", "--log-level", "--log-level=debug"])
+    await expect([arg], "ergo");
   // Seeded opaque argv includes empty, whitespace, shell metacharacters, Unicode
   // and a terminator. The shim must forward bytes, not interpret any of them.
   let seed = 42;
@@ -113,6 +115,7 @@ async function verify(script: string) {
   for (let i = 0; i < words.length; i++) {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
     const args = ["issue", "view", words[seed % words.length]!, words[i]!];
+    await expect(args, "ergo");
     await expect(args, "ts", "ts");
     await expect(args, "ergo", "ergo");
   }
@@ -124,12 +127,14 @@ async function verify(script: string) {
     invalid.err !== "LINEAR_IMPL must be ts or ergo\n"
   )
     throw new Error("invalid override was not refused");
-  // Missing native binary is only a default fallback, never an override.
+  // Neither default nor explicit Ergo may silently fall back to TS.
   await chmod(join(home, "linear-ergo"), 0o644);
-  await expect(["team", "list"], "ts");
-  const missing = await run(shim, ["team", "list"], home, "ergo");
-  if (missing.code === 23 || missing.out !== "")
-    throw new Error("explicit ergo silently fell back");
+  for (const impl of [undefined, "ergo"]) {
+    const missing = await run(shim, ["team", "list"], home, impl);
+    if (missing.code === 0 || missing.code === 23 || missing.out !== "")
+      throw new Error("missing native silently fell back");
+  }
+  await expect(["team", "list"], "ts", "ts");
 }
 
 await verify(source);
@@ -144,15 +149,23 @@ if (native) {
 }
 if (process.argv.includes("--mutants")) {
   const mutants = [
-    ["interactive-routes-to-ts", "--wizard|--wizard=*|", "--interactive|--wizard|--wizard=*|"],
-    ["auth-routes-to-ts", "auth:|auth:whoami", "auth:whoami"],
-    ["create-routes-to-ts", "issue:start|issue:create|", "issue:start|"],
+    ["default-still-ts", 'exec "$bindir/linear-ergo" "$@"\n', 'exec "$bindir/linear-ts" "$@"\n'],
+    [
+      "effect-flag-still-ts",
+      "case ${LINEAR_IMPL-} in",
+      'for arg do\n  case $arg in --wizard|--completions=*|--log-level|--log-level=*) exec "$bindir/linear-ts" "$@" ;; esac\ndone\ncase ${LINEAR_IMPL-} in',
+    ],
+    [
+      "missing-native-falls-back",
+      'exec "$bindir/linear-ergo" "$@"\n',
+      '[ -x "$bindir/linear-ergo" ] || exec "$bindir/linear-ts" "$@"\nexec "$bindir/linear-ergo" "$@"\n',
+    ],
     [
       "override-ignored",
       'ts) exec "$bindir/linear-ts" "$@"',
       'ts) exec "$bindir/linear-ergo" "$@"',
     ],
-    ["shim-loses-argument", 'exec "$bindir/linear-$impl" "$@"', 'exec "$bindir/linear-$impl"'],
+    ["shim-loses-argument", 'exec "$bindir/linear-ergo" "$@"\n', 'exec "$bindir/linear-ergo"\n'],
   ];
   for (const [name, from, to] of mutants) {
     if (!from || to === undefined || source.split(from).length !== 2)
@@ -161,7 +174,11 @@ if (process.argv.includes("--mutants")) {
     try {
       await verify(source.replace(from, to));
     } catch (error) {
-      if (!(error instanceof Error) || !error.message.startsWith("route/argv mismatch:"))
+      if (
+        !(error instanceof Error) ||
+        (!error.message.startsWith("route/argv mismatch:") &&
+          error.message !== "missing native silently fell back")
+      )
         throw error;
       killed = true;
     }
