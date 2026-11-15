@@ -15,25 +15,13 @@ func UploadText(u UploadURL) string { u.value }
 func UploadPath(u UploadURL) string { u.value[len(UploadOrigin()):] }
 
 // UploadTarget is the request target a transport sends: the path and query,
-// never the fragment. WHATWG keeps a "%" that starts no escape;
-// std http at pin 50facc08 rejects it in Go's url.Parse, so here it is the
-// escape "%25". HTTP permits the original target; G-L4-3/S-target removes
-// this transport limit. See parity/declared-differences.md.
+// never the fragment. std http sends a URL request's WHATWG target as given
+// (S-target), so a "%" that starts no escape goes out as the original sends it.
 func UploadTarget(u UploadURL) string {
-	let mut rest = UploadPath(u)
+	let rest = UploadPath(u)
 	let fragment = strings.Index(rest, "#")
-	if fragment >= 0 { rest = rest[:fragment] }
-	let mut query = ""
-	let at = strings.Index(rest, "?")
-	if at >= 0 {
-		query = rest[at:]
-		rest = rest[:at]
-	}
-	let mut path = ""
-	for i in 0..len(rest) {
-		if rest[i] == '%' && !escapeAt(rest, i) { path = path + "%25" } else { path = path + rest[i:i+1] }
-	}
-	path + query
+	if fragment >= 0 { return rest[:fragment] }
+	rest
 }
 
 func escapeAt(s string, i int) bool {

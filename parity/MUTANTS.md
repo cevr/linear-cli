@@ -7,7 +7,6 @@
 - `query-file-denied-unknown`: the readFile `fs.Denied` arm prints `Unknown`. The generated L3 state "mode-000 file" compares readFile bytes.
 - `upload-query-quote-raw`, `upload-fragment-tick-raw`, `upload-path-tick-raw`, `upload-path-caret-raw`, `upload-inner-tab-kept`: drop one member of a WHATWG encode set, or keep an inner tab. The generated L4 URL grammar puts every byte class in path, query and fragment of an accepted URL for every seed; the old 13-URL list reached none of them.
 - `upload-empty-userinfo-refused`, `upload-host-escape-kept`, `upload-host-unmapped`: refuse `@`/`:@`, skip host percent-decoding, or skip UTS #46 mapping. The grammar's host and user-information variants are accepted by the original.
-- `upload-stray-percent-sent`: send a stray `%` unescaped; the transport cannot build the request and the download fails where the original succeeds.
 - `upload-userinfo-accepted`, `upload-other-port-accepted`: accept a q101 input. Each seed has one non-empty user information and one non-443 port on an accepted host; the run requires exactly the refusal line.
 
 ## Round 2 regressions (declared before the guards)

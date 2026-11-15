@@ -25,15 +25,11 @@ Downloads (L4):
   belongs. The property checks that the port prints exactly the original's
   refusal line for each such input, with status 1 and no file.
 - A `%` that starts no escape stays in the printed URL, as in the original.
-  At compiler pin `50facc08`, std http's Go `url.Parse` rejects that request
-  target, so the port sends this `%` as `%25`. This is a std transport limit,
-  not an HTTP request-line restriction: Bun sends the original `%` verbatim.
-  Go's `EscapedPath` also re-escapes the whole decoded path when `|` occurs:
-  `x%2Fy|z.txt` becomes `/x/y%7Cz.txt`, not the original `/x%2Fy|z.txt`.
-  Both differences can change the resource a real server returns. Gap G-L4-3
-  is assigned to the queued S-target std unit (verbatim request targets).
-  Re-pin and remove these differences when that unit lands. The fragment
-  is never sent. This is not a claim of wire-target parity or owner approval.
+  Since the S-target std unit, std http sends a URL request's WHATWG target
+  as given, so the port sends the same request target as the original (the
+  `%25` and `|` re-escape differences of the earlier pin are gone). The
+  fragment is never sent. The offline comparison checks bytes, files and
+  status, not the target on the wire; std http's own property checks the wire.
 - The original follows one redirect and sends no token on it. The port follows one
   redirect through the std http network policy; the token is a credential of the
   upload origin, so a redirect back to that origin carries it and any other origin

@@ -252,7 +252,6 @@ const mutants: Mutant[] = [
         "host = host + m.Value",
         "host = host + utf8.RuneText(c) + m.Value[:0]",
       ],
-      ["upload-stray-percent-sent", 'path = path + "%25"', 'path = path + "%"'],
       [
         "upload-userinfo-accepted",
         'if userinfo != "" && userinfo != ":" { return invalid }',
