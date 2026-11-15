@@ -18,9 +18,11 @@ the records.
   parity entry's loopback-only origins remain, and every case still fails when
   the storage listener sees a credential.
 - `fake-forgets-created-issue` and `fake-forgets-created-comment` ran the
-  TypeScript record leg against the broken fake; they now run the binary
-  against it, and the schema's refusal of the missing post-create root still
-  kills them.
+  TypeScript record leg against the broken fake, which read the created
+  entity back and met the schema's refusal. The port does not read it back,
+  so the runner now checks the fake world after a successful `issue create`
+  (as before) and `issue comment` (new; case `comment-json`), and that check
+  kills both.
 - New in `parity/launcher.ts`: `checkout-binary-ignored` (a source checkout's
   `bin/linear-ergo` is skipped) and `impl-switch-kept` (`LINEAR_IMPL=ts` still
   selects another program).

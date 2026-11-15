@@ -254,6 +254,14 @@ async function run(c: Case): Promise<Result> {
       if (!created || !out.includes(created.identifier))
         throw new Error(`${c.name}: fake-forgets-created-issue survived`);
     }
+    if (
+      status === 0 &&
+      c.args[0] === "issue" &&
+      c.args[1] === "comment" &&
+      !c.args.includes("--dry-run") &&
+      !w.comments.some((comment) => comment.id === "00000000-0000-4000-8000-000000000199")
+    )
+      throw new Error(`${c.name}: fake-forgets-created-comment survived`);
     const normalize = (s: string) => s.replaceAll(dir, "$CASE");
     await unlock();
     return {

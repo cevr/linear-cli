@@ -699,18 +699,16 @@ for (const entity of ["issue", "comment"]) {
     [
       join(fakeDir, "parity/run.ts"),
       "--phase=3",
-      ...(entity === "issue"
-        ? ["--case=create-json"]
-        : ["--seed=1002", "--case=seed-1002-comment"]),
+      ...(entity === "issue" ? ["--case=create-json"] : ["--case=comment-json"]),
     ],
     fakeDir,
   );
-  if (
-    fakeResult.code === 0 ||
-    !fakeResult.output.includes("expected exit 0, got 1") ||
-    !fakeResult.output.includes(`Cannot return null for non-nullable field Query.${entity}.`)
-  )
+  // The TypeScript CLI read the created entity back, so the schema refused the
+  // missing root; the port does not read it back, so the runner's own check
+  // that a created issue or comment is in the fake world (run.ts) must catch it.
+  const guard = `${name} survived`;
+  if (fakeResult.code === 0 || !fakeResult.output.includes(guard))
     throw new Error(`${name}: survived or failed for the wrong reason: ${fakeResult.output}`);
-  console.log(`killed ${name}: schema refuses missing post-create root`);
+  console.log(`killed ${name}: ${guard} (runner check of the fake world)`);
 }
 console.log("EXIT: 0 (selected product and harness mutants killed)");
