@@ -11,7 +11,8 @@
   "files": [
     "bin/linear",
     "npm",
-    "skills"
+    "skills",
+    "CHANGELOG.md"
   ],
   "os": [
     "darwin",

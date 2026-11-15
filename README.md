@@ -1,26 +1,32 @@
 # Linear CLI
 
-A command-line interface for [Linear](https://linear.app) built with Bun and Effect TypeScript.
-
-The unshipped `ergo-port` pilot also has a native implementation. Its local
-`bin/linear` shim now defaults to Ergo for all commands; `LINEAR_IMPL=ts` selects
-the retained TypeScript binary. Build both binaries before using the shim (see
-[native port](ergo/README.md)). The npm package ships the native binaries
-for darwin and linux (arm64, x64) and a sh launcher; it has no postinstall. This branch does not change the owner's installed link or publish
-a package.
+A command-line interface for [Linear](https://linear.app), written in
+[Ergo](https://github.com/cevr/ergo) and shipped as a native binary. The
+TypeScript source in `src/` (Bun and Effect) is the reference implementation:
+the parity suite runs both programs against an offline fake Linear and requires
+the same output. It stays until it is retired.
 
 ## Installation
 
 ```bash
-# Clone and build
-git clone <repo>
-cd linear
-bun install
-bun run build
-
-# Add to PATH (symlink to ~/.local/bin)
-bun run link
+bun add --global @cvr/linear    # or: npm install --global @cvr/linear
 ```
+
+The package carries native binaries for macOS and Linux (arm64 and x64) and a
+small `sh` launcher, `bin/linear`, that runs the one for your platform. It has
+no postinstall step and needs no Bun or Node at run time.
+
+From a source checkout, build the compiler at the pin in `ergo-toolchain.json`
+(`go build ./cmd/ergo` in a checkout of that commit), then:
+
+```bash
+bun install
+ERGO=/path/to/ergo bun run build:ergo   # bin/linear-ergo
+bun run link                            # symlink bin/linear to ~/.local/bin
+```
+
+`LINEAR_IMPL=ts linear …` runs the TypeScript build (`bun run build`) instead,
+in a source checkout only.
 
 ## Usage
 
@@ -142,9 +148,25 @@ bun run test
 # Build binary
 bun run build
 
-# Run without building
+# Run the TypeScript reference without building
 bun run src/main.ts --help
 ```
+
+The Ergo port (`ergo/`, see [ergo/README.md](ergo/README.md)) and its parity
+suite, with `ERGO` naming the pinned compiler:
+
+```bash
+bun scripts/build.ts --parity && bun scripts/build.ts --ergo
+ergo build ergo/cmd/linear-parity -o bin/linear-ergo-parity
+bun parity/run.ts --phase=6 --target=default             # fixed cases
+bun parity/run.ts --phase=6 --target=default --property=1000
+bun parity/mutants.ts                                    # the mutant ledger
+bun scripts/release.ts   # the four native binaries the package ships, in npm/
+bun scripts/smoke.ts     # pack, install with bun and npm, run the installed linear
+```
+
+CI (`.github/workflows/ci.yml`) builds the pinned compiler and runs the parity
+suite; the release workflow builds the binaries on Linux and macOS runners.
 
 ## Architecture
 
