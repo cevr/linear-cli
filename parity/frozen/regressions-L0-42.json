@@ -1,0 +1,331 @@
+{
+ "regression-L0-error-0": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-1": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-2": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-3": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-4": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-5": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-6": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-7": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-8": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-9": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-10": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-11": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-12": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-13": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-14": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-15": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-16": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - failure-42-authentication-tail\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-17": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - failure-42-authentication-tail\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-18": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - \n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-19": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - readable-42\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-20": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - failure-42-authentication-tail: { detail: 42 }\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-21": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - failure-42-authentication-tail: { detail: 42 }\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-22": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - \n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-23": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-authentication-tail - readable-42\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-24": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-25": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-26": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-27": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-28": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-29": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-30": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-31": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-32": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - failure-42-ordinary-tail\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-33": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - failure-42-ordinary-tail\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-34": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - \n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-35": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - readable-42\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-36": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - failure-42-ordinary-tail: { detail: 42 }\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-37": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - failure-42-ordinary-tail: { detail: 42 }\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-38": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - \n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-39": {
+  "out": "",
+  "err": "Linear API Error: Error: Failure-42-ordinary-tail - readable-42\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-40": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-41": {
+  "out": "",
+  "err": "Authentication Error: Invalid API token\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-error-brace": {
+  "out": "",
+  "err": "Linear API Error: Error: String cannot represent a non string value - String cannot represent a non string value: { a: 1 }\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-member": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":3,\"label\":\"Medium\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-nonmember": {
+  "out": "",
+  "err": "Linear API Error: Error: Cannot return null for non-nullable field Query.issue.\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-comment-nonmember": {
+  "out": "",
+  "err": "Linear API Error: Error: Entity not found: Issue - Could not find referenced Issue.\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L0-comment-nonmember-uuid": {
+  "out": "",
+  "err": "Linear API Error: Error: Entity not found: Issue - Could not find referenced Issue.\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ }
+}

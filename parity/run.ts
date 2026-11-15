@@ -23,6 +23,7 @@ import { regressionCases } from "./regressions";
 import { checkRootLookups } from "./lookup-property";
 import { q99Equal } from "./owner-exceptions";
 import { refusal } from "./upload-property";
+import { frozen } from "./frozen";
 
 const root = resolve(import.meta.dir, "..");
 // One owned scratch per pilot step; the default is the original pilot folder.
@@ -51,6 +52,16 @@ if (property)
 const selected = all.filter((c) => c.phase <= phase && (!caseArg || c.name === caseArg));
 if (!selected.length) throw new Error("No parity cases selected");
 await mkdir(scratch, { recursive: true });
+// The property and regression cases compare with the TypeScript CLI's recorded
+// outputs (parity/frozen); the fixed cases with parity/cases.
+const records =
+  property || regressions
+    ? frozen(
+        property ? "property" : `regressions-${regressions}`,
+        property ?? seeds ?? 42,
+        Boolean(caseArg),
+      )
+    : undefined;
 
 const quote = (s: string) => `'${s.replaceAll("'", "'\\''")}'`;
 // Exercise the real shim, but bind only offline siblings. The shipped native
@@ -324,7 +335,7 @@ for (const c of selected) {
       throw new Error(`${c.name}: q101 refusal mismatch`);
     }
   } else if (property || regressions) {
-    const reference = await run(c, "ts");
+    const reference = await records!.get(c.name, () => run(c, "ts"));
     if (process.argv.includes("--trace"))
       console.log(JSON.stringify({ name: c.name, args: c.args, reference, actual }));
     if (reference.status !== wantedStatus)
@@ -426,4 +437,5 @@ for (const c of selected) {
   }
   console.log(`ok ${c.name}${record ? " (two equal records)" : ""}`);
 }
+records?.done();
 console.log(`EXIT: 0 (${selected.length} cases)`);

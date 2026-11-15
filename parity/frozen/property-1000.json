@@ -1,0 +1,1368 @@
+{
+ "seed-1000-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"},{\"id\":\"00000000-0000-4000-8000-000000000041\",\"key\":\"NET1\",\"name\":\"Network 1\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-list-text": {
+  "out": "\nYour Issues:\n\n  ↑ ENG-123    Todo         Route a packet\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"},{\"name\":\"trace-3.txt\",\"url\":\"https://uploads.linear.app/trace-3.txt\",\"source\":\"00000000-0000-4000-8000-000000000103\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-download": {
+  "out": "Saved out/nested/trace.txt (15 bytes)\nSaved out/nested/trace-0.txt (15 bytes)\nSaved out/nested/trace-1.txt (15 bytes)\nSaved out/nested/trace-2.txt (15 bytes)\nSaved out/nested/trace-3.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-3.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1000-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1000-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1000\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"priority\":0}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1000-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1000",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1000-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"},{\"id\":\"00000000-0000-4000-8000-000000000041\",\"key\":\"NET1\",\"name\":\"Network 1\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":3,\"label\":\"Medium\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":3,\"label\":\"Medium\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-list-text": {
+  "out": "\nYour Issues:\n\n  ─ ENG-124    In Progress  Relay 1\n  ○ ENG-126    In Progress  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"},{\"name\":\"trace-3.txt\",\"url\":\"https://uploads.linear.app/trace-3.txt\",\"source\":\"00000000-0000-4000-8000-000000000103\"},{\"name\":\"trace-4.txt\",\"url\":\"https://uploads.linear.app/trace-4.txt\",\"source\":\"00000000-0000-4000-8000-000000000104\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-download": {
+  "out": "Saved files/trace.txt (15 bytes)\nSaved files/trace-0.txt (15 bytes)\nSaved files/trace-1.txt (15 bytes)\nSaved files/trace-2.txt (15 bytes)\nSaved files/trace-3.txt (15 bytes)\nSaved files/trace-4.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-3.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-4.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1001-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1001\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"description\":\"Packet\",\"priority\":1}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1001\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1001-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":4,\"label\":\"Low\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}],\"children\":[],\"comments\":[],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-list-text": {
+  "out": "\nYour Issues:\n\n  ⬆ ENG-123    Todo         Route a packet\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"out/nested/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1002-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1002-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1002\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"parent\":\"ENG-123\",\"priority\":2}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1002-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1002",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1002-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-list-text": {
+  "out": "\nYour Issues:\n\n  ○ ENG-124    In Progress  Relay 1\n  ⬆ ENG-126    In Progress  Relay 3\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"files/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-0.txt\",\"path\":\"files/trace-0.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1003-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1003\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"description\":\"Packet\",\"parent\":\"ENG-123\",\"priority\":3}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1003\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1003-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"},{\"id\":\"00000000-0000-4000-8000-000000000050\",\"name\":\"Tools 0\",\"slug\":\"tools-0\",\"state\":\"planned\",\"url\":\"https://linear.app/project/tools-0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}},{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\",\"branchName\":\"eng-125-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-list-text": {
+  "out": "\nYour Issues:\n\n  ⬆ ENG-123    Todo         Route a packet\n  ⬆ ENG-124    In Progress  Café 🚀 1\n  ○ ENG-125    Todo         Relay 2\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-download": {
+  "out": "Saved out/nested/trace.txt (15 bytes)\nSaved out/nested/trace-0.txt (15 bytes)\nSaved out/nested/trace-1.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1004-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1004-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1004\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"projectId\":\"00000000-0000-4000-8000-000000000006\",\"priority\":4}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1004-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1004",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1004-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"},{\"id\":\"00000000-0000-4000-8000-000000000050\",\"name\":\"Tools 0\",\"slug\":\"tools-0\",\"state\":\"planned\",\"url\":\"https://linear.app/project/tools-0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-list-text": {
+  "out": "\nYour Issues:\n\n  ↑ ENG-124    In Progress  Relay 1\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Relay 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-download": {
+  "out": "Saved files/trace.txt (15 bytes)\nSaved files/trace-0.txt (15 bytes)\nSaved files/trace-1.txt (15 bytes)\nSaved files/trace-2.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1005-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1005\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"description\":\"Packet\",\"projectId\":\"00000000-0000-4000-8000-000000000006\",\"priority\":0}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1005\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1005-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"},{\"id\":\"00000000-0000-4000-8000-000000000041\",\"key\":\"NET1\",\"name\":\"Network 1\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"},{\"id\":\"00000000-0000-4000-8000-000000000050\",\"name\":\"Tools 0\",\"slug\":\"tools-0\",\"state\":\"planned\",\"url\":\"https://linear.app/project/tools-0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":3,\"label\":\"Medium\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":3,\"label\":\"Medium\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-list-text": {
+  "out": "\nYour Issues:\n\n  ⬆ ENG-123    Todo         Route a packet\n  ─ ENG-124    In Progress  Café 🚀 1\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"},{\"name\":\"trace-3.txt\",\"url\":\"https://uploads.linear.app/trace-3.txt\",\"source\":\"00000000-0000-4000-8000-000000000103\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"out/nested/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-0.txt\",\"path\":\"out/nested/trace-0.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-1.txt\",\"path\":\"out/nested/trace-1.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-2.txt\",\"path\":\"out/nested/trace-2.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-3.txt\",\"path\":\"out/nested/trace-3.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-3.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1006-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1006-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1006\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"parent\":\"ENG-123\",\"projectId\":\"00000000-0000-4000-8000-000000000006\",\"priority\":1}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1006-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1006",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1006-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"},{\"id\":\"00000000-0000-4000-8000-000000000041\",\"key\":\"NET1\",\"name\":\"Network 1\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"},{\"id\":\"00000000-0000-4000-8000-000000000050\",\"name\":\"Tools 0\",\"slug\":\"tools-0\",\"state\":\"planned\",\"url\":\"https://linear.app/project/tools-0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":4,\"label\":\"Low\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}},{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\",\"branchName\":\"eng-125-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":4,\"label\":\"Low\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-list-text": {
+  "out": "\nYour Issues:\n\n  ↓ ENG-124    In Progress  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\n  ─ ENG-126    In Progress  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-view-flags": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"},{\"id\":\"00000000-0000-4000-8000-000000000033\",\"name\":\"tooling3\"},{\"id\":\"00000000-0000-4000-8000-000000000034\",\"name\":\"tooling4\"},{\"id\":\"00000000-0000-4000-8000-000000000035\",\"name\":\"tooling5\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000103\",\"body\":\"[trace-3.txt](https://uploads.linear.app/trace-3.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/3\"},{\"id\":\"00000000-0000-4000-8000-000000000104\",\"body\":\"[trace-4.txt](https://uploads.linear.app/trace-4.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/4\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"},{\"name\":\"trace-3.txt\",\"url\":\"https://uploads.linear.app/trace-3.txt\",\"source\":\"00000000-0000-4000-8000-000000000103\"},{\"name\":\"trace-4.txt\",\"url\":\"https://uploads.linear.app/trace-4.txt\",\"source\":\"00000000-0000-4000-8000-000000000104\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"files/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-0.txt\",\"path\":\"files/trace-0.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-1.txt\",\"path\":\"files/trace-1.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-2.txt\",\"path\":\"files/trace-2.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-3.txt\",\"path\":\"files/trace-3.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-4.txt\",\"path\":\"files/trace-4.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-3.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-4.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1007-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-create": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"Café 🚀 1007\",\"teamId\":\"00000000-0000-4000-8000-000000000004\",\"description\":\"Packet\",\"parent\":\"ENG-123\",\"projectId\":\"00000000-0000-4000-8000-000000000006\",\"priority\":2}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1007\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1007-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"Café 🚀 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[],\"children\":[],\"comments\":[],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-list-text": {
+  "out": "\nYour Issues:\n\n  ⬆ ENG-123    Todo         Route a packet\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-view-flags": {
+  "out": "\nENG-123: Route a packet\n────────────────────────────────────────────────────────────\nState:    Todo\nTeam:     Engineering\nPriority: Urgent\nAssignee: Pilot User\nProject:  Router\nParent:   None\nBranch:   eng-123-route\nURL:      https://linear.app/issue/ENG-123\n\nDescription:\n[trace.txt](https://uploads.linear.app/trace.txt)\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1008-download": {
+  "out": "Saved out/nested/trace.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1008-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1008-create": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000099\",\"identifier\":\"ENG-999\",\"title\":\"Café 🚀 1008\",\"url\":\"https://linear.app/issue/ENG-999\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.create",
+    "input": {
+     "priority": 3,
+     "teamId": "00000000-0000-4000-8000-000000000004",
+     "title": "Café 🚀 1008"
+    }
+   }
+  ]
+ },
+ "seed-1008-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1008",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1008-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Relay 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":0,\"label\":\"No priority\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-list-text": {
+  "out": "\nYour Issues:\n\n  ○ ENG-124    In Progress  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\n  ↓ ENG-126    In Progress  Relay 3\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-view-flags": {
+  "out": "\nENG-123: Route a packet\n────────────────────────────────────────────────────────────\nState:    Todo\nTeam:     Engineering\nPriority: Urgent\nAssignee: Pilot User\nProject:  Router\nParent:   None\nBranch:   eng-123-route\nURL:      https://linear.app/issue/ENG-123\n\nDescription:\n[trace.txt](https://uploads.linear.app/trace.txt)\n\nComments (1):\n  Pilot User · 2026-01-01T00:00:00.000Z\n  [trace-0.txt](https://uploads.linear.app/trace-0.txt)\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-download": {
+  "out": "Saved files/trace.txt (15 bytes)\nSaved files/trace-0.txt (15 bytes)\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1009-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-create": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000099\",\"identifier\":\"ENG-999\",\"title\":\"Café 🚀 1009\",\"url\":\"https://linear.app/issue/ENG-999\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.create",
+    "input": {
+     "description": "Packet",
+     "priority": 4,
+     "teamId": "00000000-0000-4000-8000-000000000004",
+     "title": "Café 🚀 1009"
+    }
+   }
+  ]
+ },
+ "seed-1009-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1009\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1009-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Relay 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-list-text": {
+  "out": "\nYour Issues:\n\n  ⬆ ENG-123    Todo         Route a packet\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-view-flags": {
+  "out": "\nENG-123: Route a packet\n────────────────────────────────────────────────────────────\nState:    Todo\nTeam:     Engineering\nPriority: Urgent\nAssignee: Pilot User\nProject:  Router\nParent:   None\nBranch:   eng-123-route\nURL:      https://linear.app/issue/ENG-123\n\nDescription:\n[trace.txt](https://uploads.linear.app/trace.txt)\n\nSub-issues (2):\n  ENG-124  Relay 1\n  ENG-126  Café 🚀 3\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1010-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"out/nested/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-0.txt\",\"path\":\"out/nested/trace-0.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-1.txt\",\"path\":\"out/nested/trace-1.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "out/nested/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "out/nested/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1010-start": {
+  "out": "{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.update",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "input": {
+     "stateId": "00000000-0000-4000-8000-000000000003"
+    }
+   }
+  ]
+ },
+ "seed-1010-create": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000099\",\"identifier\":\"ENG-999\",\"title\":\"Café 🚀 1010\",\"url\":\"https://linear.app/issue/ENG-999\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.create",
+    "input": {
+     "parentId": "00000000-0000-4000-8000-000000000010",
+     "priority": 0,
+     "teamId": "00000000-0000-4000-8000-000000000004",
+     "title": "Café 🚀 1010"
+    }
+   }
+  ]
+ },
+ "seed-1010-comment": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000199\",\"url\":\"https://linear.app/comment/created\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "comment.create",
+    "input": {
+     "body": "Ready 1010",
+     "issueId": "ENG-123"
+    }
+   }
+  ]
+ },
+ "seed-1010-graphql": {
+  "out": "{\"issue\":{\"identifier\":\"ENG-124\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-team": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\",\"description\":\"General tools\"},{\"id\":\"00000000-0000-4000-8000-000000000005\",\"key\":\"OPS\",\"name\":\"Operations\"},{\"id\":\"00000000-0000-4000-8000-000000000040\",\"key\":\"NET0\",\"name\":\"Network 0\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-project": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"slug\":\"router\",\"state\":\"started\",\"url\":\"https://linear.app/project/router\"},{\"id\":\"00000000-0000-4000-8000-000000000007\",\"name\":\"Relay\",\"slug\":\"relay\",\"state\":\"planned\",\"url\":\"https://linear.app/project/relay\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-list": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"}}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-view": {
+  "out": "[{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\",\"branchName\":\"eng-123-route\",\"priority\":{\"value\":1,\"label\":\"Urgent\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000002\",\"name\":\"Todo\",\"type\":\"unstarted\"},\"description\":\"[trace.txt](https://uploads.linear.app/trace.txt)\",\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"assignee\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\",\"email\":\"pilot@example.invalid\"},\"project\":{\"id\":\"00000000-0000-4000-8000-000000000006\",\"name\":\"Router\",\"url\":\"https://linear.app/project/router\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"}],\"children\":[{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"},{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000202\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000203\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000204\",\"type\":\"blocks\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}},{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\"}},{\"id\":\"00000000-0000-4000-8000-000000000302\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000012\",\"identifier\":\"ENG-125\",\"title\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 2\",\"url\":\"https://linear.app/issue/ENG-125\"}},{\"id\":\"00000000-0000-4000-8000-000000000303\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000013\",\"identifier\":\"ENG-126\",\"title\":\"Café 🚀 3\",\"url\":\"https://linear.app/issue/ENG-126\"}},{\"id\":\"00000000-0000-4000-8000-000000000304\",\"type\":\"related\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000014\",\"identifier\":\"ENG-127\",\"title\":\"Café 🚀 4\",\"url\":\"https://linear.app/issue/ENG-127\"}}]},{\"id\":\"00000000-0000-4000-8000-000000000011\",\"identifier\":\"ENG-124\",\"title\":\"Café 🚀 1\",\"url\":\"https://linear.app/issue/ENG-124\",\"branchName\":\"eng-124-route\",\"priority\":{\"value\":2,\"label\":\"High\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"team\":{\"id\":\"00000000-0000-4000-8000-000000000004\",\"key\":\"ENG\",\"name\":\"Engineering\"},\"parent\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"labels\":[{\"id\":\"00000000-0000-4000-8000-000000000030\",\"name\":\"tooling\"},{\"id\":\"00000000-0000-4000-8000-000000000031\",\"name\":\"tooling1\"},{\"id\":\"00000000-0000-4000-8000-000000000032\",\"name\":\"tooling2\"}],\"children\":[],\"comments\":[{\"id\":\"00000000-0000-4000-8000-000000000100\",\"body\":\"[trace-0.txt](https://uploads.linear.app/trace-0.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/0\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}},{\"id\":\"00000000-0000-4000-8000-000000000101\",\"body\":\"[trace-1.txt](https://uploads.linear.app/trace-1.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/1\"},{\"id\":\"00000000-0000-4000-8000-000000000102\",\"body\":\"[trace-2.txt](https://uploads.linear.app/trace-2.txt)\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"url\":\"https://linear.app/comment/2\",\"author\":{\"id\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}],\"relations\":[{\"id\":\"00000000-0000-4000-8000-000000000301\",\"type\":\"related\",\"direction\":\"outbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}},{\"id\":\"00000000-0000-4000-8000-000000000201\",\"type\":\"blocks\",\"direction\":\"inbound\",\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"}}]}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-list-text": {
+  "out": "\nYour Issues:\n\n  ↑ ENG-124    In Progress  Café 🚀 1\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-view-flags": {
+  "out": "\nENG-123: Route a packet\n────────────────────────────────────────────────────────────\nState:    Todo\nTeam:     Engineering\nPriority: Urgent\nAssignee: Pilot User\nProject:  Router\nParent:   None\nBranch:   eng-123-route\nURL:      https://linear.app/issue/ENG-123\n\nDescription:\n[trace.txt](https://uploads.linear.app/trace.txt)\n\nSub-issues (2):\n  ENG-124  Café 🚀 1\n  ENG-126  Café 🚀 3\n\nComments (3):\n  Pilot User · 2026-01-01T00:00:00.000Z\n  [trace-0.txt](https://uploads.linear.app/trace-0.txt)\n  Unknown · 2026-01-01T00:00:00.000Z\n  [trace-1.txt](https://uploads.linear.app/trace-1.txt)\n  Pilot User · 2026-01-01T00:00:00.000Z\n  [trace-2.txt](https://uploads.linear.app/trace-2.txt)\n\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-files": {
+  "out": "[{\"name\":\"trace.txt\",\"url\":\"https://uploads.linear.app/trace.txt\",\"source\":\"description\"},{\"name\":\"trace-0.txt\",\"url\":\"https://uploads.linear.app/trace-0.txt\",\"source\":\"00000000-0000-4000-8000-000000000100\"},{\"name\":\"trace-1.txt\",\"url\":\"https://uploads.linear.app/trace-1.txt\",\"source\":\"00000000-0000-4000-8000-000000000101\"},{\"name\":\"trace-2.txt\",\"url\":\"https://uploads.linear.app/trace-2.txt\",\"source\":\"00000000-0000-4000-8000-000000000102\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-download": {
+  "out": "[{\"url\":\"https://uploads.linear.app/trace.txt\",\"path\":\"files/trace.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-0.txt\",\"path\":\"files/trace-0.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-1.txt\",\"path\":\"files/trace-1.txt\",\"bytes\":15,\"contentType\":\"text/plain\"},{\"url\":\"https://uploads.linear.app/trace-2.txt\",\"path\":\"files/trace-2.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "files/trace-0.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-1.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace-2.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   },
+   {
+    "path": "files/trace.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "seed-1011-start": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.start\",\"input\":{\"id\":\"ENG-123\"},\"result\":{\"issue\":{\"id\":\"00000000-0000-4000-8000-000000000010\",\"identifier\":\"ENG-123\",\"title\":\"Route a packet\",\"url\":\"https://linear.app/issue/ENG-123\"},\"state\":{\"id\":\"00000000-0000-4000-8000-000000000003\",\"name\":\"In Progress\",\"type\":\"started\"},\"branchName\":\"eng-123-route\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-create": {
+  "out": "{\"id\":\"00000000-0000-4000-8000-000000000099\",\"identifier\":\"ENG-999\",\"title\":\"Café 🚀 1011\",\"url\":\"https://linear.app/issue/ENG-999\"}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": [
+   {
+    "operation": "issue.create",
+    "input": {
+     "description": "Packet",
+     "parentId": "00000000-0000-4000-8000-000000000010",
+     "priority": 1,
+     "teamId": "00000000-0000-4000-8000-000000000004",
+     "title": "Café 🚀 1011"
+    }
+   }
+  ]
+ },
+ "seed-1011-comment": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"Ready 1011\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "seed-1011-graphql": {
+  "out": "{\"viewer\":{\"mutation\":\"00000000-0000-4000-8000-000000000001\",\"name\":\"Pilot User\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ }
+}

@@ -1,0 +1,904 @@
+{
+ "regression-L3-title-0": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-0": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-1": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-1": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-2": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-2": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-3": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-3": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-4": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-4": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-5": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-5": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-6": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-6": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-7": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-7": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-8": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-8": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-9": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-9": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-10": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-10": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-11": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-11": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-12": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-12": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-13": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-13": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-14": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-14": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-15": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-15": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-16": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-16": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-17": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-17": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-18": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-18": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-19": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-19": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-20": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-20": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-21": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-21": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-22": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-22": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-23": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-23": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-24": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-24": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-25": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-25": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-26": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"᠎\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-26": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"᠎\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-27": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"​\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-27": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"​\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-28": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"⁠\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-28": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"⁠\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-30": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-30": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-31": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"A\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-31": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"A\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-32": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"🚀\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-32": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"🚀\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-33": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-33": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-34": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"﻿　\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-34": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"﻿　\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-35": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"  \",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-35": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"  \"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-36": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\" ​ \",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-36": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\" ​ \"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-37": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-37": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-38": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-38": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-39": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-39": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-40": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-40": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot contain control characters\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-41": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"᠎​A \",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-41": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"᠎​A \"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-42": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-42": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-43": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-43": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-44": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"🚀 🚀\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-44": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"🚀 🚀\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-45": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"⁠\\n  \",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-45": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"⁠\\n  \"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-46": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"  ⁠ A\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-46": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"  ⁠ A\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-47": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-47": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-title-48": {
+  "out": "",
+  "err": "Invalid input: Issue title cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-comment-48": {
+  "out": "",
+  "err": "Invalid input: Comment body cannot be empty\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-0": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-1": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-2": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-3": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-4": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-5": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-6": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected a valid JSON string)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-7": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-8": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-9": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-10": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-11": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-12": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-variables-13": {
+  "out": "",
+  "err": "Invalid input: --variables must be a JSON object: SchemaError(Expected object)\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L3-file-0": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/missing-1000.graphql: PlatformError: NotFound: FileSystem.realPath ($CASE/d1000-0/missing-1000.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-1": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/absent-1000/query.graphql: PlatformError: NotFound: FileSystem.realPath ($CASE/d1000-0/absent-1000/query.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-2": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/dangling-1000.graphql: PlatformError: NotFound: FileSystem.realPath ($CASE/d1000-0/dangling-1000.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/dangling-1000.graphql",
+    "link": "nowhere-1000.graphql"
+   },
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-3": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/blocked-1000/query.graphql: PlatformError: BadResource: FileSystem.realPath ($CASE/d1000-0/blocked-1000/query.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/blocked-1000",
+    "mode": "644",
+    "sha256": "3b2a43e3a5b13459006960eac2534b6a71bf7170ea998dc49b1990f23508a6d6"
+   },
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-4": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/folder-1000: PlatformError: BadResource: FileSystem.readFile ($CASE/d1000-0/folder-1000)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/folder-1000/child",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   },
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-5": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/loop-1000.graphql: PlatformError: BadResource: FileSystem.realPath ($CASE/d1000-0/loop-1000.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   },
+   {
+    "path": "d1000-0/loop-1000.graphql",
+    "link": "loop-1000.graphql"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-6": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/locked-1000/query.graphql: PlatformError: PermissionDenied: FileSystem.realPath ($CASE/d1000-0/locked-1000/query.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   },
+   {
+    "path": "d1000-0/locked-1000/query.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L3-file-7": {
+  "out": "",
+  "err": "Invalid input: Could not read GraphQL query file d1000-0/unreadable-1000.graphql: PlatformError: PermissionDenied: FileSystem.readFile ($CASE/d1000-0/unreadable-1000.graphql)\n",
+  "status": 1,
+  "files": [
+   {
+    "path": "d1000-0/keep.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   },
+   {
+    "path": "d1000-0/unreadable-1000.graphql",
+    "mode": "644",
+    "sha256": "2bc37c1266cb1ed845971009ea0e370dd1a7d12ae34940fcfa714229e7126d02"
+   }
+  ],
+  "mutations": []
+ }
+}
