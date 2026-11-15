@@ -610,7 +610,7 @@ for (const mutant of mutants) {
     result = await run(
       process.execPath,
       [
-        join(root, mutant.version ? "parity/switch.ts" : "parity/run.ts"),
+        join(root, mutant.version ? "parity/version.ts" : "parity/run.ts"),
         ...(mutant.version
           ? [`--native=${binary}`]
           : [
@@ -687,7 +687,6 @@ for (const entity of ["issue", "comment"]) {
   if (only && only !== name) continue;
   const fakeDir = await mkdtemp(join(scratch, "fake-mutant-"));
   await cp(join(root, "parity"), join(fakeDir, "parity"), { recursive: true });
-  await symlink(join(root, "src"), join(fakeDir, "src"));
   await symlink(join(root, "node_modules"), join(fakeDir, "node_modules"));
   const fakePath = join(fakeDir, "parity/fake-linear.ts");
   const fakeSource = await readFile(fakePath, "utf8");
@@ -698,7 +697,6 @@ for (const entity of ["issue", "comment"]) {
     process.execPath,
     [
       join(fakeDir, "parity/run.ts"),
-      "--record",
       "--phase=3",
       ...(entity === "issue"
         ? ["--case=create-json"]

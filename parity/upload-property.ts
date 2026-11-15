@@ -1,9 +1,10 @@
 // A seeded grammar over WHATWG URL components for `file download`. The oracle
-// is the original's own parser (Bun's URL.parse, as src/domain/Input.ts uses
-// it); the run compares the native CLI with the compiled TS control on every
-// case it accepts or refuses. Cases the owner declared refused (q101:
-// non-empty user information, a port other than 443) are checked against the
-// exact refusal line instead, because offline the TS control cannot reach them.
+// is the original's own parser (Bun's URL.parse, as the TypeScript CLI used
+// it); the run compares the native CLI with that CLI's recorded output
+// (parity/frozen) on every case it accepts or refuses. Cases the owner declared
+// refused (q101: non-empty user information, a port other than 443) are checked
+// against the exact refusal line instead, because offline the original could
+// not reach them.
 const target = "uploads.linear.app";
 
 export type UploadCase = { url: string; status: number; declared: boolean };

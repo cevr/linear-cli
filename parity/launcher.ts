@@ -1,8 +1,8 @@
 // Builds no Go. The public seam is the launcher's chosen file, argv, status and
 // refusal line, in the package layout (npm/<os>-<arch>/linear), reached through
 // the links npm (relative) and bun (absolute) make. A fake `uname` names each
-// platform; fake binaries print their directory and argv. parity/switch.ts owns
-// the source-checkout layout (bin/linear-ergo, LINEAR_IMPL).
+// platform; fake binaries print their directory and argv. A source checkout's
+// bin/linear-ergo wins when present.
 //
 //   bun parity/launcher.ts [--shim=PATH] [--mutants]
 import { spawn, spawnSync } from "node:child_process";
@@ -142,17 +142,10 @@ async function verify(script: string) {
         );
     }
   }
-  // LINEAR_IMPL=ergo is the default; ts has no TS binary in the package.
-  const ergo = await run(entries[1]!, ["team", "list"], env("Linux", "x86_64", "ergo"));
-  if (ergo.out !== "linux-x64\nteam\nlist\n" || ergo.code !== 23)
-    throw new Fault(`launcher: LINEAR_IMPL=ergo differs from the default: ${JSON.stringify(ergo)}`);
-  const ts = await run(entries[1]!, ["team", "list"], env("Linux", "x86_64", "ts"));
-  if (
-    ts.out !== "" ||
-    ts.code !== 1 ||
-    !ts.err.startsWith("linear: LINEAR_IMPL=ts needs bin/linear-ts")
-  )
-    throw new Fault(`launcher: LINEAR_IMPL=ts in the package: ${JSON.stringify(ts)}`);
+  // There is one implementation: the old LINEAR_IMPL switch selects nothing.
+  const old = await run(entries[1]!, ["team", "list"], env("Linux", "x86_64", "ts"));
+  if (old.out !== "linux-x64\nteam\nlist\n" || old.err !== "" || old.code !== 23)
+    throw new Fault(`launcher: LINEAR_IMPL changed the route: ${JSON.stringify(old)}`);
   // A missing binary for this platform is an error; no other platform's runs.
   await rename(join(pkg, "npm/linux-x64/linear"), join(pkg, "npm/linux-x64/gone"));
   const missing = await run(entries[1]!, ["team", "list"], env("Linux", "x86_64"));
@@ -163,6 +156,15 @@ async function verify(script: string) {
       `linear: ${join(pkg, "npm/linux-x64/linear")} is missing; reinstall the package, or run bun scripts/release.ts in a source checkout\n`
   )
     throw new Fault(`launcher: missing binary not refused: ${JSON.stringify(missing)}`);
+  // A source checkout: the host binary bun run build writes beside the launcher wins.
+  await writeFile(
+    join(pkg, "bin/linear-ergo"),
+    `#!/bin/sh\nprintf '%s\\n' checkout "$@"\nexit 24\n`,
+    { mode: 0o755 },
+  );
+  const checkout = await run(entries[2]!, ["team", "list"], env("Linux", "x86_64"));
+  if (checkout.out !== "checkout\nteam\nlist\n" || checkout.err !== "" || checkout.code !== 24)
+    throw new Fault(`launcher: checkout binary not chosen: ${JSON.stringify(checkout)}`);
 }
 
 await verify(source);
@@ -176,6 +178,12 @@ if (process.argv.includes("--mutants")) {
     ["relative-link-from-cwd", '*) self=$(dirname -- "$self")/$link ;;', "*) self=$link ;;"],
     ["unsupported-arch-as-x64", "*) arch= ;;", "*) arch=x64 ;;"],
     ["unsupported-os-as-linux", "*) os= ;;", "*) os=linux ;;"],
+    ["checkout-binary-ignored", 'if [ -e "$bindir/linear-ergo" ]; then', "if false; then"],
+    [
+      "impl-switch-kept",
+      'if [ -e "$bindir/linear-ergo" ]; then',
+      '[ "${LINEAR_IMPL-}" = ts ] && exec "$bindir/linear-ts" "$@"\nif [ -e "$bindir/linear-ergo" ]; then',
+    ],
   ];
   for (const [name, from, to] of mutants) {
     if (source.split(from).length !== 2) throw new Error(`${name}: edit is not unique`);

@@ -5,125 +5,14 @@
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
-    "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUnusedLocals": true,
-    "noImplicitOverride": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": ".",
-    "types": ["bun"],
-    "plugins": [
-      {
-        "name": "@effect/language-service",
-        "diagnostics": true,
-        "diagnosticsName": true,
-        "includeSuggestionsInTsc": true,
-        "ignoreEffectSuggestionsInTscExitCode": false,
-        "ignoreEffectWarningsInTscExitCode": false,
-        "ignoreEffectErrorsInTscExitCode": false,
-        "diagnosticSeverity": {
-          "anyUnknownInErrorContext": "error",
-          "asyncFunction": "off",
-          "cryptoRandomUUID": "off",
-          "cryptoRandomUUIDInEffect": "off",
-          "globalConsole": "off",
-          "globalConsoleInEffect": "off",
-          "globalDate": "off",
-          "globalDateInEffect": "off",
-          "globalFetch": "off",
-          "globalFetchInEffect": "off",
-          "globalRandom": "off",
-          "globalRandomInEffect": "off",
-          "globalTimers": "off",
-          "globalTimersInEffect": "off",
-          "newPromise": "off",
-          "nodeBuiltinImport": "off",
-          "processEnv": "off",
-          "processEnvInEffect": "off",
-          "deterministicKeys": "error",
-          "instanceOfSchema": "warning",
-          // Effect 4.0.0 marks the whole effect/cli module @stability unstable. This CLI is
-          // built on it, so the rule would flag every command, flag, and prompt definition.
-          "unstableApiUsage": "off",
-          "missedPipeableOpportunity": "suggestion",
-          "missingEffectServiceDependency": "warning",
-          "schemaUnionOfLiterals": "warning",
-          "strictBooleanExpressions": "warning",
-          // Upstream default. The rule has no entry-point detection, so it fires on the single
-          // legitimate Effect.provide in src/main.ts. multipleEffectProvide still guards chains.
-          "strictEffectProvide": "off",
-          "catchAllToMapError": "warning",
-          "catchUnfailableEffect": "warning",
-          "effectFnOpportunity": "warning",
-          "effectMapVoid": "warning",
-          "effectSucceedWithVoid": "warning",
-          "leakingRequirements": "warning",
-          "globalJson": "off",
-          "globalJsonInEffect": "off",
-          "redundantSchemaTagIdentifier": "warning",
-          "returnEffectInGen": "warning",
-          "runEffectInsideEffect": "error",
-          "schemaStructWithTag": "warning",
-          "schemaSyncInEffect": "warning",
-          "tryCatchInEffectGen": "off",
-          "unnecessaryEffectGen": "warning",
-          "unnecessaryFailYieldableError": "warning",
-          "unnecessaryPipe": "warning",
-          "unnecessaryPipeChain": "warning"
-        },
-        // These platform and CLI APIs are intentionally used with Effect pinned exactly.
-        "allowedUnstableApis": [
-          "effect/cli",
-          "effect/process",
-          "effect/FileSystem",
-          "effect/Path",
-          "effect/encoding/Toml",
-          "@effect/platform-bun"
-        ],
-        "keyPatterns": [
-          {
-            "target": "service",
-            "pattern": "default",
-            "skipLeadingPath": ["src/"]
-          },
-          {
-            "target": "error",
-            "pattern": "default",
-            "skipLeadingPath": ["src/"]
-          }
-        ],
-        "overrides": [
-          {
-            "include": ["**/tests/**/*.ts", "**/*.test.ts"],
-            "options": {
-              "allowedUnstableApis": [
-                "effect/cli",
-                "effect/process",
-                "effect/FileSystem",
-                "effect/Path",
-                "effect/encoding/Toml",
-                "@effect/platform-bun",
-                "@effect/vitest",
-                "effect/testing",
-                "effect/crypto/SecureRandom"
-              ],
-              "diagnosticSeverity": {
-                "strictEffectProvide": "off"
-              }
-            }
-          }
-        ]
-      }
-    ]
+    "noEmit": true,
+    "types": ["bun"]
   },
-  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist", "bin"]
+  "include": ["parity/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", "bin", "npm"]
 }

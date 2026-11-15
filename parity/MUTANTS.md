@@ -1,5 +1,30 @@
 # Parity mutant ledger
 
+## TypeScript CLI removed (owner, 2026-11-15)
+
+The TypeScript source, the `LINEAR_IMPL` switch and `parity/switch.ts` are
+gone. Where an entry below names the TS control, binary or process, the
+comparison is now against that program's recorded output (`parity/cases`,
+`parity/frozen`); every product and fake mutant below runs unchanged against
+the records.
+
+- Retired with the switch: the L4b, L5, L6 and L7 switch mutants
+  (`config-create-routes-to-ergo`, `override-ignored`, `shim-loses-argument`,
+  `interactive-routes-to-ts`, `auth-routes-to-ts`, `create-routes-to-ts`,
+  `default-still-ts`, `effect-flag-still-ts`, `missing-native-falls-back`): no
+  program is left to route to. `root-version-undeclared` now runs through
+  `parity/version.ts`.
+- Retired with the TypeScript preload: `preload-allows-real-host`. The native
+  parity entry's loopback-only origins remain, and every case still fails when
+  the storage listener sees a credential.
+- `fake-forgets-created-issue` and `fake-forgets-created-comment` ran the
+  TypeScript record leg against the broken fake; they now run the binary
+  against it, and the schema's refusal of the missing post-create root still
+  kills them.
+- New in `parity/launcher.ts`: `checkout-binary-ignored` (a source checkout's
+  `bin/linear-ergo` is skipped) and `impl-switch-kept` (`LINEAR_IMPL=ts` still
+  selects another program).
+
 ## Round 3 (declared before the guards)
 
 - `fake-comment-on-missing-issue`: commentCreate records and returns a comment for an issue id the world does not hold. The L0 mutation-reference property (every id-taking mutation input, generated member and nonmember ids) requires Linear's input error and no recorded mutation; the lookup-root property never sends a mutation. Siblings on the same rule: `fake-archives-missing-issue`, `fake-creates-under-missing-reference`, `fake-records-before-resolving` (issueUpdate records before it resolves its references).

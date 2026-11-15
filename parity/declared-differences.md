@@ -78,6 +78,5 @@ Config files (L6):
   variables or workspace-file errors.
 - Unknown keys are skipped, as the original's schema does.
 
-Performance receipts (L7) are not native-parity claims. The local switch and
-its unconditional native default are described in `routing.md`. No installed command is changed
+The launcher is described in `routing.md`. No installed command is changed
 by this branch.

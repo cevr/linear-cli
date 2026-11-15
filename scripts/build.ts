@@ -31,14 +31,11 @@ async function run(command: string, args: string[]) {
   }
 }
 await chmod(join(root, "bin/linear"), 0o755);
-if (process.argv.includes("--ergo")) {
-  await run(process.env.ERGO ?? "ergo", ["build", "ergo/cmd/linear", "-o", "bin/linear-ergo"]);
-} else {
-  await run(process.execPath, [
-    "build",
-    process.argv.includes("--parity") ? "./parity/ts-main.ts" : "./src/main.ts",
-    "--compile",
-    "--outfile",
-    process.argv.includes("--parity") ? "bin/linear-ts-parity" : "bin/linear-ts",
-  ]);
-}
+await run(process.env.ERGO ?? "ergo", ["build", "ergo/cmd/linear", "-o", "bin/linear-ergo"]);
+// Offline parity entry: Linear and storage URLs go to a loopback fake only.
+await run(process.env.ERGO ?? "ergo", [
+  "build",
+  "ergo/cmd/linear-parity",
+  "-o",
+  "bin/linear-ergo-parity",
+]);

@@ -28,17 +28,12 @@
   },
   "scripts": {
     "build": "bun scripts/build.ts",
-    "build:ergo": "bun scripts/build.ts --ergo",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "link": "ln -sf $(pwd)/bin/linear ~/.local/bin/linear",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "typecheck": "tsc --noEmit",
-    "gate": "concurrently -n type,style,build,test -c blue,yellow,cyan,green \"bun run typecheck\" \"bun run lint && bun run fmt:check\" \"bun run build\" \"bun run test\"",
-    "prepare": "lefthook install && effect-tsgo patch",
+    "typecheck": "tsgo --noEmit",
     "version": "changeset version && bun scripts/version.ts",
     "release": "changeset publish",
     "release:build": "bun scripts/release.ts",
@@ -47,20 +42,10 @@
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@effect/platform-bun": "4.1.2",
-    "@effect/tsgo": "0.64.1",
-    "@effect/vitest": "4.1.2",
-    "@linear/sdk": "^88.2.0",
     "@types/bun": "^1.3.14",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "concurrently": "^10.0.3",
-    "effect": "4.1.2",
     "graphql": "^17.0.2",
-    "lefthook": "^2.1.10",
     "oxfmt": "^0.59.0",
-    "oxlint": "^1.74.0",
-    "oxlint-plugin-effect": "0.32.1",
-    "typescript": "^7.0.2",
-    "vitest": "5.1.0"
+    "oxlint": "^1.74.0"
   }
 }

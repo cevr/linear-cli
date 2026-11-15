@@ -48,14 +48,12 @@ jobs:
       - name: Format
         run: bun run fmt:check
 
-      - name: Test
-        run: bun run test
-
   # The published CLI is the Ergo build. This job builds the compiler at the pin
   # in ergo-toolchain.json, checks and tests every Ergo package, builds both
-  # entries, and runs the parity suite: the TypeScript CLI is the oracle, both
-  # programs run against the offline fake Linear, and their bytes, exits, files
-  # and mutation logs must agree. No case reaches the real service.
+  # entries, and runs the parity suite: against the offline fake Linear, the
+  # binary's bytes, exits, files and mutation logs must equal the TypeScript
+  # CLI's, recorded before that source was removed (parity/cases and
+  # parity/frozen). No case reaches the real service.
   parity:
     name: Ergo build and parity
     runs-on: ubuntu-latest
@@ -86,7 +84,7 @@ jobs:
           go-version: ${{ steps.pin.outputs.go }}
           cache: false
 
-      # The parity records were made with this Bun; the oracle's bytes follow it.
+      # The harness runs on Bun; upload-host and the upload property use its URL parser.
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.4
@@ -109,29 +107,25 @@ jobs:
       - name: The shipped entry reads no origin variable
         run: "! grep -q 'LINEAR_PARITY\\|ORIGIN\\|ENDPOINT' ergo/cmd/linear/main.ergo"
 
-      - name: Build both programs
-        run: |
-          bun scripts/build.ts
-          bun scripts/build.ts --parity
-          bun scripts/build.ts --ergo
-          "$ERGO" build ergo/cmd/linear-parity -o bin/linear-ergo-parity
+      - name: Build both entries
+        run: bun scripts/build.ts
 
       - name: Schema and skill coverage
         run: |
           bun parity/schema-check.ts
           bun parity/coverage.ts
 
-      - name: Launcher and switch
+      - name: Launcher and version
         run: |
           bun parity/launcher.ts --mutants
-          bun parity/switch.ts --mutants --native="$PWD/bin/linear-ergo"
+          bun parity/version.ts --native="$PWD/bin/linear-ergo"
 
       - name: Parity cases
         run: |
-          bun parity/run.ts --phase=6 --target=default
-          bun parity/run.ts --phase=6 --target=default --seed=42
+          bun parity/run.ts --phase=6 --launcher
+          bun parity/run.ts --phase=6 --launcher --seed=42
 
       - name: Parity properties
         run: |
-          bun parity/run.ts --phase=6 --target=default --property=1000
+          bun parity/run.ts --phase=6 --launcher --property=1000
           for r in L0 L3 L4 LUTF8; do bun parity/run.ts --regressions=$r --seed=42; done

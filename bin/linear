@@ -19,18 +19,8 @@ fail() {
   exit 1
 }
 
-# LINEAR_IMPL=ts is the way back (q96) while a source checkout ships the TS
-# source; the npm package ships only native binaries.
-case ${LINEAR_IMPL-} in
-  ts)
-    [ -e "$bindir/linear-ts" ] || fail "LINEAR_IMPL=ts needs bin/linear-ts, which only a source checkout builds (bun run build)"
-    exec "$bindir/linear-ts" "$@" ;;
-  ergo | '') ;;
-  *) printf '%s\n' 'LINEAR_IMPL must be ts or ergo' >&2; exit 1 ;;
-esac
-
-# A source checkout: `bun run build:ergo` builds this host's binary here. The
-# package never ships it. A missing native binary is an error, never TS.
+# A source checkout: `bun run build` builds this host's binary here. The
+# package never ships it.
 if [ -e "$bindir/linear-ergo" ]; then
   exec "$bindir/linear-ergo" "$@"
 fi

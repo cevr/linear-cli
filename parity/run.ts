@@ -31,13 +31,10 @@ const scratch = process.env.LINEAR_PARITY_SCRATCH ?? "/tmp/opencode/linear-port"
 const candidate = process.argv.find((x) => x.startsWith("--binary="))?.slice("--binary=".length);
 if (candidate && !(await realpath(candidate)).startsWith(`${scratch}/`))
   throw new Error("Candidate binary must be under the pilot scratch directory");
-const record = process.argv.includes("--record");
-const target = process.argv.find((arg) => arg.startsWith("--target="))?.slice(9);
-if (target && !["default", "ergo", "ts"].includes(target))
-  throw new Error("Target must be default, ergo or ts");
-if (target && (candidate || record || process.argv.includes("--check-ts")))
-  throw new Error("Target cannot be combined with binary, record or check-ts");
-const tsCheck = process.argv.includes("--check-ts") || target === "ts";
+// --launcher runs every case through a copy of the real bin/linear, with the
+// offline entry as its checkout sibling.
+const launcher = process.argv.includes("--launcher");
+if (launcher && candidate) throw new Error("--launcher cannot be combined with --binary");
 const phaseArg = process.argv.find((x) => x.startsWith("--phase="));
 const phase = phaseArg ? Number(phaseArg.split("=")[1]) : 6;
 const caseArg = process.argv.find((x) => x.startsWith("--case="))?.split("=")[1];
@@ -64,15 +61,14 @@ const records =
     : undefined;
 
 const quote = (s: string) => `'${s.replaceAll("'", "'\\''")}'`;
-// Exercise the real shim, but bind only offline siblings. The shipped native
-// entry must never accept the fake-origin environment variables.
+// Exercise the real launcher, but bind only the offline entry. The shipped
+// native entry must never accept the fake-origin environment variables.
 let shim: string | undefined;
-if (target) {
-  const siblings = await mkdtemp(join(scratch, "targets-"));
+if (launcher) {
+  const siblings = await mkdtemp(join(scratch, "launcher-"));
   shim = join(siblings, "linear");
   await writeFile(shim, await readFile(join(root, "bin/linear")), { mode: 0o755 });
   await symlink(join(root, "bin/linear-ergo-parity"), join(siblings, "linear-ergo"));
-  await symlink(join(root, "bin/linear-ts-parity"), join(siblings, "linear-ts"));
 }
 function setup(c: Case): string {
   const lines = ["set -eu", "umask 022"];
@@ -144,7 +140,7 @@ function processArgs(command: string, args: string[], c: Case) {
   return { command: "python3", args: [join(root, "parity/argv.py"), command, ...rawArgs] };
 }
 
-async function run(c: Case, implementation: "ts" | "ergo", throughShim = false): Promise<Result> {
+async function run(c: Case): Promise<Result> {
   const w = world(c.seed ?? 1);
   if (c.scenario === "empty") {
     w.teams.length = 0;
@@ -196,19 +192,11 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
     TZ: "UTC",
   };
   if (!c.noToken) env.LINEAR_API_KEY = c.badEnvToken ? "wrong-fixture-token" : "pilot-test-token";
-  if (throughShim && target !== "default") env.LINEAR_IMPL = target!;
   if (env.HOME !== dir) throw new Error("runner-uses-owner-home survived");
-  let command = candidate ?? join(root, "bin/linear-ergo-parity");
-  if (implementation === "ts")
-    command = regressions ? join(root, "bin/linear-ts-parity") : process.execPath;
-  if (throughShim) command = shim!;
-  const args =
-    !throughShim && implementation === "ts" && !regressions
-      ? ["--preload", join(root, "parity/redirect.ts"), join(root, "src/main.ts"), ...c.args]
-      : c.args;
+  const command = shim ?? candidate ?? join(root, "bin/linear-ergo-parity");
   let out = "",
     err = "";
-  const launch = processArgs(command, args, c);
+  const launch = processArgs(command, c.args, c);
   const child = spawn(launch.command, launch.args, {
     cwd: dir,
     env,
@@ -287,7 +275,7 @@ async function run(c: Case, implementation: "ts" | "ergo", throughShim = false):
 }
 
 for (const c of selected) {
-  const actual = await run(c, record || tsCheck ? "ts" : "ergo", Boolean(target));
+  const actual = await run(c);
   // A broken fake must not silently become an all-failure golden corpus.
   const failures = new Set([
     "download-notfound",
@@ -316,11 +304,9 @@ for (const c of selected) {
     "view-interactive-no-terminal",
     "create-interactive-no-terminal",
   ]);
-  // The original reads keys from a pipe; at its end the prompt quits as an
-  // interrupt (130) and prints nothing. The port refuses with status 1.
-  const noTerminal = new Set(["view-interactive-no-terminal", "create-interactive-no-terminal"]);
-  let wantedStatus = c.expectedStatus ?? (failures.has(c.name) ? 1 : 0);
-  if (noTerminal.has(c.name) && (record || tsCheck)) wantedStatus = 130;
+  // view and create --interactive with no terminal: the original quit as an
+  // interrupt (130); the port refuses with status 1 (declared).
+  const wantedStatus = c.expectedStatus ?? (failures.has(c.name) ? 1 : 0);
   if (!regressions && actual.status !== wantedStatus)
     throw new Error(
       `${c.name}: expected exit ${wantedStatus}, got ${actual.status}: ${actual.err}`,
@@ -335,7 +321,7 @@ for (const c of selected) {
       throw new Error(`${c.name}: q101 refusal mismatch`);
     }
   } else if (property || regressions) {
-    const reference = await records!.get(c.name, () => run(c, "ts"));
+    const reference = records!.get<Result>(c.name);
     if (process.argv.includes("--trace"))
       console.log(JSON.stringify({ name: c.name, args: c.args, reference, actual }));
     if (reference.status !== wantedStatus)
@@ -352,7 +338,7 @@ for (const c of selected) {
             apiError: c.apiError,
             reference,
             actual,
-            replay: `bun parity/run.ts ${regressions ? `--regressions=${regressions} --seed=${c.seed}` : `--property=${c.seed}`} --phase=${phase} --case=${c.name}${target ? ` --target=${target}` : ""}`,
+            replay: `bun parity/run.ts ${regressions ? `--regressions=${regressions} --seed=${c.seed}` : `--property=${c.seed}`} --phase=${phase} --case=${c.name}${launcher ? " --launcher" : ""}`,
           },
           null,
           2,
@@ -360,24 +346,6 @@ for (const c of selected) {
       );
       throw new Error(`${c.name}: parity mismatch`);
     }
-  } else if (record) {
-    // Two fresh processes and worlds: this acceptance must not bless unstable output.
-    const again = await run(c, "ts");
-    if (JSON.stringify(actual) !== JSON.stringify(again))
-      throw new Error(`${c.name}: record leg is not byte-stable`);
-    await mkdir(path, { recursive: true });
-    await writeFile(join(path, "args"), `${c.args.join("\n")}\n`);
-    await writeFile(join(path, "env"), caseEnv(c));
-    await writeFile(join(path, "stdin"), "");
-    await writeFile(join(path, "setup.sh"), setup(c));
-    await writeFile(join(path, "expected.out"), actual.out);
-    await writeFile(join(path, "expected.err"), actual.err);
-    await writeFile(join(path, "expected.status"), `${actual.status}\n`);
-    await writeFile(join(path, "expected.files"), `${JSON.stringify(actual.files, null, 2)}\n`);
-    await writeFile(
-      join(path, "expected.mutations"),
-      `${JSON.stringify(actual.mutations, null, 2)}\n`,
-    );
   } else {
     // The portable example-format export must stay in sync with its corpus source.
     if (
@@ -386,7 +354,9 @@ for (const c of selected) {
       (await readFile(join(path, "setup.sh"), "utf8")) !== setup(c) ||
       (await readFile(join(path, "stdin"), "utf8")) !== ""
     ) {
-      throw new Error(`${c.name}: portable case inputs drifted; re-record from the corpus`);
+      throw new Error(
+        `${c.name}: portable case inputs drifted; the corpus no longer matches the recorded case`,
+      );
     }
     const expected = {
       out: await readFile(join(path, "expected.out"), "utf8"),
@@ -397,7 +367,7 @@ for (const c of selected) {
     };
     // Only the one declared usage-layout case compares its semantic diagnostic
     // instead of Effect CLI's help bytes. Domain failure lines stay byte exact.
-    if (c.name === "repeated-flag" && !tsCheck) {
+    if (c.name === "repeated-flag") {
       const reason = 'Invalid value for flag --limit: "2 occurrences". Expected: at most 1 value';
       if (
         actual.status !== 1 ||
@@ -408,7 +378,7 @@ for (const c of selected) {
       expected.out = actual.out;
       expected.err = actual.err;
     }
-    if (c.name === "graphql-invalid" && !tsCheck) {
+    if (c.name === "graphql-invalid") {
       const prefix = "Invalid input: Invalid GraphQL document: ";
       if (!actual.err.startsWith(prefix) || actual.err.length <= prefix.length + 1)
         throw new Error("graphql-invalid: parser diagnostic prefix or detail is absent");
@@ -416,7 +386,7 @@ for (const c of selected) {
     }
     // q99 does not rewrite a TS result to look equal. It checks the narrowly
     // approved native contract and preserves file/mutation/status assertions.
-    const exception = tsCheck ? undefined : q99Equal(c.name, expected, actual);
+    const exception = q99Equal(c.name, expected, actual);
     if (!(exception ?? JSON.stringify(expected) === JSON.stringify(actual))) {
       console.error(
         JSON.stringify(
@@ -435,7 +405,7 @@ for (const c of selected) {
       throw new Error(`${c.name}: parity mismatch`);
     }
   }
-  console.log(`ok ${c.name}${record ? " (two equal records)" : ""}`);
+  console.log(`ok ${c.name}`);
 }
 records?.done();
 console.log(`EXIT: 0 (${selected.length} cases)`);

@@ -1,18 +1,16 @@
 # Native port
 
 Compiler: `ergo-toolchain.json`. Packaging: `parity/routing.md` (DIST2). No
-installed command or TypeScript source is changed. The production entry has a fixed API origin;
+installed command is changed. The production entry has a fixed API origin;
 the offline entry accepts only literal IPv4 loopback HTTP origins.
 
 ```sh
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo check ergo/cmd/linear
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo build ergo/cmd/linear -o bin/linear-ergo
 GOMAXPROCS=1 GOFLAGS=-p=1 ergo build ergo/cmd/linear-parity -o bin/linear-ergo-parity
-bun scripts/build.ts --parity
-bun parity/run.ts --target=default
-bun parity/run.ts --target=ergo
-bun parity/run.ts --target=ts
-bun parity/run.ts --target=default --property=1000
+bun parity/run.ts
+bun parity/run.ts --launcher
+bun parity/run.ts --property=1000
 ergo test ergo/linear --seed 42
 ergo test ergo/graphql --seed 42
 ergo test ergo/memory --seed 42
@@ -62,12 +60,10 @@ only leading capitals. `main` reads the working directory with Go's
 Use an explicit private GOPATH/GOMODCACHE as well as GOCACHE for isolated HOME
 builds. Clean a private read-only module cache with Go's `clean -modcache`, not
 permission changes. Installed-command linking remains the owner's action.
-The local switch in `bin/linear` defaults to Ergo for every command; there is
-no parity table or implicit TS fallback. `LINEAR_IMPL=ts` is the way back.
-See `parity/routing.md` for the offline default/Ergo/TS acceptance targets.
-`bun run build` builds `linear-ts`, never replaces the shim; `build:ergo` builds
-`linear-ergo` with the compiler from `ERGO` (or PATH). The offline gate runs the
-production binary only for the origin-free `--version` smoke check.
+`bin/linear` runs this program for every command; see `parity/routing.md`.
+`bun run build` builds `linear-ergo` and `linear-ergo-parity` with the compiler
+from `ERGO` (or PATH). The offline gate runs the production binary only for the
+origin-free `--version` check.
 
 `cli/arguments.ergo` declares one std flag command tree. Aliases are declarations
 (`WithAlias`), not argv rewrites. Repeated handles preserve all occurrences and
