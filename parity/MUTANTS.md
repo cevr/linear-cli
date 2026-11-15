@@ -23,6 +23,14 @@ the records.
   so the runner now checks the fake world after a successful `issue create`
   (as before) and `issue comment` (new; case `comment-json`), and that check
   kills both.
+- `frozen-unused-record-ignored`, `frozen-missing-record-ignored`
+  (`parity/mutants.ts`, verifier follow-up T1): `parity/frozen.ts` stops
+  failing a full run on a record no case reached, or stops failing a case
+  that has no record. The guards edit a copy's L0 records: an extra entry
+  must fail the full run with `records no case reached`, and a removed entry
+  must fail its case with `no frozen reference for`. Both guards are checked
+  on the real `frozen.ts` first. No existing run edits the records, so
+  nothing else reaches these checks.
 - New in `parity/launcher.ts`: `checkout-binary-ignored` (a source checkout's
   `bin/linear-ergo` is skipped) and `impl-switch-kept` (`LINEAR_IMPL=ts` still
   selects another program).

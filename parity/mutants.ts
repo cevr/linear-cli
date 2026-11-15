@@ -678,6 +678,88 @@ for (const mutant of fakeMutants) {
     throw new Error(`${mutant.name} survived or failed for wrong reason: ${result.output}`);
   console.log(`killed ${mutant.name}: L0 membership property`);
 }
+// The recorded references (parity/frozen.ts): a record no case reaches and a
+// case with no record must each fail a run. The guards edit a copy's L0
+// records: one extra entry fails the full run, one removed entry fails the
+// case that needs it. Unmutated, both guards must see their failure; each
+// mutant turns one check off, and a guard must then miss its failure.
+const frozenMutants = [
+  {
+    name: "frozen-unused-record-ignored",
+    from: "      if (unused.length)\n",
+    to: "      if (false && unused.length)\n",
+  },
+  {
+    name: "frozen-missing-record-ignored",
+    from: "      if (!(key in table)) throw",
+    to: "      if (false) throw",
+  },
+];
+async function frozenCopy(edit?: { from: string; to: string }) {
+  const dir = await mkdtemp(join(scratch, "frozen-mutant-"));
+  await cp(join(root, "parity"), join(dir, "parity"), { recursive: true });
+  await symlink(join(root, "bin"), join(dir, "bin"));
+  await symlink(join(root, "node_modules"), join(dir, "node_modules"));
+  if (edit) {
+    const path = join(dir, "parity/frozen.ts");
+    const source = await readFile(path, "utf8");
+    if (source.split(edit.from).length !== 2)
+      throw new Error(`frozen edit is not unique: ${edit.from}`);
+    await writeFile(path, source.replace(edit.from, edit.to));
+  }
+  return dir;
+}
+async function editRecords(dir: string, change: (table: Record<string, unknown>) => void) {
+  const path = join(dir, "parity/frozen/regressions-L0-42.json");
+  const table = JSON.parse(await readFile(path, "utf8"));
+  change(table);
+  await writeFile(path, JSON.stringify(table));
+}
+// The guards a frozen.ts at `edit` lets through (none for the real one).
+async function frozenMisses(edit?: { from: string; to: string }) {
+  const misses: string[] = [];
+  const extra = await frozenCopy(edit);
+  await editRecords(extra, (t) => {
+    t["regression-L0-no-such-case"] = t["regression-L0-error-0"];
+  });
+  const full = await run(
+    process.execPath,
+    [join(extra, "parity/run.ts"), "--regressions=L0", "--seed=42"],
+    extra,
+  );
+  if (
+    full.code === 0 ||
+    !full.output.includes("records no case reached: regression-L0-no-such-case")
+  )
+    misses.push(`unused record: ${full.output.slice(-400)}`);
+  const missing = await frozenCopy(edit);
+  await editRecords(missing, (t) => {
+    delete t["regression-L0-error-0"];
+  });
+  const one = await run(
+    process.execPath,
+    [
+      join(missing, "parity/run.ts"),
+      "--regressions=L0",
+      "--seed=42",
+      "--case=regression-L0-error-0",
+    ],
+    missing,
+  );
+  if (one.code === 0 || !one.output.includes("no frozen reference for regression-L0-error-0"))
+    misses.push(`missing record: ${one.output.slice(-400)}`);
+  return misses;
+}
+if (!only || frozenMutants.some((m) => m.name === only)) {
+  const base = await frozenMisses();
+  if (base.length) throw new Error(`frozen guards fail on the real frozen.ts: ${base.join("; ")}`);
+  for (const mutant of frozenMutants) {
+    if (only && only !== mutant.name) continue;
+    const misses = await frozenMisses(mutant);
+    if (!misses.length) throw new Error(`${mutant.name} survived`);
+    console.log(`killed ${mutant.name}: ${misses.map((m) => m.split(":")[0]).join(", ")} guard`);
+  }
+}
 if (only && !["fake-forgets-created-issue", "fake-forgets-created-comment"].includes(only)) {
   console.log(`EXIT: 0 (mutant ${only} only)`);
   process.exit(0);
