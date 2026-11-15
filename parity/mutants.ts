@@ -687,6 +687,7 @@ for (const entity of ["issue", "comment"]) {
   if (only && only !== name) continue;
   const fakeDir = await mkdtemp(join(scratch, "fake-mutant-"));
   await cp(join(root, "parity"), join(fakeDir, "parity"), { recursive: true });
+  await symlink(join(root, "bin"), join(fakeDir, "bin"));
   await symlink(join(root, "node_modules"), join(fakeDir, "node_modules"));
   const fakePath = join(fakeDir, "parity/fake-linear.ts");
   const fakeSource = await readFile(fakePath, "utf8");
