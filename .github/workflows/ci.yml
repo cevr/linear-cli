@@ -30,3 +30,86 @@ jobs:
 
       - name: Test
         run: bun run test
+
+  # The published CLI is the Ergo build. This job builds the compiler at the pin
+  # in ergo-toolchain.json, checks and tests every Ergo package, builds both
+  # entries, and runs the parity suite: the TypeScript CLI is the oracle, both
+  # programs run against the offline fake Linear, and their bytes, exits, files
+  # and mutation logs must agree. No case reaches the real service.
+  parity:
+    name: Ergo build and parity
+    runs-on: ubuntu-latest
+    env:
+      LINEAR_PARITY_SCRATCH: ${{ runner.temp }}/parity
+      ERGO: ${{ runner.temp }}/ergo
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the Ergo pin
+        id: pin
+        run: |
+          echo "commit=$(jq -r .ergo ergo-toolchain.json)" >> "$GITHUB_OUTPUT"
+          echo "repository=$(jq -r .repository ergo-toolchain.json | sed 's#^https://github.com/##')" >> "$GITHUB_OUTPUT"
+          echo "go=$(jq -r .go ergo-toolchain.json | sed 's/^go//')" >> "$GITHUB_OUTPUT"
+
+      - name: Check out Ergo at the pin
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.repository }}
+          ref: ${{ steps.pin.outputs.commit }}
+          path: .ergo-src
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.pin.outputs.go }}
+          cache: false
+
+      # The parity records were made with this Bun; the oracle's bytes follow it.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Build the Ergo compiler
+        working-directory: .ergo-src
+        run: go build -o "$ERGO" ./cmd/ergo
+
+      - run: bun install
+
+      - name: Format, check and test the Ergo packages
+        run: |
+          for file in $(git ls-files 'ergo/*.ergo'); do "$ERGO" fmt --check "$file" > /dev/null; done
+          for pkg in linear graphql memory credential graphqlhttp files uploadhttp tomlconfig cli; do
+            "$ERGO" test "ergo/$pkg" --seed 42
+          done
+          "$ERGO" check ergo/cmd/linear > /dev/null
+          "$ERGO" check ergo/cmd/linear-parity > /dev/null
+
+      - name: The shipped entry reads no origin variable
+        run: "! grep -q 'LINEAR_PARITY\\|ORIGIN\\|ENDPOINT' ergo/cmd/linear/main.ergo"
+
+      - name: Build both programs
+        run: |
+          bun scripts/build.ts
+          bun scripts/build.ts --parity
+          bun scripts/build.ts --ergo
+          "$ERGO" build ergo/cmd/linear-parity -o bin/linear-ergo-parity
+
+      - name: Schema and skill coverage
+        run: |
+          bun parity/schema-check.ts
+          bun parity/coverage.ts
+
+      - name: Launcher and switch
+        run: |
+          bun parity/launcher.ts --mutants
+          bun parity/switch.ts --mutants --native="$PWD/bin/linear-ergo"
+
+      - name: Parity cases
+        run: |
+          bun parity/run.ts --phase=6 --target=default
+          bun parity/run.ts --phase=6 --target=default --seed=42
+
+      - name: Parity properties
+        run: |
+          bun parity/run.ts --phase=6 --target=default --property=1000
+          for r in L0 L3 L4 LUTF8; do bun parity/run.ts --regressions=$r --seed=42; done
