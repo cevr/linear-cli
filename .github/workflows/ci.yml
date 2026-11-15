@@ -39,10 +39,12 @@ jobs:
   parity:
     name: Ergo build and parity
     runs-on: ubuntu-latest
-    env:
-      LINEAR_PARITY_SCRATCH: ${{ runner.temp }}/parity
-      ERGO: ${{ runner.temp }}/ergo
     steps:
+      - name: Scratch and compiler paths
+        run: |
+          echo "LINEAR_PARITY_SCRATCH=$RUNNER_TEMP/parity" >> "$GITHUB_ENV"
+          echo "ERGO=$RUNNER_TEMP/ergo" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
 
       - name: Read the Ergo pin
