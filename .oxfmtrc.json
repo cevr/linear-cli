@@ -1,1 +1,3 @@
-{}
+{
+  "ignorePatterns": ["parity/schema.graphql"]
+}
