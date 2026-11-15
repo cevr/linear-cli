@@ -26,17 +26,21 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 		""
 	}
 	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
-	let net = http.NewClient("https://api.linear.app", http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
+	let net = http.NewClient("https://api.linear.app", http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
 	}
 	let tracker = graphqlhttp.New(net, credentials)
 	// An upload redirects to a storage host named only in the response, so the
 	// upload network admits any origin and follows one redirect, as the original
 	// does. The token is a credential of the upload origin: no other host gets it.
-	let remote = http.NewNet(http.AnyOrigin, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536}, http.Follow{MaxHops: 1}) catch {
+	let remote = http.NewNet(http.AnyOrigin, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}, http.Follow{MaxHops: 1}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Linear API Error: invalid upload network"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
 	}
 	let uploads = uploadhttp.New(remote, linear.UploadOrigin(), "", credentials)
 	// auth runs `open` on the key page, as the original does.

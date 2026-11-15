@@ -49,14 +49,18 @@ func main() fails os.Exit needs Ambient | go.Foreign {
 	let origin = try loopback(process.Getenv("LINEAR_PARITY_ORIGIN"))
 	let storage = try loopback(process.Getenv("LINEAR_PARITY_STORAGE_ORIGIN"))
 	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
-	let net = http.NewClient(origin, http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536}) catch {
+	let net = http.NewClient(origin, http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
 	}
 	let tracker = graphqlhttp.New(net, credentials)
-	let remote = http.NewNet(http.Origins{Values: []string{origin, storage}}, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536}, http.Follow{MaxHops: 1}) catch {
+	let remote = http.NewNet(http.Origins{Values: []string{origin, storage}}, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}, http.Follow{MaxHops: 1}) catch {
 	case http.InvalidClient:
 		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
 	}
 	let uploads = uploadhttp.New(remote, origin, "/uploads", credentials)
 	// The offline entry never starts a program: opening the key page always
