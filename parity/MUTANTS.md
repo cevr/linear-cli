@@ -31,6 +31,12 @@ the records.
   must fail its case with `no frozen reference for`. Both guards are checked
   on the real `frozen.ts` first. No existing run edits the records, so
   nothing else reaches these checks.
+- `umask-not-fixed` (`parity/mutants.ts`): `parity/frozen.ts` no longer sets
+  umask 022 for the runner, so a host with umask 002 fails every case that
+  makes a file or folder. The guard runs `download-disposition-plain` under
+  umask 002. It must pass with the real `frozen.ts` and fail with `parity
+mismatch` without the umask line. Every earlier run used the host's 022,
+  so none reached this.
 - New in `parity/launcher.ts`: `checkout-binary-ignored` (a source checkout's
   `bin/linear-ergo` is skipped) and `impl-switch-kept` (`LINEAR_IMPL=ts` still
   selects another program).

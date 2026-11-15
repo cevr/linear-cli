@@ -760,6 +760,33 @@ if (!only || frozenMutants.some((m) => m.name === only)) {
     console.log(`killed ${mutant.name}: ${misses.map((m) => m.split(":")[0]).join(", ")} guard`);
   }
 }
+// frozen.ts sets umask 022 for the runner. The guard runs the fixed case
+// `download-disposition-plain` (it writes a downloaded file into a new case
+// folder) under umask 002: it must pass with the real frozen.ts, and fail
+// when the umask line is dropped.
+async function underUmask002(dropUmask: boolean) {
+  const dir = await frozenCopy(dropUmask ? { from: "process.umask(0o022);\n", to: "" } : undefined);
+  return run(
+    "sh",
+    [
+      "-c",
+      'umask 002; exec "$0" "$@"',
+      process.execPath,
+      join(dir, "parity/run.ts"),
+      "--phase=4",
+      "--case=download-disposition-plain",
+    ],
+    dir,
+  );
+}
+if (!only || only === "umask-not-fixed") {
+  const base = await underUmask002(false);
+  if (base.code !== 0) throw new Error(`case fails under umask 002: ${base.output.slice(-400)}`);
+  const mutated = await underUmask002(true);
+  if (mutated.code === 0 || !mutated.output.includes("parity mismatch"))
+    throw new Error(`umask-not-fixed survived: ${mutated.output.slice(-400)}`);
+  console.log("killed umask-not-fixed: download-disposition-plain under umask 002");
+}
 if (only && !["fake-forgets-created-issue", "fake-forgets-created-comment"].includes(only)) {
   console.log(`EXIT: 0 (mutant ${only} only)`);
   process.exit(0);
