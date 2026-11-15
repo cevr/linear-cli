@@ -1,11 +1,14 @@
 // Read command text only; never execute skill content.
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { cases } from "./corpus";
-const files = [
-  join(import.meta.dir, "../skills/linear/SKILL.md"),
-  "/home/exedev/Developer/personal/dotfiles/skills/linear/SKILL.md",
-];
+// The repo's skill, and each other installed copy named in LINEAR_SKILL_COPIES
+// (colon-separated; agents may load a copy from a dotfiles repo). A named copy
+// that is missing is an error, not a skip.
+const copies = (process.env.LINEAR_SKILL_COPIES ?? "").split(":").filter(Boolean);
+for (const copy of copies) if (!existsSync(copy)) throw new Error(`no skill copy at ${copy}`);
+const files = [join(import.meta.dir, "../skills/linear/SKILL.md"), ...copies];
 const leaves = new Set([
   "auth",
   "auth whoami",

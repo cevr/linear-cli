@@ -148,3 +148,6 @@ npm/
 
 # OS
 .DS_Store
+
+# Round requests live in the orchestration run dir, never in this repo.
+parity/requests/
