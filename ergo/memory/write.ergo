@@ -1,0 +1,28 @@
+import json
+import linearport/credential
+import linearport/linear
+import sync
+
+type Mutation = StateChanged{Id string, StateId string} | IssueCreated{Input linear.CreateInput} | CommentAdded{Id linear.Selector, Body string}
+type Writes { events sync.Ref[[]Mutation] }
+func NewWrites() Writes               { Writes{events: sync.NewRef[[]Mutation]([]Mutation{})} }
+func Events(w Writes) []Mutation      { w.events.Get() }
+func record(w Writes, event Mutation) { w.events.Update(func(events []Mutation) []Mutation { events.Append(event) }) }
+func Start(w Writes, id string, stateId string) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError { record(w, StateChanged{Id: id, StateId: stateId}) }
+func Create(w Writes, input linear.CreateInput) linear.Reference fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	record(w, IssueCreated{Input: input})
+	linear.Reference{Id: "created", Identifier: "ENG-1", Title: input.Title, Url: "https://linear.app/issue/ENG-1"}
+}
+func Comment(w Writes, id linear.Selector, body string) linear.CommentCreated fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	record(w, CommentAdded{Id: id, Body: body})
+	linear.CommentCreated{Id: "comment", Url: "https://linear.app/comment/comment"}
+}
+type WorkflowSnapshot { states []linear.WorkflowState }
+func NewWorkflowSnapshot(states []linear.WorkflowState) WorkflowSnapshot                                                                                     { WorkflowSnapshot{states: states} }
+func States(w WorkflowSnapshot, teamId string) []linear.WorkflowState fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError { w.states }
+
+// The raw provider is deliberately independent of Writer: a caller chooses
+// its policy before handing a document to an executor.
+type RawReply { value json.Value }
+func NewRawReply(value json.Value) RawReply { RawReply{value: value} }
+func Execute(r RawReply, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError { r.value }

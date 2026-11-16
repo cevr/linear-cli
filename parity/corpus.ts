@@ -1,0 +1,413 @@
+import type { Failure } from "./fake-linear";
+export interface Case {
+  name: string;
+  phase: number;
+  args: string[];
+  seed?: number;
+  failure?: Failure;
+  apiError?: { message: string; extensions?: { userPresentableMessage: string } };
+  // Hex bytes passed to execve at these argv indices, not JS strings.
+  argvBytes?: Record<number, string>;
+  noToken?: boolean;
+  files?: Record<string, string>;
+  // Symbolic links (path -> target) and modes applied after files, restored
+  // before the case directory is inspected.
+  links?: Record<string, string>;
+  modes?: Record<string, number>;
+  symlink?: boolean;
+  // An owner-approved refusal (q101): compared with the exact refusal line,
+  // not with the TS control, which cannot reach the input offline.
+  declared?: "q101";
+  scenario?: "empty" | "one-team" | "unsafe-names" | "duplicate-names";
+  tokenFile?: boolean;
+  badEnvToken?: boolean;
+  expectedStatus?: number;
+}
+const c = (name: string, phase: number, args: string[], extra: Partial<Case> = {}): Case => ({
+  name,
+  phase,
+  args,
+  ...extra,
+});
+export const cases: Case[] = [
+  c("download-disposition-plain", 4, [
+    "file",
+    "download",
+    "https://uploads.linear.app/disposition-plain",
+    "--output-dir",
+    "files",
+    "--json",
+  ]),
+  c("download-disposition-encoded", 4, [
+    "file",
+    "download",
+    "https://uploads.linear.app/disposition-encoded",
+    "--output-dir",
+    "files",
+    "--json",
+  ]),
+  c("download-notfound", 4, ["file", "download", "https://uploads.linear.app/missing", "--json"]),
+  c("view-bulk-three", 2, ["issue", "view", "ENG-123", "ENG-124", "ENG-125", "--json"]),
+  c("view-children", 2, ["issue", "view", "ENG-123", "--children", "--json"], { seed: 2 }),
+  c("view-comments", 2, ["issue", "view", "ENG-123", "--comments", "--json"]),
+  c("view-relations", 2, ["issue", "view", "ENG-123", "--relations", "--json"]),
+  c("whoami-json", 1, ["auth", "whoami", "--json"]),
+  c("whoami-text", 1, ["auth", "whoami"]),
+  c("whoami-status", 1, ["auth", "whoami", "--json"], { seed: 2 }),
+  c("team-json", 1, ["team", "list", "--json"]),
+  c("team-text", 1, ["team", "list"]),
+  c("project-json", 1, ["project", "list", "--json"]),
+  c("project-text", 1, ["project", "list"]),
+  c("team-empty", 1, ["team", "list", "--json"], { scenario: "empty" }),
+  c("team-empty-text", 1, ["team", "list"], { scenario: "empty" }),
+  c("project-empty-text", 1, ["project", "list"], { scenario: "empty" }),
+  c("no-token", 1, ["auth", "whoami", "--json"], { noToken: true }),
+  c("unauthorized", 1, ["auth", "whoami", "--json"], { failure: "401" }),
+  c("api-500", 1, ["team", "list", "--json"], { failure: "500" }),
+  c("api-errors", 1, ["team", "list", "--json"], { failure: "graphql" }),
+  c("token-file", 1, ["auth", "whoami", "--json"], { tokenFile: true }),
+  c("token-file-precedence", 1, ["auth", "whoami", "--json"], {
+    tokenFile: true,
+    badEnvToken: true,
+  }),
+  c("list-json", 2, ["issue", "list", "--json"]),
+  c("list-text", 2, ["issue", "list"]),
+  c("list-state", 2, ["issue", "list", "--state", "started", "--limit", "10", "--json"]),
+  c("list-alias", 2, ["issue", "list", "-s", "unstarted", "-n", "1", "--json"]),
+  c("list-empty", 2, ["issue", "list", "--json"], { scenario: "empty" }),
+  c("limit-low", 2, ["issue", "list", "--limit", "0", "--json"]),
+  c("limit-high", 2, ["issue", "list", "--limit", "251", "--json"]),
+  c("repeated-flag", 2, ["issue", "list", "--limit", "1", "--limit", "2"]),
+  c("view-json", 2, ["issue", "view", "ENG-123", "--json"]),
+  c("view-text", 2, ["issue", "view", "ENG-123"]),
+  c("view-url", 2, ["issue", "view", "https://linear.app/pilot/issue/ENG-123/route", "--json"]),
+  c(
+    "view-many",
+    2,
+    ["issue", "view", "ENG-123", "ENG-124", "--children", "--comments", "--relations", "--json"],
+    { seed: 2 },
+  ),
+  c("view-details-text", 2, [
+    "issue",
+    "view",
+    "ENG-123",
+    "--children",
+    "--comments",
+    "--relations",
+  ]),
+  c("view-missing", 2, ["issue", "view", "--json"]),
+  c("view-bad-selector", 2, ["issue", "view", "ENG-123?fields=name", "--json"]),
+  c("files-list", 2, ["issue", "files", "ENG-123", "--json"]),
+  c("files-text", 2, ["issue", "files", "ENG-123"]),
+  c("start-dry", 3, ["issue", "start", "ENG-123", "--dry-run"]),
+  c("start-json", 3, ["issue", "start", "ENG-123", "--json"]),
+  c("start-text", 3, ["issue", "start", "ENG-123"]),
+  c("start-missing", 3, ["issue", "start"]),
+  c("create-missing-title", 3, ["issue", "create", "--dry-run"]),
+  c("create-dry", 3, [
+    "issue",
+    "create",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--description",
+    "Packet",
+    "--parent",
+    "ENG-123",
+    "--project",
+    "router",
+    "--priority",
+    "2",
+    "--dry-run",
+  ]),
+  c("create-json", 3, [
+    "issue",
+    "create",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--description",
+    "Packet",
+    "--parent",
+    "ENG-123",
+    "--project",
+    "Router",
+    "--priority",
+    "0",
+    "--json",
+  ]),
+  c("create-text", 3, ["issue", "create", "--team", "ENG", "--title", "Route"]),
+  c("create-one-team", 3, ["issue", "create", "--title", "Route", "--dry-run"], {
+    scenario: "one-team",
+  }),
+  c("create-multiple-teams", 3, ["issue", "create", "--title", "Route", "--dry-run"]),
+  c("create-unknown-team", 3, [
+    "issue",
+    "create",
+    "--team",
+    "UNKNOWN",
+    "--title",
+    "Route",
+    "--dry-run",
+  ]),
+  c("create-unknown-project", 3, [
+    "issue",
+    "create",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--project",
+    "unknown",
+    "--dry-run",
+  ]),
+  c("create-bad-priority", 3, [
+    "issue",
+    "create",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--priority",
+    "5",
+    "--dry-run",
+  ]),
+  c("comment-dry", 3, ["issue", "comment", "ENG-123", "--body", "Ready", "--dry-run"], {
+    noToken: true,
+  }),
+  c("comment-json", 3, ["issue", "comment", "ENG-123", "--body", "Ready", "--json"]),
+  c("comment-text", 3, ["issue", "comment", "ENG-123", "--body", "Ready"]),
+  c("graphql-read", 3, ["api", "graphql", "--query", "query { viewer { id name } }"]),
+  c("graphql-variables", 3, [
+    "api",
+    "graphql",
+    "--query",
+    "query($id: String!) { issue(id: $id) { identifier } }",
+    "--variables",
+    '{"id":"ENG-123"}',
+  ]),
+  c("graphql-mutation-denied", 3, [
+    "api",
+    "graphql",
+    "--query",
+    'mutation { issueArchive(id: "ENG-123") { success } }',
+  ]),
+  c("graphql-mutation", 3, [
+    "api",
+    "graphql",
+    "--query",
+    'mutation { issueArchive(id: "ENG-123") { success } }',
+    "--allow-mutation",
+  ]),
+  c("graphql-invalid", 3, ["api", "graphql", "--query", "query { viewer {"]),
+  c("graphql-file", 3, ["api", "graphql", "--query-file", "query.graphql", "--variables", "{}"], {
+    files: { "query.graphql": "query { viewer { id name } }\n" },
+  }),
+  c(
+    "graphql-file-mutation",
+    3,
+    ["api", "graphql", "--query-file", "mutation.graphql", "--allow-mutation"],
+    { files: { "mutation.graphql": 'mutation { issueArchive(id: "ENG-123") { success } }\n' } },
+  ),
+  c("graphql-file-escape", 3, ["api", "graphql", "--query-file", "escape.graphql"], {
+    symlink: true,
+  }),
+  c("download-redirect", 4, [
+    "file",
+    "download",
+    "https://uploads.linear.app/trace.txt",
+    "--output-dir",
+    "files",
+    "--json",
+  ]),
+  c("download-foreign-host", 4, ["file", "download", "https://other.invalid/uploads.linear.app/x"]),
+  c("files-download", 4, [
+    "issue",
+    "files",
+    "ENG-123",
+    "--download",
+    "--output-dir",
+    "files",
+    "--json",
+  ]),
+  c(
+    "download-exists",
+    4,
+    ["file", "download", "https://uploads.linear.app/trace.txt", "--output-dir", "files", "--json"],
+    { files: { "files/trace.txt": "existing\n" } },
+  ),
+  c(
+    "download-overwrite",
+    4,
+    [
+      "file",
+      "download",
+      "https://uploads.linear.app/trace.txt",
+      "--output-dir",
+      "files",
+      "--overwrite",
+      "--json",
+    ],
+    { files: { "files/trace.txt": "existing\n" } },
+  ),
+  c(
+    "files-unsafe-names",
+    4,
+    ["issue", "files", "ENG-123", "--download", "--output-dir", "files", "--json"],
+    { scenario: "unsafe-names" },
+  ),
+  c(
+    "files-duplicate-names",
+    4,
+    ["issue", "files", "ENG-123", "--download", "--output-dir", "files", "--json"],
+    { scenario: "duplicate-names" },
+  ),
+  // --interactive is accepted and changes nothing when the input is given.
+  c("view-interactive-id", 5, ["issue", "view", "ENG-123", "--interactive", "--json"]),
+  c("start-interactive-id", 5, ["issue", "start", "ENG-123", "--interactive", "--dry-run"]),
+  c("create-interactive-title", 5, [
+    "issue",
+    "create",
+    "--interactive",
+    "--team",
+    "ENG",
+    "--title",
+    "Route",
+    "--dry-run",
+  ]),
+  // A prompt with no terminal on standard input (the runner's stdin is a pipe).
+  c("view-interactive-no-terminal", 5, ["issue", "view", "--interactive", "--json"]),
+  c("create-interactive-no-terminal", 5, ["issue", "create", "--interactive", "--dry-run"]),
+  c("config-global", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
+    files: { ".config/linear/config.toml": 'team_id = "ENG"\n' },
+  }),
+  c("config-quoted", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
+    files: { ".linear.toml": 'team_id = "E\\u004eG" # default\r\n' },
+  }),
+  c("config-project", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
+    files: { "linear.toml": 'team_id = "ENG"\n' },
+  }),
+  c("config-malformed", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
+    files: { ".linear.toml": 'team_id = "unterminated' },
+  }),
+  c("config-invalid-type", 6, ["issue", "create", "--title", "Route", "--dry-run"], {
+    files: { ".linear.toml": "team_id = 42\n" },
+  }),
+];
+
+export function generatedCases(seed: number): Case[] {
+  return [
+    c(`seed-${seed}-team`, 1, ["team", "list", "--json"], { seed }),
+    c(`seed-${seed}-project`, 1, ["project", "list", "--json"], { seed }),
+    c(`seed-${seed}-list`, 2, ["issue", "list", "--limit", String(1 + (seed % 5)), "--json"], {
+      seed,
+    }),
+    c(
+      `seed-${seed}-view`,
+      2,
+      ["issue", "view", "ENG-123", "ENG-124", "--comments", "--children", "--relations", "--json"],
+      { seed },
+    ),
+    ...(seed < 1000
+      ? []
+      : [
+          c(
+            `seed-${seed}-list-text`,
+            2,
+            [
+              "issue",
+              "list",
+              "--limit",
+              String(1 + (seed % 5)),
+              ...(seed % 2 ? ["--state", "started"] : []),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-view-flags`,
+            2,
+            [
+              "issue",
+              "view",
+              "ENG-123",
+              ...(seed & 1 ? ["--comments"] : []),
+              ...(seed & 2 ? ["--children"] : []),
+              ...(seed & 4 ? ["--relations"] : []),
+              ...(seed & 8 ? ["--json"] : []),
+            ],
+            { seed },
+          ),
+          c(`seed-${seed}-files`, 2, ["issue", "files", "ENG-123", "--json"], { seed }),
+          // Text and JSON saved-file output, the short output-dir name, and a
+          // nested output folder that does not exist yet.
+          c(
+            `seed-${seed}-download`,
+            4,
+            [
+              "issue",
+              "files",
+              "ENG-123",
+              "--download",
+              ...(seed & 1 ? ["-o", "files"] : ["--output-dir", "out/nested"]),
+              ...(seed & 2 ? ["--json"] : []),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-start`,
+            3,
+            ["issue", "start", "ENG-123", ...(seed % 2 ? ["--dry-run"] : ["--json"])],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-create`,
+            3,
+            [
+              "issue",
+              "create",
+              "--team",
+              "eng",
+              "--title",
+              `Café 🚀 ${seed}`,
+              "--priority",
+              String(seed % 5),
+              ...(seed & 1 ? ["--description", "Packet"] : []),
+              ...(seed & 2 ? ["--parent", "ENG-123"] : []),
+              ...(seed & 4 ? ["--project", "router"] : []),
+              ...(seed & 8 ? ["--dry-run"] : ["--json"]),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-comment`,
+            3,
+            [
+              "issue",
+              "comment",
+              "ENG-123",
+              "--body",
+              `Ready ${seed}`,
+              ...(seed & 1 ? ["--dry-run"] : ["--json"]),
+            ],
+            { seed },
+          ),
+          c(
+            `seed-${seed}-graphql`,
+            3,
+            [
+              "api",
+              "graphql",
+              "--query",
+              seed % 2
+                ? "query mutation($yes: Boolean! = true) { viewer @include(if: $yes) { mutation: id ...F } } fragment F on User { name } # mutation"
+                : 'query($id: String! = "ENG-123") { issue(id: $id) { identifier } }',
+              "--variables",
+              seed % 2 ? "{}" : '{"id":"ENG-124"}',
+            ],
+            { seed },
+          ),
+        ]),
+  ];
+}

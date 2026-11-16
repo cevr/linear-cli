@@ -1,0 +1,54 @@
+import http
+import linearport/credential
+import linearport/linear
+import strings
+
+// Remote reads uploads over an http.Remote that only main can build, under
+// the origin and redirect policy main chose. origin and prefix say where the
+// upload origin is served: the upload origin itself in production, a loopback
+// fake in the parity entry. The token is a credential of origin alone, so the
+// transport never sends it to a redirect target.
+type Remote { net http.Remote, origin string, prefix string, credentials credential.Credentials }
+
+func New(net http.Remote, origin string, prefix string, credentials credential.Credentials) Remote {
+	Remote{net: net, origin: origin, prefix: prefix, credentials: credentials}
+}
+
+func header(fields []http.Field, name string) Option[string] {
+	for f in fields { if strings.EqualFold(f.Name, name) { return Some[string]{Value: f.Value} } }
+	None
+}
+
+func reason(cause http.Cause) string {
+	match cause {
+	case http.Refused as c:
+		c.Reason
+	case http.Transport as c:
+		c.Reason
+	case http.Malformed as c:
+		c.Reason
+	case http.TooLarge as c:
+		"the response is over \(c.Limit) bytes"
+	}
+}
+
+func Download(r Remote, u linear.UploadURL) linear.Downloaded fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let token = try r.credentials.Load()
+	let public = linear.UploadText(u)
+	let secret = credential.Bind(token, r.origin) catch {
+	case http.InvalidClient as e:
+		return linear.ApiError{Message: "Download failed: " + e.Reason}
+	}
+	let request = http.URLRequest{URL: r.origin + r.prefix + linear.UploadTarget(u), Method: "GET", Header: []http.Field{}, Credentials: []http.Credential{secret}, Body: ""}
+	let response = r.net.SendURL(request) catch {
+	case http.OriginRefused as o:
+		return linear.ApiError{Message: "Download failed: redirect to a refused origin " + o.Origin + " for " + public}
+	case http.RedirectLimit as l:
+		return linear.ApiError{Message: "Download failed: more than \(l.Limit) redirect for " + public}
+	case http.RequestFailed as f:
+		return linear.ApiError{Message: "Download failed: " + reason(f.Cause)}
+	}
+	if response.Status == 401 { return linear.AuthError{Message: "Invalid API token"} }
+	if response.Status < 200 || response.Status >= 300 { return linear.ApiError{Message: "Download failed with HTTP \(response.Status) for " + public} }
+	linear.Downloaded{Bytes: response.Body, ContentType: header(response.Header, "Content-Type"), Disposition: header(response.Header, "Content-Disposition")}
+}

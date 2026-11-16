@@ -1,0 +1,186 @@
+import hex
+import linearport/credential
+import strings
+import utf8
+
+// UploadOrigin is the one origin an upload URL names. The token may go there.
+func UploadOrigin() string { "https://uploads.linear.app" }
+
+// Only ParseUploadURL constructs an UploadURL, so every value names the
+// upload origin. A provider maps it to a transport target; it cannot forge one.
+type UploadURL { value string }
+func UploadText(u UploadURL) string { u.value }
+
+// UploadPath is the path, query and fragment after the origin; it starts with "/".
+func UploadPath(u UploadURL) string { u.value[len(UploadOrigin()):] }
+
+// UploadTarget is the request target a transport sends: the path and query,
+// never the fragment. std http sends a URL request's WHATWG target as given
+// (S-target), so a "%" that starts no escape goes out as the original sends it.
+func UploadTarget(u UploadURL) string {
+	let rest = UploadPath(u)
+	let fragment = strings.Index(rest, "#")
+	if fragment >= 0 { return rest[:fragment] }
+	rest
+}
+
+func escapeAt(s string, i int) bool {
+	if i+3 > len(s) { return false }
+	let _ = hex.Decode(s[i+1 : i+3]) catch {
+	case hex.Malformed:
+		return false
+	}
+	true
+}
+
+func dotSegment(segment string) bool {
+	let s = strings.ReplaceAll(strings.ToLower(segment), "%2e", ".")
+	s == "." || s == ".."
+}
+
+// URL encoding keeps existing escapes (including their case), as WHATWG does.
+// A special HTTPS URL uses different encode sets in path, query and fragment.
+func uploadEncode(s string, component string) string {
+	let digits = "0123456789ABCDEF"
+	let mut result = ""
+	for i in 0..len(s) {
+		let c = int(s[i])
+		if c <= 32 || c >= 127 || c == 34 || c == 60 || c == 62 || (component == "path" && (c == 94 || c == 96 || c == 123 || c == 125)) || (component == "query" && c == 39) || (component == "fragment" && c == 96) {
+			result = result + "%" + digits[c/16:c/16+1] + digits[c%16:c%16+1]
+		} else {
+			result = result + s[i:i+1]
+		}
+	}
+	result
+}
+
+func uploadPath(path string) string {
+	let parts = strings.Split(path, "/")
+	let mut kept = []string{""}
+	for i in 1..len(parts) {
+		let segment = parts[i]
+		let lower = strings.ReplaceAll(strings.ToLower(segment), "%2e", ".")
+		if dotSegment(segment) {
+			if lower == ".." && len(kept) > 1 { kept = kept[:len(kept)-1] }
+			if i == len(parts)-1 { kept = kept.Append("") }
+		} else {
+			kept = kept.Append(segment)
+		}
+	}
+	strings.Join(kept, "/")
+}
+
+// uploadHost is the WHATWG host of text when that host can be the upload
+// host: escapes decoded, the result UTF-8, and each code point mapped as UTS
+// #46 maps it (hostRune). Any other host is None; it is not the upload host.
+func uploadHost(text string) Option[string] {
+	let mut bytes = ""
+	let mut i = 0
+	for i < len(text) {
+		if text[i] == '%' && escapeAt(text, i) {
+			let b = hex.Decode(text[i+1 : i+3]) catch {
+			case hex.Malformed:
+				return None
+			}
+			bytes = bytes + b
+			i = i + 3
+		} else {
+			bytes = bytes + text[i:i+1]
+			i = i + 1
+		}
+	}
+	if !utf8.ValidString(bytes) { return None }
+	let mut host = ""
+	for c in bytes {
+		match hostRune(c) {
+		case Some[string] as m:
+			host = host + m.Value
+		case None:
+			return None
+		}
+	}
+	Some[string]{Value: host}
+}
+
+// ParseUploadURL follows WHATWG URL parsing for a special HTTPS URL, as the
+// original's URL.parse does, then accepts only the upload host. Two inputs the
+// original accepts stay refused for credential safety (owner question q101):
+// non-empty user information and a port other than 443. The token binds to
+// UploadOrigin, never to a textual host prefix or another port.
+func ParseUploadURL(input string) UploadURL fails InvalidInput {
+	let invalid = InvalidInput{Message: "Invalid upload URL: " + input + ". Expected https://uploads.linear.app/..."}
+	let mut text = input
+	for len(text) > 0 && int(text[0]) <= 32 { text = text[1:] }
+	for len(text) > 0 && int(text[len(text)-1]) <= 32 { text = text[:len(text)-1] }
+	text = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(text, "\t", ""), "\r", ""), "\n", "")
+	if len(text) < 6 || strings.ToLower(text[:6]) != "https:" { return invalid }
+	let mut rest = text[6:]
+	let mut suffix = ""
+	let end = strings.Index(rest, "#")
+	if end >= 0 {
+		suffix = "#" + uploadEncode(rest[end+1:], "fragment")
+		rest = rest[:end]
+	}
+	let query = strings.Index(rest, "?")
+	if query >= 0 {
+		suffix = "?" + uploadEncode(rest[query+1:], "query") + suffix
+		rest = rest[:query]
+	}
+	rest = strings.ReplaceAll(rest, "\\", "/")
+	for strings.HasPrefix(rest, "/") { rest = rest[1:] }
+	let slash = strings.Index(rest, "/")
+	let mut authority = if slash < 0 { rest } else { rest[:slash] }
+	let at = strings.LastIndex(authority, "@")
+	if at >= 0 {
+		// "" and ":" are an empty user name and password; WHATWG drops them.
+		let userinfo = authority[:at]
+		if userinfo != "" && userinfo != ":" { return invalid }
+		authority = authority[at+1:]
+	}
+	if strings.Contains(authority, "[") { return invalid }
+	let colon = strings.Index(authority, ":")
+	let mut hostText = authority
+	if colon >= 0 {
+		hostText = authority[:colon]
+		let mut port = authority[colon+1:]
+		for strings.HasPrefix(port, "0") { port = port[1:] }
+		if port != "443" && authority[colon+1:] != "" { return invalid }
+	}
+	match uploadHost(hostText) {
+	case Some[string] as h:
+		if h.Value != "uploads.linear.app" { return invalid }
+	case None:
+		return invalid
+	}
+	let path = if slash < 0 { "/" } else { rest[slash:] }
+	UploadURL{value: UploadOrigin() + uploadEncode(uploadPath(path), "path") + suffix}
+}
+
+// UploadURLKeepsOrigin: whatever follows the host text, a parsed upload URL
+// names the upload origin itself, never a longer host such as
+// uploads.linear.app.example or uploads.linear.apps (a host spelled only
+// with letters the host table maps).
+law UploadURLKeepsOrigin(rest string) {
+	let _ = ParseUploadURL(UploadOrigin() + "s/" + rest) catch {
+	case InvalidInput:
+		let _ = ParseUploadURL(UploadOrigin() + ".example/" + rest) catch {
+		case InvalidInput:
+			let u = ParseUploadURL(UploadOrigin() + rest) catch {
+			case InvalidInput:
+				return true
+			}
+			return strings.HasPrefix(UploadText(u), UploadOrigin()+"/")
+		}
+		return false
+	}
+	false
+}
+
+// Downloaded is one upload's bytes and the response fields a name may use.
+type Downloaded { Bytes string, ContentType Option[string], Disposition Option[string] }
+
+// Uploads reads a file a user attached to an issue. A provider sends the
+// credential only to the upload origin; a redirect target never receives it.
+type Uploads {
+	Download(u UploadURL) Downloaded fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+}

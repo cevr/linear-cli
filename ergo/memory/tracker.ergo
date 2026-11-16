@@ -1,0 +1,20 @@
+import linearport/credential
+import linearport/linear
+
+type Tracker { viewer linear.Viewer, teams []linear.Team, projects []linear.Project }
+
+func New(v linear.Viewer, ts []linear.Team, ps []linear.Project) Tracker {
+	NewTracker(v, ts, ps)
+}
+
+// Invalid fixture identities are not members of the tracker snapshot.
+// This constructor also gives laws a fresh generated snapshot per case.
+func NewTracker(v linear.Viewer, ts []linear.Team, ps []linear.Project) Tracker {
+	let mut teams = []linear.Team{}
+	for team in ts { if team.Id != "" && team.Key != "" { teams = teams.Append(team) } }
+	Tracker{viewer: v, teams: teams, projects: ps}
+}
+
+func Viewer(t Tracker) linear.Viewer fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError      { t.viewer }
+func Teams(t Tracker) []linear.Team fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError       { t.teams }
+func Projects(t Tracker) []linear.Project fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError { t.projects }

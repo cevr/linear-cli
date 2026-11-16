@@ -1,0 +1,183 @@
+import http
+import json
+import linearport/credential
+import linearport/linear
+import strings
+import utf8
+
+type Client { net http.Net, credentials credential.Credentials }
+
+func New(net http.Net, credentials credential.Credentials) Client {
+	Client{net: net, credentials: credentials}
+}
+
+type Ask { Query string, Variables json.Value }
+type Extensions { UserPresentableMessage json.Optional[string] }
+type Error { Message string, Extensions json.Optional[Extensions] }
+type Envelope { Data json.Optional[json.Value], Errors json.Optional[[]Error] }
+
+// failure is the original SDK's LinearError text for a GraphQL error: the raw
+// message (capitalized, cut at its first ": {") and the most readable message
+// (userPresentableMessage, else the raw message), each once, joined by " - ".
+func failure(e Error) string {
+	let mut raw = e.Message
+	let cut = strings.Index(raw, ": {")
+	if cut >= 0 { raw = raw[:cut] }
+	if raw != "" {
+		let first = utf8.DecodeRuneInString(raw)
+		raw = strings.ToUpper(raw[:first.Size]) + raw[first.Size:]
+	}
+	let readable = match e.Extensions {
+	case json.Present[Extensions] as x:
+		match x.Value.UserPresentableMessage {
+		case json.Present[string] as m:
+			m.Value
+		case json.Absent:
+			e.Message
+		}
+	case json.Absent:
+		e.Message
+	}
+	let mut parts = []string{}
+	if raw != "" { parts = parts.Append(raw) }
+	if readable != raw { parts = parts.Append(readable) }
+	"Error: " + strings.Join(parts, " - ")
+}
+
+func query(c Client, document string) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	try queryVariables(c, document, json.Object{Members: []json.Member{}})
+}
+
+func queryVariables(c Client, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	try send(c, try c.credentials.Load(), document, variables)
+}
+
+// send posts one document with token. Only the API origin's client sends it.
+func send(c Client, token credential.Token, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError {
+	let request = credential.Authorize(token, http.Request{Method: "POST", Path: "/graphql", Query: []http.Field{},
+		Header: []http.Field{http.Field{Name: "Content-Type", Value: "application/json"}},
+		Body:   http.Buffered{Text: json.Encode(json.Codec[Ask]{MaxBytes: 0, MaxDepth: 0}, Ask{Query: document, Variables: variables})}})
+	let response = c.net.Send(request) catch {
+	case http.RequestFailed:
+		return linear.ApiError{Message: "request failed"}
+	}
+	if response.Status == 401 { return linear.AuthError{Message: "Invalid API token"} }
+	let envelope = json.Decode(json.Codec[Envelope]{MaxBytes: 8000000, MaxDepth: 64}, response.Body) catch {
+	case _:
+		return linear.ApiError{Message: "unexpected response"}
+	}
+	match envelope.Errors {
+	case json.Present[[]Error] as errors:
+		if len(errors.Value) > 0 {
+			let message = failure(errors.Value[0])
+			// The TS service classifies the SDK's rendered text, not only the
+			// HTTP status. Linear can send GraphQL errors with HTTP 200.
+			if strings.Contains(message, "Authentication") || strings.Contains(message, "401") {
+				return linear.AuthError{Message: "Invalid API token"}
+			}
+			return linear.ApiError{Message: message}
+		}
+	case json.Absent:
+	}
+	match envelope.Data {
+	case json.Present[json.Value] as d:
+		d.Value
+	case json.Absent:
+		linear.ApiError{Message: "response has no data"}
+	}
+}
+
+type PageInfo { HasNextPage bool, EndCursor json.Nullable[string] }
+type TeamNode { Id string, Key string, Name string, Description json.Nullable[string] }
+type TeamsConnection { Nodes []TeamNode, PageInfo PageInfo }
+type TeamsData { Teams TeamsConnection }
+
+func optional[T](s json.Nullable[T]) Option[T] {
+	match s {
+	case json.Null:
+		None
+	case json.NonNull[T] as n:
+		Some[T]{Value: n.Value}
+	}
+}
+
+func after(p PageInfo) string fails linear.ApiError {
+	match p.EndCursor {
+	case json.Null:
+		linear.ApiError{Message: "paginated response has no cursor"}
+	case json.NonNull[string] as c:
+		", after:" + json.Encode(json.Codec[string]{MaxBytes: 0, MaxDepth: 0}, c.Value)
+	}
+}
+
+func Teams(c Client) []linear.Team fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut cursor = ""
+	let mut result = []linear.Team{}
+	for {
+		let value = try c.query("query { teams(first: 50" + cursor + ") { nodes { id key name description } pageInfo { hasNextPage endCursor } } }")
+		let data = json.Decode(json.Codec[TeamsData]{MaxBytes: 8000000, MaxDepth: 32}, json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, value)) catch {
+		case _:
+			return linear.ApiError{Message: "unexpected teams response"}
+		}
+		for n in data.Teams.Nodes {
+			if n.Id == "" || n.Key == "" { return linear.ApiError{Message: "unexpected team identity"} }
+			result = result.Append(linear.Team{Id: n.Id, Key: n.Key, Name: n.Name, Description: optional(n.Description)})
+		}
+		if !data.Teams.PageInfo.HasNextPage { return result }
+		let next = try after(data.Teams.PageInfo)
+		if next == cursor { return linear.ApiError{Message: "pagination did not advance"} }
+		cursor = next
+	}
+}
+
+type ProjectNode { Id string, Name string, SlugId string, State string, Url string }
+type ProjectsConnection { Nodes []ProjectNode, PageInfo PageInfo }
+type ProjectsData { Projects ProjectsConnection }
+
+func Projects(c Client) []linear.Project fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut cursor = ""
+	let mut result = []linear.Project{}
+	for {
+		let value = try c.query("query { projects(first: 50" + cursor + ") { nodes { id name slugId state url } pageInfo { hasNextPage endCursor } } }")
+		let data = json.Decode(json.Codec[ProjectsData]{MaxBytes: 8000000, MaxDepth: 32}, json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, value)) catch {
+		case _:
+			return linear.ApiError{Message: "unexpected projects response"}
+		}
+		for n in data.Projects.Nodes { result = result.Append(linear.Project{Id: n.Id, Name: n.Name, Slug: n.SlugId, State: n.State, Url: n.Url}) }
+		if !data.Projects.PageInfo.HasNextPage { return result }
+		let next = try after(data.Projects.PageInfo)
+		if next == cursor { return linear.ApiError{Message: "pagination did not advance"} }
+		cursor = next
+	}
+}
+
+type ViewerNode { Id string, Name string, Email string, Admin bool, StatusEmoji json.Nullable[string], StatusLabel json.Nullable[string] }
+type ViewerData { Viewer ViewerNode }
+
+let viewerDocument = "query { viewer { id name email admin statusEmoji statusLabel } }"
+
+func Viewer(c Client) linear.Viewer fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	try viewerOf(try c.query(viewerDocument))
+}
+
+// Verify reads the viewer with a token a person gave, not the stored one.
+func Verify(c Client, token credential.Token) linear.Viewer fails linear.ApiError | linear.AuthError {
+	try viewerOf(try send(c, token, viewerDocument, json.Object{Members: []json.Member{}}))
+}
+
+func viewerOf(value json.Value) linear.Viewer fails linear.ApiError {
+	let data = json.Decode(json.Codec[ViewerData]{MaxBytes: 8000000, MaxDepth: 32}, json.Encode(json.Codec[json.Value]{MaxBytes: 0, MaxDepth: 0}, value)) catch {
+	case _:
+		return linear.ApiError{Message: "unexpected viewer response"}
+	}
+	let v = data.Viewer
+	let emoji = optional(v.StatusEmoji)
+	let label = optional(v.StatusLabel)
+	let status Option[linear.Status] = match (emoji, label) {
+	case (None, None):
+		None
+	case (_, _):
+		Some[linear.Status]{Value: linear.Status{Emoji: emoji, Label: label}}
+	}
+	linear.Viewer{Id: v.Id, Name: v.Name, Email: v.Email, Admin: v.Admin, Status: status}
+}

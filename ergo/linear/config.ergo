@@ -1,0 +1,11 @@
+import linearport/credential
+
+// Defaults are what a config file may preset for a command: the team that
+// issue create uses when --team is not given.
+type Defaults { TeamId Option[string] }
+
+// Settings reads the defaults. A file that is there but not valid is a
+// ConfigError, never silently no defaults.
+type Settings {
+	Defaults() Defaults fails credential.ConfigError,
+}

@@ -1,0 +1,30 @@
+import linearport/credential
+import linearport/linear
+
+type ReadSnapshot { issues []linear.Details }
+func NewReadSnapshot(issues []linear.Details) ReadSnapshot { ReadSnapshot{issues: issues} }
+
+func MyIssues(s ReadSnapshot, state Option[string], limit int) []linear.Summary fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut result = []linear.Summary{}
+	for d in s.issues {
+		let matches = match (state, d.State) {
+		case (None, _):
+			true
+		case (Some[string] as filter, Some[linear.WorkflowState] as status):
+			filter.Value == status.Value.Type
+		case (_, _):
+			false
+		}
+		if matches && len(result) < limit { result = result.Append(linear.Summary{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: d.State}) }
+	}
+	result
+}
+
+func Issue(s ReadSnapshot, id linear.Selector, options linear.DetailsOptions) linear.Details fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	for d in s.issues {
+		if d.Id == linear.Text(id) || d.Identifier == linear.Text(id) {
+			return linear.Details{..d, Children: if options.Children { d.Children } else { None }, Comments: if options.Comments { d.Comments } else { None }, Relations: if options.Relations { d.Relations } else { None }}
+		}
+	}
+	linear.ApiError{Message: "Issue not found"}
+}

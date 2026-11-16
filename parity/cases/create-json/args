@@ -1,0 +1,15 @@
+issue
+create
+--team
+ENG
+--title
+Route
+--description
+Packet
+--parent
+ENG-123
+--project
+Router
+--priority
+0
+--json

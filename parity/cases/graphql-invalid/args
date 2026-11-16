@@ -1,0 +1,4 @@
+api
+graphql
+--query
+query { viewer {

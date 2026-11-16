@@ -1,0 +1,110 @@
+import json
+import linearport/credential
+import machines
+import strings
+
+type CreateInput { Title string, TeamId string, Description Option[string], Parent Option[Selector], ProjectId Option[string], Priority Option[int] }
+type Started { Issue Reference, State WorkflowState, BranchName string }
+type CommentCreated { Id string, Url string }
+
+type Workflow {
+	States(teamId string) []WorkflowState fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+}
+type Writer {
+	Start(id string, stateId string) fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+	Create(input CreateInput) Reference fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+	Comment(id Selector, body string) CommentCreated fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+}
+type RawGraphQL { Execute(document string, variables json.Value) json.Value fails ApiError | AuthError | credential.NoToken | credential.ConfigError }
+
+func PlanStart(id Selector) Started fails InvalidInput | ApiError | AuthError | credential.NoToken | credential.ConfigError needs Reader | Workflow {
+	let issue = try Reader.Issue(id, DetailsOptions{Comments: false, Children: false, Relations: false})
+	let team = match issue.Team {
+	case None:
+		return InvalidInput{Message: "Issue " + issue.Identifier + " is not associated with a team"}
+	case Some[IssueTeam] as t:
+		t.Value
+	}
+	let states = try Workflow.States(team.Id)
+	for state in states {
+		if state.Type == "started" || strings.ToLower(state.Name) == "in progress" {
+			return Started{Issue: Reference{Id: issue.Id, Identifier: issue.Identifier, Title: issue.Title, Url: issue.Url}, State: state, BranchName: issue.BranchName}
+		}
+	}
+	InvalidInput{Message: "No started state exists for team " + team.Key}
+}
+
+func TextUnits(s string) int {
+	let mut n = 0
+	for c in s { n = n + if c > 65535 { 2 } else { 1 } }
+	n
+}
+func ValidateText(name string, value string, maximum int, allowEmpty bool) string fails InvalidInput {
+	if HasControl(value) { return InvalidInput{Message: name + " cannot contain control characters"} }
+	if !allowEmpty && blank(value) { return InvalidInput{Message: name + " cannot be empty"} }
+	if TextUnits(value) > maximum { return InvalidInput{Message: name + " cannot exceed \(maximum) characters"} }
+	value
+}
+
+func blank(value string) bool {
+	// ECMAScript trim's WhiteSpace and LineTerminator set. Go TrimSpace also
+	// removes U+0085, which is valid nonblank input in the original CLI.
+	for c in value {
+		if !(c == 9 || c == 10 || c == 11 || c == 12 || c == 13 || c == 32 || c == 160 || c == 5760 || (c >= 8192 && c <= 8202) || c == 8232 || c == 8233 || c == 8239 || c == 8287 || c == 12288 || c == 65279) { return false }
+	}
+	true
+}
+
+type CreateState = NeedTeam{} | NeedTitle{TeamId string} | NeedDescription{TeamId string, Title string} | Ready{TeamId string, Title string, Description string}
+type CreateSignal = TeamGiven{Id string} | TitleGiven{Text string} | DescriptionGiven{Text string}
+
+func CreateStep(state CreateState, signal CreateSignal) Decision[CreateState, string] fails InvalidInput {
+	match (state, signal) {
+	case (NeedTeam, TeamGiven as team):
+		if team.Id == "" { return InvalidInput{Message: "No team available"} }
+		Enter[CreateState]{Next: NeedTitle{TeamId: team.Id}}
+	case (NeedTitle as team, TitleGiven as title):
+		let text = try ValidateText("Issue title", title.Text, 255, false)
+		Enter[CreateState]{Next: NeedDescription{TeamId: team.TeamId, Title: text}}
+	case (NeedDescription as draft, DescriptionGiven as description):
+		let text = try ValidateText("Issue description", description.Text, 100000, true)
+		Enter[CreateState]{Next: Ready{TeamId: draft.TeamId, Title: draft.Title, Description: text}}
+	case (_, _):
+		Ignore
+	}
+}
+type Create machine[CreateState, CreateSignal] { initial: NeedTeam, step: CreateStep }
+
+// Feed steps the create machine by one input, so a caller can take each
+// input from a flag or from a person in the machine's order.
+func Feed(state CreateState, signal CreateSignal) CreateState fails InvalidInput {
+	machines.Next(state, try CreateStep(state, signal))
+}
+
+func PrepareCreate(teamId string, title string, description string) Ready fails InvalidInput {
+	let result = machines.Run(Create{}, []CreateSignal{TeamGiven{Id: teamId}, TitleGiven{Text: title}, DescriptionGiven{Text: description}}) catch {
+	case InvalidInput as e:
+		return e
+	case machines.Rejected:
+		return InvalidInput{Message: "Creation input was rejected"}
+	}
+	match result {
+	case machines.Running[CreateState, string] as run:
+		match run.State {
+		case Ready as r:
+			r
+		case _:
+			InvalidInput{Message: "Creation input is incomplete"}
+		}
+	case machines.Finished[CreateState, string]:
+		InvalidInput{Message: "Creation input is incomplete"}
+	}
+}
+
+law CreateReadyTitle(title string) {
+	let ready = PrepareCreate("team", title, "") catch {
+	case InvalidInput:
+		return true
+	}
+	!blank(ready.Title) && TextUnits(ready.Title) <= 255 && !HasControl(ready.Title)
+}

@@ -1,0 +1,286 @@
+// Executable GraphQL syntax is parsed before any authenticated request. Tokens
+// retain their kind: text in comments/strings cannot authorize an operation.
+import json
+import strconv
+import strings
+
+type InvalidDocument { Message string }
+type Token { Kind string, Text string }
+type Parser { tokens []Token, at int }
+type Document { text string, mutation bool }
+func Text(d Document) string     { d.text }
+func IsMutation(d Document) bool { d.mutation }
+
+func alpha(c byte) bool { (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' }
+func digit(c byte) bool { c >= '0' && c <= '9' }
+func hex(c byte) bool   { digit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') }
+
+func hexValue(text string) int64 fails InvalidDocument {
+	strconv.ParseInt(text, 16, 32) catch {
+	case _:
+		return InvalidDocument{Message: "invalid Unicode escape"}
+	}
+}
+func unicodeEscape(text string, at int) int fails InvalidDocument {
+	if at+1 < len(text) && text[at+1] == '{' {
+		let mut end = at + 2
+		for end < len(text) && hex(text[end]) { end = end + 1 }
+		if end >= len(text) || text[end] != '}' || end == at+2 || end-at-2 > 8 { return InvalidDocument{Message: "invalid Unicode escape"} }
+		let scalar = try hexValue(text[at+2 : end])
+		if scalar > 1114111 || (scalar >= 55296 && scalar <= 57343) { return InvalidDocument{Message: "invalid Unicode scalar"} }
+		return end
+	}
+	if at+4 >= len(text) { return InvalidDocument{Message: "invalid Unicode escape"} }
+	for i in at+1..at+5 { if !hex(text[i]) { return InvalidDocument{Message: "invalid Unicode escape"} } }
+	let first = try hexValue(text[at+1 : at+5])
+	if first >= 56320 && first <= 57343 { return InvalidDocument{Message: "unpaired Unicode surrogate"} }
+	if first >= 55296 && first <= 56319 {
+		if at+10 >= len(text) || text[at+5:at+7] != "\\u" { return InvalidDocument{Message: "unpaired Unicode surrogate"} }
+		for i in at+7..at+11 { if !hex(text[i]) { return InvalidDocument{Message: "invalid Unicode escape"} } }
+		let second = try hexValue(text[at+7 : at+11])
+		if second < 56320 || second > 57343 { return InvalidDocument{Message: "unpaired Unicode surrogate"} }
+		return at + 10
+	}
+	at + 4
+}
+
+func lex(text string) []Token fails InvalidDocument {
+	let mut tokens = []Token{}
+	let mut at = 0
+	for at < len(text) {
+		let c = text[at]
+		if c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == ',' {
+			at = at + 1
+			continue
+		}
+		if strings.HasPrefix(text[at:], "\uFEFF") {
+			at = at + 3
+			continue
+		}
+		if c == '#' {
+			for at < len(text) && text[at] != '\n' && text[at] != '\r' { at = at + 1 }
+			continue
+		}
+		let start = at
+		if alpha(c) {
+			at = at + 1
+			for at < len(text) && (alpha(text[at]) || digit(text[at])) { at = at + 1 }
+			tokens = tokens.Append(Token{Kind: "name", Text: text[start:at]})
+			continue
+		}
+		if c == '"' {
+			if strings.HasPrefix(text[at:], "\"\"\"") {
+				at = at + 3
+				let mut closed = false
+				for at < len(text) {
+					if strings.HasPrefix(text[at:], "\\\"\"\"") {
+						at = at + 4
+						continue
+					}
+					if strings.HasPrefix(text[at:], "\"\"\"") {
+						at = at + 3
+						closed = true
+						break
+					}
+					if text[at] < 32 && text[at] != 9 && text[at] != 10 && text[at] != 13 { return InvalidDocument{Message: "control character in block string"} }
+					at = at + 1
+				}
+				if !closed { return InvalidDocument{Message: "unterminated block string"} }
+			} else {
+				at = at + 1
+				let mut closed = false
+				for at < len(text) {
+					if text[at] == '"' {
+						at = at + 1
+						closed = true
+						break
+					}
+					if text[at] < 32 { return InvalidDocument{Message: "control character in string"} }
+					if text[at] == '\\' {
+						at = at + 1
+						if at >= len(text) { return InvalidDocument{Message: "unterminated escape"} }
+						if text[at] == 'u' {
+							at = try unicodeEscape(text, at)
+						} else {
+							if !strings.Contains("\"\\/bfnrt", text[at:at+1]) { return InvalidDocument{Message: "invalid string escape"} }
+						}
+					}
+					at = at + 1
+				}
+				if !closed { return InvalidDocument{Message: "unterminated string"} }
+			}
+			tokens = tokens.Append(Token{Kind: "string", Text: text[start:at]})
+			continue
+		}
+		if c == '-' || digit(c) {
+			if c == '-' { at = at + 1 }
+			if at >= len(text) || !digit(text[at]) { return InvalidDocument{Message: "expected a number"} }
+			if text[at] == '0' { at = at + 1 } else { for at < len(text) && digit(text[at]) { at = at + 1 } }
+			if at < len(text) && text[at] == '.' {
+				at = at + 1
+				let first = at
+				for at < len(text) && digit(text[at]) { at = at + 1 }
+				if at == first { return InvalidDocument{Message: "expected fraction digits"} }
+			}
+			if at < len(text) && (text[at] == 'e' || text[at] == 'E') {
+				at = at + 1
+				if at < len(text) && (text[at] == '+' || text[at] == '-') { at = at + 1 }
+				let first = at
+				for at < len(text) && digit(text[at]) { at = at + 1 }
+				if at == first { return InvalidDocument{Message: "expected exponent digits"} }
+			}
+			if at < len(text) && (alpha(text[at]) || digit(text[at]) || text[at] == '.') { return InvalidDocument{Message: "invalid number suffix"} }
+			tokens = tokens.Append(Token{Kind: "number", Text: text[start:at]})
+			continue
+		}
+		if strings.HasPrefix(text[at:], "...") {
+			tokens = tokens.Append(Token{Kind: "punct", Text: "..."})
+			at = at + 3
+			continue
+		}
+		if strings.Contains("!$&():=@[]{|}", text[at:at+1]) {
+			tokens = tokens.Append(Token{Kind: "punct", Text: text[at : at+1]})
+			at = at + 1
+			continue
+		}
+		return InvalidDocument{Message: "unexpected character at byte \(at)"}
+	}
+	tokens.Append(Token{Kind: "end", Text: ""})
+}
+
+func peek(p Parser) Token  { p.tokens[p.at] }
+func bump(p Parser) Parser { Parser{..p, at: p.at + 1} }
+func expect(p Parser, text string) Parser fails InvalidDocument {
+	if peek(p).Text != text { return InvalidDocument{Message: "expected " + text + ", got " + peek(p).Text} }
+	bump(p)
+}
+func name(p Parser) Parser fails InvalidDocument {
+	if peek(p).Kind != "name" { return InvalidDocument{Message: "expected a name"} }
+	bump(p)
+}
+func bounded(depth int) fails InvalidDocument { if depth > 128 { return InvalidDocument{Message: "document nesting exceeds 128"} } }
+
+func value(p Parser, constant bool, depth int) Parser fails InvalidDocument {
+	try bounded(depth)
+	let token = peek(p)
+	if token.Text == "$" && !constant { return name(bump(p)) }
+	if token.Text == "[" {
+		let mut next = bump(p)
+		for peek(next).Text != "]" { next = try value(next, constant, depth+1) }
+		return bump(next)
+	}
+	if token.Text == "{" {
+		let mut next = bump(p)
+		for peek(next).Text != "}" { next = try value(try expect(try name(next), ":"), constant, depth+1) }
+		return bump(next)
+	}
+	if token.Kind == "name" || token.Kind == "string" || token.Kind == "number" { return bump(p) }
+	InvalidDocument{Message: "expected a value"}
+}
+
+func arguments(p Parser, constant bool) Parser fails InvalidDocument {
+	if peek(p).Text != "(" { return p }
+	let mut next = bump(p)
+	next = try value(try expect(try name(next), ":"), constant, 0)
+	for peek(next).Text != ")" { next = try value(try expect(try name(next), ":"), constant, 0) }
+	bump(next)
+}
+func directives(p Parser, constant bool) Parser fails InvalidDocument {
+	let mut next = p
+	for peek(next).Text == "@" { next = try arguments(try name(bump(next)), constant) }
+	next
+}
+func typeRef(p Parser, depth int) Parser fails InvalidDocument {
+	try bounded(depth)
+	let next = if peek(p).Text == "[" { try expect(try typeRef(bump(p), depth+1), "]") } else { try name(p) }
+	if peek(next).Text == "!" { bump(next) } else { next }
+}
+func variables(p Parser) Parser fails InvalidDocument {
+	if peek(p).Text != "(" { return p }
+	let mut next = bump(p)
+	let mut count = 0
+	for peek(next).Text != ")" {
+		next = try typeRef(try expect(try name(try expect(next, "$")), ":"), 0)
+		if peek(next).Text == "=" { next = try value(bump(next), true, 0) }
+		next = try directives(next, true)
+		count = count + 1
+	}
+	if count == 0 { return InvalidDocument{Message: "empty variable definitions"} }
+	bump(next)
+}
+func selection(p Parser, depth int) Parser fails InvalidDocument {
+	try bounded(depth)
+	let mut next = try expect(p, "{")
+	let mut count = 0
+	for peek(next).Text != "}" {
+		if peek(next).Text == "..." {
+			next = bump(next)
+			if peek(next).Kind == "name" && peek(next).Text != "on" {
+				next = try directives(try name(next), false)
+			} else {
+				if peek(next).Text == "on" { next = try name(bump(next)) }
+				next = try selection(try directives(next, false), depth+1)
+			}
+		} else {
+			next = try name(next)
+			if peek(next).Text == ":" { next = try name(bump(next)) }
+			next = try directives(try arguments(next, false), false)
+			if peek(next).Text == "{" { next = try selection(next, depth+1) }
+		}
+		count = count + 1
+	}
+	if count == 0 { return InvalidDocument{Message: "empty selection"} }
+	bump(next)
+}
+
+func Parse(text string) Document fails InvalidDocument {
+	if strings.ToValidUTF8(text, "�") != text { return InvalidDocument{Message: "document is not valid UTF-8"} }
+	let mut p = Parser{tokens: try lex(text), at: 0}
+	let mut mutation = false
+	let mut count = 0
+	for peek(p).Kind != "end" {
+		let token = peek(p)
+		if token.Kind == "string" || (token.Kind == "name" && token.Text != "query" && token.Text != "mutation" && token.Text != "subscription" && token.Text != "fragment") {
+			p = description(p)
+			let extension = peek(p).Text == "extend"
+			if extension {
+				if token.Kind == "string" { return InvalidDocument{Message: "description on an extension"} }
+				p = bump(p)
+			}
+			p = try schemaDefinition(p, extension)
+			count = count + 1
+			continue
+		}
+		if token.Text == "{" {
+			p = try selection(p, 0)
+		} else {
+			if token.Kind != "name" { return InvalidDocument{Message: "expected an operation or fragment"} }
+			p = bump(p)
+			if token.Text == "fragment" {
+				if peek(p).Text == "on" { return InvalidDocument{Message: "fragment name cannot be on"} }
+				p = try selection(try directives(try name(try expect(try name(p), "on")), false), 0)
+			} else {
+				if token.Text != "query" && token.Text != "mutation" && token.Text != "subscription" { return InvalidDocument{Message: "expected an executable operation"} }
+				mutation = mutation || token.Text == "mutation"
+				if peek(p).Kind == "name" { p = bump(p) }
+				p = try selection(try directives(try variables(p), false), 0)
+			}
+		}
+		count = count + 1
+	}
+	if count == 0 { return InvalidDocument{Message: "empty document"} }
+	Document{text: text, mutation: mutation}
+}
+
+// The mutation rule is structural. Generated strings cannot escape a quoted
+// value; generated prefixes exercise a mutation after other definitions.
+law MutationIsAnOperation(text string, later bool, mode uint8) {
+	// GraphQL Source is Unicode. Ergo's arbitrary byte strings may contain
+	// invalid UTF-8; its JSON codec intentionally surrogate-escapes those bytes.
+	let quoted = json.Encode(json.Codec[string]{MaxBytes: 0, MaxDepth: 0}, strings.ToValidUTF8(text, "�"))
+	let mut prefix = "query mutation { alias: field(arg: " + quoted + ") } # mutation\nfragment mutation on T { field }\n"
+	if mode%3 == 1 { prefix = "query Q($x: [String!]! = [" + quoted + "] @tag) @tag(arg: { value: 1.5e+2, flags: [true, false, null] }) { ... on T @tag { alias: field(arg: $x) } ...Frag } fragment Frag on T { field }\n" }
+	if mode%3 == 2 { prefix = "schema { query: Query mutation: Mutation } " + quoted + " type Query implements & Node @tag { field(arg: [String!]! = [" + quoted + "]): String } interface Node { id: ID } scalar Date @tag union U = | Query | Mutation enum E { A B } input Input { x: String = " + quoted + " } directive @tag repeatable on | OBJECT | SCALAR extend type Query { added: Int } extend schema @tag\n" }
+	let doc = try Parse(prefix + if later { "mutation Write { field }" } else { "" })
+	IsMutation(doc) == later
+}

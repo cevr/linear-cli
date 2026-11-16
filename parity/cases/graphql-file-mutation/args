@@ -1,0 +1,5 @@
+api
+graphql
+--query-file
+mutation.graphql
+--allow-mutation

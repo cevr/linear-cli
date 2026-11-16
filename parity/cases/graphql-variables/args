@@ -1,0 +1,6 @@
+api
+graphql
+--query
+query($id: String!) { issue(id: $id) { identifier } }
+--variables
+{"id":"ENG-123"}

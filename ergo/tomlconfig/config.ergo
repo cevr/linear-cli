@@ -1,0 +1,68 @@
+// Package tomlconfig reads linear.Settings from TOML files with std toml:
+// the first of .linear.toml and linear.toml in the working directory, else
+// ~/.config/linear/config.toml. Only the first file that is there counts.
+
+import filepath
+import fs
+import json
+import linearport/credential
+import linearport/linear
+import strconv
+import toml
+
+type File { files fs.Files, cwd string, home string }
+
+// New reads files relative to cwd (absolute, for messages) and home.
+func New(files fs.Files, cwd string, home string) File {
+	File{files: files, cwd: cwd, home: home}
+}
+
+// Form is the file's form. Its keys are snake_case; the derived codec lowers
+// only leading capitals, so the field is spelled Team_id (pilot gap G-L6-1).
+type Form { Team_id json.Optional[string] }
+
+// Candidates are the files Defaults reads, in order.
+func Candidates(f File) []string {
+	[]string{filepath.Join([]string{f.cwd, ".linear.toml"}), filepath.Join([]string{f.cwd, "linear.toml"}), filepath.Join([]string{f.home, ".config", "linear", "config.toml"})}
+}
+
+func Defaults(f File) linear.Defaults fails credential.ConfigError {
+	for path in Candidates(f) {
+		match try read(f, path) {
+		case Some[string] as text:
+			return try parse(path, text.Value)
+		case None:
+		}
+	}
+	linear.Defaults{TeamId: None}
+}
+
+func read(f File, path string) Option[string] fails credential.ConfigError {
+	let text = f.files.ReadFile(path) catch {
+	case fs.NotFound:
+		return None
+	case fs.Denied:
+		return credential.ConfigError{Message: "Failed to read " + path + ": permission denied"}
+	case fs.Failed as e:
+		return credential.ConfigError{Message: "Failed to read " + path + ": " + e.Reason}
+	}
+	Some[string]{Value: text}
+}
+
+func parse(path string, text string) linear.Defaults fails credential.ConfigError {
+	let form = toml.Decode(json.Codec[Form]{MaxBytes: 1000000, MaxDepth: 64}, text) catch {
+	case toml.Malformed as m:
+		let at = if m.Key == "" { "line " + strconv.Itoa(m.Line) } else { "line " + strconv.Itoa(m.Line) + ", key " + m.Key }
+		return credential.ConfigError{Message: "Failed to parse " + path + ": " + at + ": " + m.Reason}
+	case WireWrongKind as e:
+		return credential.ConfigError{Message: "Invalid Linear config in " + path + ": expected " + e.Want + " at " + e.Path}
+	case _:
+		return credential.ConfigError{Message: "Invalid Linear config in " + path}
+	}
+	match form.Team_id {
+	case json.Present[string] as t:
+		linear.Defaults{TeamId: Some[string]{Value: t.Value}}
+	case json.Absent:
+		linear.Defaults{TeamId: None}
+	}
+}

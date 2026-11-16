@@ -1,0 +1,78 @@
+import exec
+import fs
+import http
+import io
+import linearport/cli
+import linearport/credential
+import linearport/graphqlhttp
+import linearport/linear
+import linearport/tomlconfig
+import linearport/uploadhttp
+import os
+import strconv
+import strings
+import term
+import go path/filepath
+
+// loopback admits only a literal IPv4 loopback HTTP origin with a port.
+func loopback(value Option[string]) string fails os.Exit {
+	let refused = os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	let origin = match value {
+	case Some[string] as o:
+		o.Value
+	case None:
+		return refused
+	}
+	let prefix = "http://127.0.0.1:"
+	if !strings.HasPrefix(origin, prefix) { return refused }
+	let port = strconv.Atoi(origin[len(prefix):]) catch {
+	case _:
+		return refused
+	}
+	if port < 1 || port > 65535 || origin != prefix+"\(port)" { return refused }
+	origin
+}
+
+// Separate offline entry. Literal loopback only; never a production fallback.
+// The fake serves the upload origin under /uploads on the API origin and
+// redirects to a second loopback origin that stands for storage.
+func main() fails os.Exit needs Ambient | go.Foreign {
+	let process = os.NewHost()
+	let disk = fs.NewHost()
+	let out = io.NewHost()
+	let home = match process.Getenv("HOME") {
+	case Some[string] as h:
+		h.Value
+	case None:
+		""
+	}
+	let origin = try loopback(process.Getenv("LINEAR_PARITY_ORIGIN"))
+	let storage = try loopback(process.Getenv("LINEAR_PARITY_STORAGE_ORIGIN"))
+	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
+	let net = http.NewClient(origin, http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
+	}
+	let tracker = graphqlhttp.New(net, credentials)
+	let remote = http.NewNet(http.Origins{Values: []string{origin, storage}}, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}, http.Follow{MaxHops: 1}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Parity requires a loopback API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
+	}
+	let uploads = uploadhttp.New(remote, origin, "/uploads", credentials)
+	// The offline entry never starts a program: opening the key page always
+	// fails here, so a run cannot reach a browser.
+	let opener = exec.Script{Results: Map[string, exec.Result]{}}
+	// std os has no working directory; Go's Abs reads it (getcwd).
+	let cwd = filepath.Abs(".") catch {
+	case _:
+		"."
+	}
+	let settings = tomlconfig.New(disk, cwd, home)
+	with context { linear.Settings: settings, linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
+		try cli.Run(process.Args())
+	}
+}

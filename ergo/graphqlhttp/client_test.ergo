@@ -1,0 +1,22 @@
+import fstest
+import http
+import json
+import linearport/credential
+
+type LawReply { Data TeamsData }
+
+// Tracker.IdentityFields runs through the real request, codec and mapping
+// boundary. Generated ids include empty strings, which valid-shape CLI worlds
+// do not cover. No host, binary child or real credential is involved.
+func NewClient(ids []string) Client {
+	let mut nodes = []TeamNode{}
+	for id in ids { nodes = nodes.Append(TeamNode{Id: id, Key: id, Name: id, Description: json.Null}) }
+	let reply = json.Encode(json.Codec[LawReply]{MaxBytes: 0, MaxDepth: 0}, LawReply{Data: TeamsData{Teams: TeamsConnection{
+		Nodes: nodes, PageInfo: PageInfo{HasNextPage: false, EndCursor: json.Null},
+	}}})
+	let net = http.InMemory(func(_ http.Request) http.Response needs http.Streaming {
+		http.Response{Status: 200, Header: []http.Field{}, Body: reply}
+	})
+	let credentials = credential.New(fstest.NewMemory(), fstest.NewMemory(), ".", Some[string]{Value: "synthetic-law-token"})
+	Client{net: net, credentials: credentials}
+}

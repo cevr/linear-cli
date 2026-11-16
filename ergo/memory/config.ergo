@@ -1,0 +1,6 @@
+import linearport/credential
+import linearport/linear
+
+type Settings { defaults linear.Defaults }
+func NewSettings(teamId Option[string]) Settings                       { Settings{defaults: linear.Defaults{TeamId: teamId}} }
+func Defaults(s Settings) linear.Defaults fails credential.ConfigError { s.defaults }

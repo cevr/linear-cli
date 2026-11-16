@@ -1,0 +1,77 @@
+import exec
+import flag
+import io
+import linearport/credential
+import linearport/linear
+import prompt
+import strings
+import term
+
+// A command asks a person only with --interactive (and auth, which always
+// asks). Each prompt draws on standard error, so standard output keeps only
+// the command's result. With no terminal a prompt fails NotInteractive.
+let interactiveFlag = flag.Bool("interactive", false, "Allow prompts when required input is missing").Repeated()
+
+let keyPage = "https://linear.app/settings/account/security"
+
+// pickIssue asks for one of the viewer's started issues, or unstarted ones
+// when none is started; at most 20 are offered.
+func pickIssue() string fails linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | term.Terminal | io.Stderr {
+	let mut issues = try linear.Reader.MyIssues(Some[string]{Value: "started"}, 50)
+	if len(issues) == 0 { issues = try linear.Reader.MyIssues(Some[string]{Value: "unstarted"}, 50) }
+	let shown = try linear.Candidates(issues)
+	let mut labels = []string{}
+	for s in shown {
+		let state = match s.State {
+		case None:
+			"Unknown state"
+		case Some[linear.WorkflowState] as w:
+			w.Value.Name
+		}
+		labels = labels.Append(s.Identifier + ": " + truncate(s.Title, 40) + " - " + state)
+	}
+	shown[try prompt.Select("Select an issue", labels)].Identifier
+}
+
+// chooseTeam is the team a selector names, the only team, or the team a
+// person picks when asking; otherwise --team is required.
+func chooseTeam(teams []linear.Team, selector Option[string], asking bool) string fails linear.InvalidInput | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs term.Terminal | io.Stderr {
+	match selector {
+	case Some[string] as s:
+		for team in teams {
+			if team.Id == s.Value || strings.ToLower(team.Key) == strings.ToLower(s.Value) { return team.Id }
+		}
+		return linear.InvalidInput{Message: "Unknown team: " + s.Value}
+	case None:
+	}
+	if len(teams) == 1 { return teams[0].Id }
+	if !asking { return linear.InvalidInput{Message: "--team is required when multiple teams exist"} }
+	let mut labels = []string{}
+	for team in teams { labels = labels.Append(team.Key + ": " + team.Name) }
+	teams[try prompt.Select("Select a team", labels)].Id
+}
+
+// authenticate asks for an API key, checks it against Linear, and only then
+// keeps it. The key page is opened when the host can open it.
+func authenticate() fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.ConfigError | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs io.Stdout | io.Stderr | term.Terminal | exec.Runner | linear.Sessions | credential.Credentials {
+	io.Stdout.Println("\nTo authenticate, you'll need a Linear API key.")
+	io.Stdout.Println("Opening: " + keyPage + "\n")
+	if !opened() { io.Stdout.Println("Could not open browser. Please visit the URL manually.") }
+	let secret = try prompt.Secret("Paste your API key")
+	io.Stdout.Println("\nValidating token...")
+	let token = credential.FromSecret(secret) catch {
+	case credential.NoToken:
+		return linear.InvalidInput{Message: "API key cannot be empty"}
+	}
+	let viewer = try linear.Sessions.Verify(token)
+	try credential.Credentials.Save(token)
+	io.Stdout.Println("\nAuthenticated as " + viewer.Name + " (" + viewer.Email + ")")
+}
+
+func opened() bool needs exec.Runner {
+	let result = exec.Runner.Run(exec.New("open", []string{keyPage})) catch {
+	case exec.NotFound, exec.Denied, exec.Failed:
+		return false
+	}
+	result.Status == 0
+}

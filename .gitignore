@@ -141,7 +141,13 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Build output
-bin/
+bin/*
+!bin/linear
+# scripts/release.ts: the native binaries the package ships
+npm/
 
 # OS
 .DS_Store
+
+# Round requests live in the orchestration run dir, never in this repo.
+parity/requests/

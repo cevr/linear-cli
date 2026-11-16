@@ -1,0 +1,25 @@
+import linearport/credential
+
+type ApiError { Message string }
+type AuthError { Message string }
+type Status { Emoji Option[string], Label Option[string] }
+type Viewer { Id string, Name string, Email string, Admin bool, Status Option[Status] }
+type Team { Id string, Key string, Name string, Description Option[string] }
+type Project { Id string, Name string, Slug string, State string, Url string }
+
+type Tracker {
+	Viewer() Viewer fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+	Teams() []Team fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+	Projects() []Project fails ApiError | AuthError | credential.NoToken | credential.ConfigError,
+
+	// IdentityFields: every returned team has an identity and a display key.
+	// The provider controls presence, never the wire decoder's zero value.
+	law IdentityFields() {
+		let teams = Teams() catch {
+		case ApiError, AuthError, credential.NoToken, credential.ConfigError:
+			return true
+		}
+		for t in teams { if t.Id == "" || t.Key == "" { return false } }
+		true
+	},
+}

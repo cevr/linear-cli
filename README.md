@@ -1,18 +1,27 @@
 # Linear CLI
 
-A command-line interface for [Linear](https://linear.app) built with Bun and Effect TypeScript.
+A command-line interface for [Linear](https://linear.app), written in
+[Ergo](https://github.com/cevr/ergo) and shipped as a native binary. It was a
+Bun and Effect program until the Ergo port replaced it; the parity suite holds
+the port to that program's recorded output.
 
 ## Installation
 
 ```bash
-# Clone and build
-git clone <repo>
-cd linear
-bun install
-bun run build
+bun add --global @cvr/linear    # or: npm install --global @cvr/linear
+```
 
-# Add to PATH (symlink to ~/.local/bin)
-bun run link
+The package carries native binaries for macOS and Linux (arm64 and x64) and a
+small `sh` launcher, `bin/linear`, that runs the one for your platform. It has
+no postinstall step and needs no Bun or Node at run time.
+
+From a source checkout, build the compiler at the pin in `ergo-toolchain.json`
+(`go build ./cmd/ergo` in a checkout of that commit), then:
+
+```bash
+bun install
+ERGO=/path/to/ergo bun run build       # bin/linear-ergo
+bun run link                            # symlink bin/linear to ~/.local/bin
 ```
 
 ## Usage
@@ -125,28 +134,27 @@ team_id = "ENG"
 
 ## Development
 
+The source is in `ergo/` (see [ergo/README.md](ergo/README.md)). With `ERGO`
+naming the pinned compiler:
+
 ```bash
-# Install dependencies
-bun install
-
-# Run tests
-bun run test
-
-# Build binary
-bun run build
-
-# Run without building
-bun run src/main.ts --help
+bun install                                       # the harness and release tools
+bun run build                                     # bin/linear-ergo and bin/linear-ergo-parity
+bun parity/run.ts --phase=6                       # fixed cases (parity/cases)
+bun parity/run.ts --phase=6 --property=1000       # the generated read property
+for r in L0 L3 L4 LUTF8; do bun parity/run.ts --regressions=$r --seed=42; done
+bun parity/mutants.ts                             # the mutant ledger
+bun scripts/release.ts   # the four native binaries the package ships, in npm/
+bun scripts/smoke.ts     # pack, install with bun and npm, run the installed linear
 ```
 
-## Architecture
+The parity suite runs the binary against an offline fake Linear (graphql-js
+over the public schema). The expected output is the TypeScript CLI's, recorded
+before its source was removed: `parity/cases` for the fixed cases and
+`parity/frozen` for the property and regression cases.
 
-Built with:
-
-- **[Bun](https://bun.sh)**: Fast JavaScript runtime with native compilation
-- **[Effect](https://effect.website)**: TypeScript library for type-safe, composable code
-- **[Effect CLI](https://github.com/Effect-TS/effect/tree/main/packages/effect/src/cli)**: CLI framework with prompts and argument parsing
-- **[@linear/sdk](https://github.com/linear/linear)**: Official Linear GraphQL SDK
+CI (`.github/workflows/ci.yml`) builds the pinned compiler and runs the parity
+suite; the release workflow builds the binaries on Linux and macOS runners.
 
 ## Credits
 

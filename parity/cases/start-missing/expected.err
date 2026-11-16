@@ -1,0 +1,1 @@
+Invalid input: Issue identifier required in non-interactive mode. Usage: linear issue start ISSUE-123 --dry-run

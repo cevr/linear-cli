@@ -1,0 +1,278 @@
+import flag
+import fs
+import io
+import json
+import linearport/credential
+import linearport/files
+import linearport/linear
+import os
+import prompt
+import strings
+import tasks
+import term
+
+let stateFlag = flag.String("state", "", "Filter by state type").Repeated().WithAlias("s")
+let limitFlag = flag.Int("limit", 20, "Number of issues").Repeated().WithAlias("n")
+let commentsFlag = flag.Bool("comments", false, "Include comments").Repeated()
+let childrenFlag = flag.Bool("children", false, "Include sub-issues").Repeated()
+let relationsFlag = flag.Bool("relations", false, "Include relations").Repeated()
+let idsArg = flag.Remaining("id", "Issue identifiers or URLs")
+
+type WireSummary { Id string, Identifier string, Title string, Url string, BranchName string, Priority linear.Priority, State json.Optional[linear.WorkflowState] }
+type WireComment { Id string, Body string, CreatedAt string, Url string, Author json.Optional[linear.Author] }
+type WireDetails {
+	Id          string,
+	Identifier  string,
+	Title       string,
+	Url         string,
+	BranchName  string,
+	Priority    linear.Priority,
+	State       json.Optional[linear.WorkflowState],
+	Description json.Optional[string],
+	Team        json.Optional[linear.IssueTeam],
+	Assignee    json.Optional[linear.Assignee],
+	Project     json.Optional[linear.IssueProject],
+	Parent      json.Optional[linear.Reference],
+	Labels      []linear.Label,
+	Children    json.Optional[[]linear.Reference],
+	Comments    json.Optional[[]WireComment],
+	Relations   json.Optional[[]linear.Relation],
+}
+type IssueFile { Name string, Url string, Source string }
+
+func wireOption[T](value Option[T]) json.Optional[T] {
+	match value {
+	case None:
+		json.Absent
+	case Some[T] as p:
+		json.Present[T]{Value: p.Value}
+	}
+}
+
+func wireDetails(d linear.Details) WireDetails {
+	let comments json.Optional[[]WireComment] = match d.Comments {
+	case None:
+		json.Absent
+	case Some[[]linear.Comment] as rows:
+		let mut result = []WireComment{}
+		for c in rows.Value { result = result.Append(WireComment{Id: c.Id, Body: c.Body, CreatedAt: c.CreatedAt, Url: c.Url, Author: wireOption(c.Author)}) }
+		json.Present[[]WireComment]{Value: result}
+	}
+	WireDetails{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State), Description: wireOption(d.Description), Team: wireOption(d.Team), Assignee: wireOption(d.Assignee), Project: wireOption(d.Project), Parent: wireOption(d.Parent), Labels: d.Labels, Children: wireOption(d.Children), Comments: comments, Relations: wireOption(d.Relations)}
+}
+
+func issueRead(command string, v flag.Values) fails os.Exit | linear.InvalidInput | files.WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError | linear.NoIssues | prompt.NotInteractive | prompt.Cancelled | io.ReadFailed needs linear.Reader | linear.Uploads | fs.Files | fs.Writes | io.Stdout | term.Terminal | io.Stderr {
+	if command == "list" {
+		try issueList(v)
+		return
+	}
+	let mut ids = flag.Rest(v)
+	if len(ids) == 0 && command == "view" && enabled(interactiveFlag, v) { ids = []string{try pickIssue()} }
+	if len(ids) == 0 { return linear.InvalidInput{Message: "Issue identifier required in non-interactive mode. Usage: linear issue view ISSUE-123 --json"} }
+	let mut selectors = []linear.Selector{}
+	for id in ids { selectors = selectors.Append(try linear.ParseSelector(id)) }
+	if command == "files" {
+		if len(ids) != 1 { return linear.InvalidInput{Message: "Expected one issue identifier"} }
+		let details = try linear.Reader.Issue(selectors[0], linear.DetailsOptions{Comments: true, Children: false, Relations: false})
+		let listed = issueFiles(details)
+		if enabled(downloadFlag, v) {
+			try downloadIssueFiles(listed, v)
+			return
+		}
+		if enabled(asJson, v) {
+			io.Stdout.Println(json.Encode(json.Codec[[]IssueFile]{MaxBytes: 0, MaxDepth: 0}, listed))
+			return
+		}
+		if len(listed) == 0 {
+			io.Stdout.Println("No files found on " + details.Identifier + ".")
+			return
+		}
+		for file in listed { io.Stdout.Println(file.Name + "\t" + file.Source + "\t" + file.Url) }
+		return
+	}
+	let options = linear.DetailsOptions{Comments: enabled(commentsFlag, v), Children: enabled(childrenFlag, v), Relations: enabled(relationsFlag, v)}
+	let details = try tasks.Transform(selectors, 4, func(id linear.Selector) linear.Details fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader {
+		linear.Reader.Issue(id, options)
+	})
+	if enabled(asJson, v) {
+		let mut rows = []WireDetails{}
+		for d in details { rows = rows.Append(wireDetails(d)) }
+		io.Stdout.Println(json.Encode(json.Codec[[]WireDetails]{MaxBytes: 0, MaxDepth: 0}, rows))
+		return
+	}
+	for d in details { renderDetails(d) }
+}
+
+func issueList(v flag.Values) fails linear.InvalidInput | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Reader | io.Stdout {
+	let limit = integer(limitFlag, v, 20)
+	if limit < 1 || limit > 250 { return linear.InvalidInput{Message: "--limit must be between 1 and 250. Example: linear issue list --limit 20"} }
+	let state Option[string] = if text(stateFlag, v, "") == "" { None } else { Some[string]{Value: text(stateFlag, v, "")} }
+	let issues = try linear.Reader.MyIssues(state, limit)
+	let end = if len(issues) < limit { len(issues) } else { limit }
+	let displayed = issues[:end]
+	if enabled(asJson, v) {
+		let mut rows = []WireSummary{}
+		for d in displayed { rows = rows.Append(WireSummary{Id: d.Id, Identifier: d.Identifier, Title: d.Title, Url: d.Url, BranchName: d.BranchName, Priority: d.Priority, State: wireOption(d.State)}) }
+		io.Stdout.Println(json.Encode(json.Codec[[]WireSummary]{MaxBytes: 0, MaxDepth: 0}, rows))
+		return
+	}
+	if len(issues) == 0 {
+		io.Stdout.Println("No issues found.")
+		return
+	}
+	io.Stdout.Println("\nYour Issues:\n")
+	for d in displayed {
+		let stateName = match d.State {
+		case None:
+			"Unknown"
+		case Some[linear.WorkflowState] as s:
+			s.Value.Name
+		}
+		let icon = if d.Priority.Value == 1 { "⬆" } else { if d.Priority.Value == 2 { "↑" } else { if d.Priority.Value == 3 { "─" } else { if d.Priority.Value == 4 { "↓" } else { "○" } } } }
+		io.Stdout.Println("  " + icon + " " + pad(d.Identifier, 10) + " " + pad(stateName, 12) + " " + truncate(d.Title, 50))
+	}
+	if len(issues) > limit { io.Stdout.Println("\n  ... and \(len(issues) - limit) more") }
+	io.Stdout.Println("")
+}
+
+func units(s string) int {
+	let mut n = 0
+	for c in s { n = n + if c > 65535 { 2 } else { 1 } }
+	n
+}
+func pad(s string, width int) string { s + strings.Repeat(" ", if units(s) < width { width - units(s) } else { 0 }) }
+func truncate(s string, width int) string {
+	if units(s) <= width { return s }
+	let mut text = ""
+	let mut used = 0
+	for c in strings.Split(s, "") {
+		let n = if len(c) > 3 { 2 } else { 1 }
+		if used+n > width-1 {
+			if used < width-1 { text = text + "�" }
+			break
+		}
+		text = text + c
+		used = used + n
+	}
+	text + "…"
+}
+
+func renderDetails(d linear.Details) needs io.Stdout {
+	io.Stdout.Println("")
+	io.Stdout.Println(d.Identifier + ": " + d.Title)
+	io.Stdout.Println(strings.Repeat("─", 60))
+	io.Stdout.Println("State:    " + match d.State {
+	case None:
+		"Unknown"
+	case Some[linear.WorkflowState] as s:
+		s.Value.Name
+	})
+	io.Stdout.Println("Team:     " + match d.Team {
+	case None:
+		"Unknown"
+	case Some[linear.IssueTeam] as s:
+		s.Value.Name
+	})
+	io.Stdout.Println("Priority: " + d.Priority.Label)
+	io.Stdout.Println("Assignee: " + match d.Assignee {
+	case None:
+		"Unassigned"
+	case Some[linear.Assignee] as s:
+		s.Value.Name
+	})
+	io.Stdout.Println("Project:  " + match d.Project {
+	case None:
+		"None"
+	case Some[linear.IssueProject] as s:
+		s.Value.Name
+	})
+	io.Stdout.Println("Parent:   " + match d.Parent {
+	case None:
+		"None"
+	case Some[linear.Reference] as s:
+		s.Value.Identifier
+	})
+	io.Stdout.Println("Branch:   " + d.BranchName)
+	io.Stdout.Println("URL:      " + d.Url)
+	match d.Description {
+	case None:
+	case Some[string] as s:
+		io.Stdout.Println("\nDescription:\n" + s.Value)
+	}
+	match d.Children {
+	case None:
+	case Some[[]linear.Reference] as rows:
+		io.Stdout.Println("\nSub-issues (\(len(rows.Value))):")
+		for r in rows.Value { io.Stdout.Println("  " + r.Identifier + "  " + r.Title) }
+	}
+	match d.Comments {
+	case None:
+	case Some[[]linear.Comment] as rows:
+		io.Stdout.Println("\nComments (\(len(rows.Value))):")
+		for r in rows.Value {
+			io.Stdout.Println("  " + match r.Author {
+			case None:
+				"Unknown"
+			case Some[linear.Author] as a:
+				a.Value.Name
+			} + " · " + r.CreatedAt + "\n  " + r.Body)
+		}
+	}
+	match d.Relations {
+	case None:
+	case Some[[]linear.Relation] as rows:
+		io.Stdout.Println("\nRelations (\(len(rows.Value))):")
+		for r in rows.Value { io.Stdout.Println("  " + r.Direction + " " + r.Type + " " + r.Issue.Identifier + "  " + r.Issue.Title) }
+	}
+	io.Stdout.Println("")
+}
+
+func links(markdown string, source string) []IssueFile {
+	let mut found = []IssueFile{}
+	let mut rest = markdown
+	for {
+		let open = strings.Index(rest, "[")
+		if open < 0 { return found }
+		rest = rest[open+1:]
+		let close = strings.Index(rest, "]")
+		if close < 0 { return found }
+		let name = rest[:close]
+		let tail = rest[close+1:]
+		let bracketed = strings.HasPrefix(tail, "(<")
+		let prefix = if bracketed { "(<https://uploads.linear.app/" } else { "(https://uploads.linear.app/" }
+		if strings.HasPrefix(tail, prefix) {
+			let end = strings.Index(tail, ")")
+			if end > 0 {
+				let start = if bracketed { 2 } else { 1 }
+				let endUrl = if strings.HasSuffix(tail[:end], ">") { end - 1 } else { end }
+				let url = tail[start:endUrl]
+				let mut valid = len(url) > len("https://uploads.linear.app/")
+				for c in url { if c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '>' { valid = false } }
+				if valid { found = found.Append(IssueFile{Name: name, Url: url, Source: source}) }
+			}
+		}
+		rest = tail
+	}
+}
+
+func issueFiles(d linear.Details) []IssueFile {
+	let description = match d.Description {
+	case None:
+		""
+	case Some[string] as p:
+		p.Value
+	}
+	let mut all = links(description, "description")
+	match d.Comments {
+	case None:
+	case Some[[]linear.Comment] as comments:
+		for comment in comments.Value { for file in links(comment.Body, comment.Id) { all = all.Append(file) } }
+	}
+	let mut unique = []IssueFile{}
+	for file in all {
+		let mut found = false
+		for prior in unique { if prior.Url == file.Url { found = true } }
+		if !found { unique = unique.Append(file) }
+	}
+	unique
+}

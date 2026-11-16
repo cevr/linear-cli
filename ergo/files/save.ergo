@@ -1,0 +1,54 @@
+import filepath
+import fs
+import linearport/credential
+import linearport/linear
+
+type WriteFailed { Message string }
+type Request { Url linear.UploadURL, LinkName Option[string] }
+type Saved { Url string, Path string, Bytes int, ContentType Option[string] }
+
+func failed(path string, e fs.Failed) WriteFailed { WriteFailed{Message: path + ": " + e.Reason} }
+
+func exists(path string) bool fails WriteFailed needs fs.Files {
+	let _ = fs.Files.Stat(path) catch {
+	case fs.NotFound:
+		return false
+	case fs.Denied:
+		return WriteFailed{Message: path + ": permission denied"}
+	case fs.Failed as e:
+		return failed(path, e)
+	}
+	true
+}
+
+// Save downloads each request in order into outputDir, which it makes when
+// missing. Names are unique within one run. An existing file stops the run
+// unless overwrite; files saved before the stop stay, as in the original.
+func Save(requests []Request, outputDir string, overwrite bool) []Saved fails linear.InvalidInput | WriteFailed | linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError needs linear.Uploads | fs.Files | fs.Writes {
+	fs.Writes.MkdirAll(outputDir) catch {
+	case fs.Denied:
+		return WriteFailed{Message: outputDir + ": permission denied"}
+	case fs.Failed as e:
+		return failed(outputDir, e)
+	}
+	let mut used = []string{}
+	let mut saved = []Saved{}
+	for r in requests {
+		let d = try linear.Uploads.Download(r.Url)
+		let name = UniqueName(SafeName(PreferredName(r.LinkName, d.Disposition, r.Url)), used)
+		used = used.Append(name)
+		let target = filepath.Join([]string{outputDir, name})
+		let present = try exists(target)
+		if present && !overwrite { return linear.InvalidInput{Message: target + " already exists. Pass --overwrite to replace it."} }
+		fs.Writes.WriteFile(target, d.Bytes) catch {
+		case fs.NotFound:
+			return WriteFailed{Message: target + ": no such directory"}
+		case fs.Denied:
+			return WriteFailed{Message: target + ": permission denied"}
+		case fs.Failed as e:
+			return failed(target, e)
+		}
+		saved = saved.Append(Saved{Url: linear.UploadText(r.Url), Path: target, Bytes: len(d.Bytes), ContentType: d.ContentType})
+	}
+	saved
+}

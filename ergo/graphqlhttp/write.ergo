@@ -1,0 +1,68 @@
+import json
+import linearport/credential
+import linearport/linear
+
+type StateItems { States Connection[linear.WorkflowState] }
+type StatesData { Team StateItems }
+func States(c Client, teamId string) []linear.WorkflowState fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut cursor = ""
+	let mut rows = []linear.WorkflowState{}
+	for {
+		let data = try decodeValue[StatesData](try c.query("query { team(id: " + quoted(teamId) + ") { states(first: 50" + cursor + ") { nodes { id name type } pageInfo { hasNextPage endCursor } } } }"))
+		for state in data.Team.States.Nodes { rows = rows.Append(state) }
+		if !data.Team.States.PageInfo.HasNextPage { return rows }
+		let next = try after(data.Team.States.PageInfo)
+		if next == cursor { return linear.ApiError{Message: "pagination did not advance"} }
+		cursor = next
+	}
+}
+func Start(c Client, id string, stateId string) fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let _ = try c.query("mutation { issueUpdate(id: " + quoted(id) + ", input: { stateId: " + quoted(stateId) + " }) { success } }")
+}
+type CreatedPayload { Issue json.Nullable[linear.Reference] }
+type CreatedData { IssueCreate CreatedPayload }
+func Create(c Client, input linear.CreateInput) linear.Reference fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let mut fields = "title: " + quoted(input.Title) + ", teamId: " + quoted(input.TeamId)
+	match input.Description {
+	case None:
+	case Some[string] as v:
+		fields = fields + ", description: " + quoted(v.Value)
+	}
+	match input.Parent {
+	case None:
+	case Some[linear.Selector] as v:
+		let parent = try c.Issue(v.Value, linear.DetailsOptions{Comments: false, Children: false, Relations: false})
+		fields = fields + ", parentId: " + quoted(parent.Id)
+	}
+	match input.ProjectId {
+	case None:
+	case Some[string] as v:
+		fields = fields + ", projectId: " + quoted(v.Value)
+	}
+	match input.Priority {
+	case None:
+	case Some[int] as v:
+		fields = fields + ", priority: \(v.Value)"
+	}
+	let data = try decodeValue[CreatedData](try c.query("mutation { issueCreate(input: { " + fields + " }) { issue { " + referenceFields + " } } }"))
+	match data.IssueCreate.Issue {
+	case json.Null:
+		linear.ApiError{Message: "Linear did not return the created issue"}
+	case json.NonNull[linear.Reference] as r:
+		r.Value
+	}
+}
+type CommentPayload { Comment json.Nullable[linear.CommentCreated] }
+type CommentData { CommentCreate CommentPayload }
+func Comment(c Client, id linear.Selector, body string) linear.CommentCreated fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	let data = try decodeValue[CommentData](try c.query("mutation { commentCreate(input: { issueId: " + quoted(linear.Text(id)) + ", body: " + quoted(body) + " }) { comment { id url } } }"))
+	match data.CommentCreate.Comment {
+	case json.Null:
+		linear.ApiError{Message: "Linear did not return the created comment"}
+	case json.NonNull[linear.CommentCreated] as r:
+		r.Value
+	}
+}
+func Execute(c Client, document string, variables json.Value) json.Value fails linear.ApiError | linear.AuthError | credential.NoToken | credential.ConfigError {
+	try queryVariables(c, document, variables)
+}

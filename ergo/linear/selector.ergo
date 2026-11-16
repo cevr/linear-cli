@@ -1,0 +1,60 @@
+import strings
+
+type InvalidInput { Message string }
+
+// Only ParseSelector constructs a Selector. A provider can read, not forge it.
+type Selector { value string }
+func Text(s Selector) string { s.value }
+
+func HasControl(s string) bool {
+	for c in s { if c == 127 || (c < 32 && c != 9 && c != 10 && c != 13) { return true } }
+	false
+}
+
+func identifier(s string) bool {
+	let parts = strings.Split(s, "-")
+	if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 { return false }
+	let key = parts[0]
+	for i, c in key {
+		let alpha = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+		if !alpha && (i == 0 || c < '0' || c > '9') { return false }
+	}
+	for c in parts[1] { if c < '0' || c > '9' { return false } }
+	true
+}
+
+func uuid(s string) bool {
+	if len(s) != 36 { return false }
+	for i, c in strings.ToLower(s) {
+		if i == 8 || i == 13 || i == 18 || i == 23 {
+			if c != '-' { return false }
+		} else {
+			if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) { return false }
+		}
+	}
+	let lower = strings.ToLower(s)
+	lower[14] >= '1' && lower[14] <= '8' && strings.Contains("89ab", lower[19:20])
+}
+
+func ParseSelector(input string) Selector fails InvalidInput {
+	if HasControl(input) { return InvalidInput{Message: "Issue identifiers cannot contain control characters"} }
+	if strings.HasPrefix(strings.ToLower(input), "https://linear.app/") {
+		let parts = strings.Split(input[len("https://linear.app/"):], "/")
+		if len(parts) >= 3 && parts[0] != "" && strings.ToLower(parts[1]) == "issue" && identifier(parts[2]) && !strings.Contains(input, "?") && !strings.Contains(input, "#") {
+			return Selector{value: parts[2]}
+		}
+	}
+	if identifier(input) || uuid(input) { return Selector{value: input} }
+	InvalidInput{Message: "Invalid issue identifier: " + input + ". Expected ENG-123, a Linear issue URL, or a UUID"}
+}
+
+// URL normalization must preserve the issue key, including its original case.
+law URLAndIdentifierAgree(key string, n uint16) {
+	let id = "E" + key + "-\(n)"
+	let direct = ParseSelector(id) catch {
+	case InvalidInput:
+		return true
+	}
+	let url = try ParseSelector("https://linear.app/work/issue/" + id + "/title")
+	Text(direct) == Text(url)
+}

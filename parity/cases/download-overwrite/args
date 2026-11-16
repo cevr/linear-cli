@@ -1,0 +1,7 @@
+file
+download
+https://uploads.linear.app/trace.txt
+--output-dir
+files
+--overwrite
+--json

@@ -1,0 +1,57 @@
+import exec
+import fs
+import http
+import io
+import linearport/cli
+import linearport/credential
+import linearport/graphqlhttp
+import linearport/linear
+import linearport/tomlconfig
+import linearport/uploadhttp
+import os
+import term
+import go path/filepath
+
+// Only this entry chooses the production origins. No environment variable can
+// redirect an API credential. GraphQL redirects remain responses; only the
+// upload network follows one, without the credential.
+func main() fails os.Exit needs Ambient | go.Foreign {
+	let process = os.NewHost()
+	let disk = fs.NewHost()
+	let out = io.NewHost()
+	let home = match process.Getenv("HOME") {
+	case Some[string] as h:
+		h.Value
+	case None:
+		""
+	}
+	let credentials = credential.New(disk, disk, home, process.Getenv("LINEAR_API_KEY"))
+	let net = http.NewClient("https://api.linear.app", http.Limits{MaxBodyBytes: 8000000, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Linear API Error: invalid API origin"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
+	}
+	let tracker = graphqlhttp.New(net, credentials)
+	// An upload redirects to a storage host named only in the response, so the
+	// upload network admits any origin and follows one redirect, as the original
+	// does. The token is a credential of the upload origin: no other host gets it.
+	let remote = http.NewNet(http.AnyOrigin, http.Limits{MaxBodyBytes: 67108864, MaxHeaderBytes: 65536, IdleTimeout: 30s, ReadHeaderTimeout: 30s, ReadBodyTimeout: 30s}, http.Follow{MaxHops: 1}) catch {
+	case http.InvalidClient:
+		return os.Exit{Code: 1, Message: "Linear API Error: invalid upload network"}
+	case http.InvalidLimits:
+		return os.Exit{Code: 1, Message: "invalid HTTP limits"}
+	}
+	let uploads = uploadhttp.New(remote, linear.UploadOrigin(), "", credentials)
+	// auth runs `open` on the key page, as the original does.
+	let opener = exec.NewHost()
+	// std os has no working directory; Go's Abs reads it (getcwd).
+	let cwd = filepath.Abs(".") catch {
+	case _:
+		"."
+	}
+	let settings = tomlconfig.New(disk, cwd, home)
+	with context { linear.Settings: settings, linear.Tracker: tracker, linear.Reader: tracker, linear.Sessions: tracker, credential.Credentials: credentials, linear.Workflow: tracker, linear.Writer: tracker, linear.RawGraphQL: tracker, linear.Uploads: uploads, io.Stdout: out, io.Stderr: io.NewErrors(), term.Terminal: term.NewHost(), exec.Runner: opener, fs.Files: disk, fs.Writes: disk } {
+		try cli.Run(process.Args())
+	}
+}

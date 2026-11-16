@@ -1,0 +1,407 @@
+{
+ "regression-LUTF8-title-0": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-0": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-0": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-1": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é���😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-1": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é���😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-1": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-2": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é���😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-2": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é���😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-2": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-3": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é���😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-3": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é���😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-3": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-4": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é����😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-4": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é����😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-4": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-5": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é����😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-5": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é����😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-5": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-6": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é�����😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-6": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é�����😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-6": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-7": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é�����😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-7": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é�����😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-7": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-8": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é�����😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-8": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é�����😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-8": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-9": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-9": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-9": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-10": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-10": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-10": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-11": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��(�😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-11": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��(�😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-11": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD(%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD(_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD(_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-12": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��A😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-12": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��A😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-12": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BDA%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BDA_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BDA_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-13": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é��😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-13": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é��😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-13": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-LUTF8-title-14": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.create\",\"input\":{\"title\":\"a42-é���😀b\",\"teamId\":\"00000000-0000-4000-8000-000000000004\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-body-14": {
+  "out": "{\"dryRun\":true,\"operation\":\"issue.comment\",\"input\":{\"id\":\"ENG-123\",\"body\":\"a42-é���😀b\"}}\n",
+  "err": "",
+  "status": 0,
+  "files": [],
+  "mutations": []
+ },
+ "regression-LUTF8-url-14": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a42-%C3%A9%EF%BF%BD%EF%BF%BD%EF%BF%BD%F0%9F%98%80b.txt\",\"path\":\"a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "a42-_C3_A9_EF_BF_BD_EF_BF_BD_EF_BF_BD_F0_9F_98_80b.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ }
+}

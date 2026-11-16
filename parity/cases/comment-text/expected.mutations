@@ -1,0 +1,9 @@
+[
+  {
+    "operation": "comment.create",
+    "input": {
+      "body": "Ready",
+      "issueId": "ENG-123"
+    }
+  }
+]

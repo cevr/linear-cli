@@ -1,0 +1,1 @@
+Invalid input: --title is required in non-interactive mode. Usage: linear issue create --team ENG --title "Title" --dry-run

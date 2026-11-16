@@ -7,6 +7,26 @@ on:
     branches: [main]
 
 jobs:
+  # A pull request that changes the package must carry a changeset, or merging
+  # it publishes nothing. The version PR consumes changesets, so it is skipped.
+  changeset:
+    name: Changeset
+    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      - name: Changeset status
+        run: bunx changeset status --since=origin/main
+
   check:
     name: Check
     runs-on: ubuntu-latest
@@ -28,5 +48,84 @@ jobs:
       - name: Format
         run: bun run fmt:check
 
-      - name: Test
-        run: bun run test
+  # The published CLI is the Ergo build. This job builds the compiler at the pin
+  # in ergo-toolchain.json, checks and tests every Ergo package, builds both
+  # entries, and runs the parity suite: against the offline fake Linear, the
+  # binary's bytes, exits, files and mutation logs must equal the TypeScript
+  # CLI's, recorded before that source was removed (parity/cases and
+  # parity/frozen). No case reaches the real service.
+  parity:
+    name: Ergo build and parity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scratch and compiler paths
+        run: |
+          echo "LINEAR_PARITY_SCRATCH=$RUNNER_TEMP/parity" >> "$GITHUB_ENV"
+          echo "ERGO=$RUNNER_TEMP/ergo" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - name: Read the Ergo pin
+        id: pin
+        run: |
+          echo "commit=$(jq -r .ergo ergo-toolchain.json)" >> "$GITHUB_OUTPUT"
+          echo "repository=$(jq -r .repository ergo-toolchain.json | sed 's#^https://github.com/##')" >> "$GITHUB_OUTPUT"
+          echo "go=$(jq -r .go ergo-toolchain.json | sed 's/^go//')" >> "$GITHUB_OUTPUT"
+
+      - name: Check out Ergo at the pin
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.repository }}
+          ref: ${{ steps.pin.outputs.commit }}
+          path: .ergo-src
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.pin.outputs.go }}
+          cache: false
+
+      # The harness runs on Bun; upload-host and the upload property use its URL parser.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Build the Ergo compiler
+        working-directory: .ergo-src
+        run: go build -o "$ERGO" ./cmd/ergo
+
+      - run: bun install
+
+      - name: Format, check and test the Ergo packages
+        run: |
+          for file in $(git ls-files 'ergo/*.ergo'); do "$ERGO" fmt --check "$file" > /dev/null; done
+          for pkg in linear graphql memory credential graphqlhttp files uploadhttp tomlconfig cli; do
+            "$ERGO" test "ergo/$pkg" --seed 42
+          done
+          "$ERGO" check ergo/cmd/linear > /dev/null
+          "$ERGO" check ergo/cmd/linear-parity > /dev/null
+
+      - name: The shipped entry reads no origin variable
+        run: "! grep -q 'LINEAR_PARITY\\|ORIGIN\\|ENDPOINT' ergo/cmd/linear/main.ergo"
+
+      - name: Build both entries
+        run: bun scripts/build.ts
+
+      - name: Schema and skill coverage
+        run: |
+          bun parity/schema-check.ts
+          bun parity/coverage.ts
+
+      - name: Launcher and version
+        run: |
+          bun parity/launcher.ts --mutants
+          bun parity/version.ts --native="$PWD/bin/linear-ergo"
+
+      - name: Parity cases
+        run: |
+          bun parity/run.ts --phase=6 --launcher
+          bun parity/run.ts --phase=6 --launcher --seed=42
+
+      - name: Parity properties
+        run: |
+          bun parity/run.ts --phase=6 --launcher --property=1000
+          for r in L0 L3 L4 LUTF8; do bun parity/run.ts --regressions=$r --seed=42; done

@@ -1,0 +1,24 @@
+
+ENG-123: Route a packet
+────────────────────────────────────────────────────────────
+State:    Todo
+Team:     Engineering
+Priority: High
+Assignee: Pilot User
+Project:  Router
+Parent:   None
+Branch:   eng-123-route
+URL:      https://linear.app/issue/ENG-123
+
+Description:
+[trace.txt](https://uploads.linear.app/trace.txt)
+
+Sub-issues (0):
+
+Comments (1):
+  Pilot User · 2026-01-01T00:00:00.000Z
+  [log.txt](https://uploads.linear.app/log.txt)
+
+Relations (1):
+  outbound blocks ENG-124  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 1
+

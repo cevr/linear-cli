@@ -1,0 +1,689 @@
+{
+ "regression-L4-upload-0": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%01/.txt?q%01%C3%A9/#h%01@\",\"path\":\"txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-1": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%1F%7D.txt?q`/#h[~#\",\"path\":\"f42-_1F_7D.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_1F_7D.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-2": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/a/f42-%20'.txt?q\\\\$#h(#\",\"path\":\"f42-_20_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_20_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-3": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%22/.txt?q%F0%9F%98%80&/#h:!?\",\"path\":\"txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-4": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%3C].txt?q&|/#h{;\",\"path\":\"f42-_3C_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_3C_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-5": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%3E%3C.txt?q,|/#h%7F%01#\",\"path\":\"f42-_3E_3C.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_3E_3C.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-6": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-%5E%5E.txt?q^&#h=%20?\",\"path\":\"f42-_5E_5E.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_5E_5E.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-7": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%60%7D.txt?q%27+#h%3E:\",\"path\":\"f42-_60_7D.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_60_7D.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-8": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%7B%7B.txt?q%C3%A9!#h%2e%2e#\",\"path\":\"f42-_7B_7B.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_7B_7B.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-9": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%7D%1F.txt?q$+/#h$}\",\"path\":\"f42-_7D_1F.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_7D_1F.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-10": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-|+.txt?q@}?#h%20,?\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-11": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-[[.txt?q%3E%1F/#h'%60#\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-12": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/b.txt/f42-]!.txt?q];/#h\\\\\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-13": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/f42-'.txt?q%7F:/#h,%60?\",\"path\":\"f42-_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-14": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/f42-/%.txt?q!%01/#h||#\",\"path\":\"_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-15": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%41].txt?q:!?#h%F0%9F%98%80{#\",\"path\":\"f42-_41_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_41_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-16": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%2e[.txt?q%3C%zz/#h;%7F\",\"path\":\"f42-_2e_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_2e_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-17": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%zz%C3%A9.txt?q[!/#h%60\",\"path\":\"f42-_zz_C3_A9.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_zz_C3_A9.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-18": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%|.txt?q%;/#h%\\\\#\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-19": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%7F[.txt?q~%F0%9F%98%80?#h($#\",\"path\":\"f42-_7F_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_7F_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-20": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-%C3%A9%3C.txt?q;|/#h%3C\",\"path\":\"f42-_C3_A9_3C.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_C3_A9_3C.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-21": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-%F0%9F%98%80$.txt?q%22%zz/#h%41%60?\",\"path\":\"f42-_F0_9F_98_80_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_F0_9F_98_80_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-22": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%01.txt?q|^#h!%3C\",\"path\":\"f42-_01.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_01.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-23": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/f42-%60.txt?q%zz%3E#h%1F,?\",\"path\":\"f42-_60.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_60.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-24": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%zz.txt?q%7F?#h]}?\",\"path\":\"f42-_zz.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_zz.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-25": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/a/f42-~@.txt?q+%2e?#h@#\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-26": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-!!.txt?q%20]?#h@%\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-27": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-$!.txt?q}{?#h}%20#\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-28": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/b.txt/f42-&.txt?q%2e&#h%C3%A9%#\",\"path\":\"f42-_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-29": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-(%1F.txt?q,#h+}\",\"path\":\"f42-(_1F.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-(_1F.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-30": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-=%3C.txt?q=\\\\/#h^{#\",\"path\":\"f42-__3C.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__3C.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-31": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-+$.txt?q%1F(?#h%zz+?\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-32": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-;+.txt?q{}/#h&,\",\"path\":\"f42-__.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-33": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-:(.txt?q%41[/#h%22%1F#\",\"path\":\"f42-_(.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_(.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-34": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-@.txt?q%C3%A9?#h\\\\?\",\"path\":\"f42-_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-35": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-,%3E.txt?q([#h~:#\",\"path\":\"f42-__3E.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__3E.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-38": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/b.txt/b.txt/f42-%20.txt#h&\",\"path\":\"f42-_20.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_20.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-40": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%3C%C3%A9.txt#h{;#\",\"path\":\"f42-_3C_C3_A9.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_3C_C3_A9.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-41": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%3E~.txt?q,|/\",\"path\":\"f42-_3E_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_3E_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-42": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%5E%41.txt?q^{\",\"path\":\"f42-_5E_41.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_5E_41.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-43": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: hTtps:/\\/uploads%2Flinear.app/.\\a\\f42-`^.txt#h>^#. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-44": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/f42-%7B%1F.txt?q%C3%A9!\",\"path\":\"f42-_7B_1F.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_7B_1F.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-45": {
+  "out": "[{\"url\":\"https://uploads.linear.app/a/f42-%7D].txt#h$%C3%A9?\",\"path\":\"f42-_7D_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_7D_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-46": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: htTps:uploads.linear.app.example/%2e/.././f42-|\u001f.txt?q@!/. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-47": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: httPs:/xn--uploads.linear.app/./b.txt/./f42-[%zz.txt?q>@/. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-48": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: httPs:/u:p@uploads-linear.app/a/./f42-]~.txt?q]\t. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-49": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-'%3E.txt?q%7F%20?\",\"path\":\"f42-__3E.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-__3E.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-50": {
+  "out": "[{\"url\":\"https://uploads.linear.app/b.txt/f42-/%7B.txt#h|%2e?\",\"path\":\"_7B.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "_7B.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-51": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: HttpS:\\/@@[::1]/%2E%2e\\b.txt\\.%2E\\f42-%41].txt#h😀<. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-52": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%2e%2e.txt#h;%3C\",\"path\":\"f42-_2e_2e.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_2e_2e.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-53": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: htTps:%zzuploads.linear.app:8443/.\\f42-%zz|.txt#h`\\. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-54": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: HttpS:\\/::@xn--uploads.linear.app/./%2e/f42-%~.txt?q%|?. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-55": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: httPs:/uploads.linear.app.example/..\\b.txt\\f42-=.txt#h(\\. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ },
+ "regression-L4-upload-56": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%C3%A9%20.txt#h%3C^?\",\"path\":\"f42-_C3_A9_20.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_C3_A9_20.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-57": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%F0%9F%98%80$.txt?q%22%2e/\",\"path\":\"f42-_F0_9F_98_80_.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_F0_9F_98_80_.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-58": {
+  "out": "[{\"url\":\"https://uploads.linear.app/f42-%zz.txt?q|%\",\"path\":\"f42-_zz.txt\",\"bytes\":15,\"contentType\":\"text/plain\"}]\n",
+  "err": "",
+  "status": 0,
+  "files": [
+   {
+    "path": "f42-_zz.txt",
+    "mode": "644",
+    "sha256": "391ddd428125157f12e40aef64fb2f4952fac82326743e5834e5b32509c06b93"
+   }
+  ],
+  "mutations": []
+ },
+ "regression-L4-upload-59": {
+  "out": "",
+  "err": "Invalid input: Invalid upload URL: httPs:/uploads.linear.app.example/.\\.\\f42-\r!.txt#h\u001f\\#. Expected https://uploads.linear.app/...\n",
+  "status": 1,
+  "files": [],
+  "mutations": []
+ }
+}
