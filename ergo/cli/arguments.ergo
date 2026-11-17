@@ -31,7 +31,7 @@ func leaf(name string, path string, flags []flag.Flag, args []flag.ArgSpec) flag
 }
 
 func commands() flag.Root[Invocation, DuplicateFlag] {
-	flag.Root[Invocation, DuplicateFlag]{Name: "linear", Usage: "", Version: Some[string]{Value: "linear v0.6.0"}, Commands: []flag.Command[Invocation, DuplicateFlag]{
+	flag.Root[Invocation, DuplicateFlag]{Name: "linear", Usage: "", Version: Some[string]{Value: "linear v0.7.0"}, Commands: []flag.Command[Invocation, DuplicateFlag]{
 		flag.Group("auth", "Authentication", []flag.Command[Invocation, DuplicateFlag]{leaf("whoami", "auth whoami", []flag.Flag{asJson}, []flag.ArgSpec{})}),
 		flag.Group("team", "Teams", []flag.Command[Invocation, DuplicateFlag]{leaf("list", "team list", []flag.Flag{asJson}, []flag.ArgSpec{})}),
 		flag.Group("project", "Projects", []flag.Command[Invocation, DuplicateFlag]{leaf("list", "project list", []flag.Flag{asJson}, []flag.ArgSpec{})}),
