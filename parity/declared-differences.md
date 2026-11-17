@@ -34,7 +34,7 @@ Downloads (L4):
   redirect through the std http network policy; the token is a credential of the
   upload origin, so a redirect back to that origin carries it and any other origin
   does not. A second redirect is `Linear API Error: Download failed: more than 1
-redirect for URL`, where the original reports the redirect's HTTP status.
+  redirect for URL`, where the original reports the redirect's HTTP status.
 - A response body is held in memory up to 64 MiB (67,108,864 bytes); a larger one
   is a `Download failed` API error. The original has no limit.
 - Transport failure and `File Error:` texts are the port's own; the prefix and
